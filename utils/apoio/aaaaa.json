@@ -1,0 +1,309 @@
+// {
+//   // --- Configurações Gerais do VS Code ---
+//   "breadcrumbs.enabled": true,
+//   "debug.terminal.clearBeforeReusing": true,
+//   "diffEditor.hideUnchangedRegions.enabled": true,
+//   "diffEditor.ignoreTrimWhitespace": true,
+//   "extensions.ignoreRecommendations": true,
+//   "files.insertFinalNewline": true,
+//   "liveServer.settings.donotShowInfoMsg": true,
+//   "liveServer.settings.donotVerifyTags": true,
+//   "window.titleBarStyle": "native",
+//   "workbench.colorTheme": "Dracula Refined",
+//   "workbench.editor.empty.hint": "hidden",
+//   "workbench.iconTheme": "material-icon-theme",
+//   "workbench.startupEditor": "newUntitledFile", // Inicia com um arquivo novo e vazio
+//   "workbench.tree.indent": 10,
+//   "workbench.tree.renderIndentGuides": "always",
+//   // --- Configurações do Editor de Texto ---
+//   "editor.acceptSuggestionOnCommitCharacter": true,
+//   "editor.accessibilitySupport": "off", // Desativa suporte a acessibilidade (se não precisar)
+//   "editor.cursorBlinking": "phase",
+//   "editor.cursorSmoothCaretAnimation": "on",
+//   "editor.cursorStyle": "line-thin",
+//   "editor.defaultFormatter": "esbenp.prettier-vscode", // Prettier como formatador padrão global
+//   "editor.fontFamily": "Fira Code",
+//   "editor.fontLigatures": true,
+//   "editor.fontSize": 12.5,
+//   "editor.formatOnSave": true, // Formata ao salvar para todas as linguagens por padrão
+//   "editor.guides.indentation": true,
+//   "editor.guides.highlightActiveIndentation": true,
+//   "editor.hideCursorInOverviewRuler": true,
+//   "editor.hover.enabled": true,
+//   "editor.lineHeight": 1.3,
+//   "editor.minimap.enabled": false,
+//   // "editor.minimap.showRegionSectionHeaders": true,
+//   // "editor.minimap.size": "fit",
+//   "editor.parameterHints.enabled": true,
+//   "editor.renderLineHighlight": "gutter",
+//   "editor.roundedSelection": false,
+//   "editor.rulers": [ // Linhas guias na coluna 80 e 120
+//     80,
+//     120
+//   ],
+//   "editor.scrollbar.vertical": "visible",
+//   "editor.semanticHighlighting.enabled": false,
+//   "editor.suggestSelection": "first",
+//   "editor.tabSize": 4, // Tamanho de tab padrão global
+//   "editor.unicodeHighlight.invisibleCharacters": false,
+//   "editor.unicodeHighlight.nonBasicASCII": false,
+//   // --- Configurações do Terminal Integrado ---
+//   "terminal.integrated.cursorStyle": "line",
+//   "terminal.integrated.cursorStyleInactive": "underline",
+//   "terminal.integrated.defaultProfile.windows": "PowerShell",
+//   "terminal.integrated.fontFamily": "monospace",
+//   "terminal.integrated.fontSize": 12,
+//   "terminal.integrated.gpuAcceleration": "off",
+//   "terminal.integrated.showExitAlert": false,
+//   // --- Configurações por Extensões / Funcionalidades Específicas ---
+//   // Code Runner
+//   "code-runner.clearPreviousOutput": true,
+//   "code-runner.ignoreSelection": true,
+//   "code-runner.runInTerminal": true,
+//   "code-runner.saveFileBeforeRun": true,
+//   "code-runner.showExecutionMessage": true,
+//   "code-runner.executorMap": {
+//     "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+//     "go": "go run",
+//     "html": "\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\"",
+//     "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+//     "javascript": "node",
+//     "perl": "perl",
+//     "php": "C:\\php\\php.exe",
+//     "python": "python",
+//     "ruby": "C:\\Ruby23-x64\\bin\\ruby.exe"
+//   },
+//   // Colorize
+//   "colorize.colorized_colors": [
+//     "HEXA",
+//     "RGB",
+//     "HSL"
+//   ],
+//   "colorize.enable_search_variables": false,
+//   "colorize.hide_current_line_decorations": false,
+//   "colorize.include": [
+//     ".tsx",
+//     ".jsx",
+//     ".ts",
+//     ".js"
+//   ],
+//   "colorize.languages": [
+//     "typescriptreact",
+//     "javascriptreact",
+//     "javascript",
+//     "typescript",
+//     "css",
+//     "xml",
+//     "svg",
+//     "json",
+//     "jsonc",
+//   ],
+//   // Emmet
+//   "emmet.includeLanguages": {
+//     "django-html": "html",
+//     "javascript": "javascriptreact"
+//   },
+//   "emmet.syntaxProfiles": {
+//     "javascript": "jsx"
+//   },
+//   // Git
+//   "git.confirmSync": false,
+//   "git.enableSmartCommit": true,
+//   "git.openRepositoryInParentFolders": "never",
+//   "gitlens.codeLens.enabled": true,
+//   "gitlens.codeLens.authors.enabled": false,
+//   // Highlight Matching Tag
+//   "highlight-matching-tag.highlightFromContent": true,
+//   "highlight-matching-tag.highlightSelfClosing": true,
+//   // Indent Rainbow
+//   "indentRainbow.colors": [
+//     "rgba(255,255,64,0.07)",
+//     "rgba(127,255,127,0.07)",
+//     "rgba(255,127,255,0.07)",
+//     "rgba(79,236,236,0.07)"
+//   ],
+//   "indentRainbow.lightIndicatorStyleLineWidth": 3,
+//   // Material Icon Theme
+//   "material-icon-theme.folders.color": "#6273a6",
+//   "material-icon-theme.folders.theme": "specific",
+//   // "material-icon-theme.hidesExplorerArrows": true, // Deixei comentado, pois estava no original
+//   // Prettier
+//   "prettier.tabWidth": 4, // Sobrescreve o tabSize global para o Prettier (se tiver global)
+//   // Tailwind CSS
+//   "tailwindCSS.experimental.classRegex": [
+//     [
+//       "tv\\(([^)]*)\\)",
+//       "[\"'`]([^\"'`]*).*?[\"'`]"
+//     ]
+//   ],
+//   // --- Mapeamento de Arquivos ---
+//   "files.associations": {
+//     "*.css": "css",
+//     "**/views/**/*.html": "django-html",
+//     "*.tpl": "django-html",
+//     "*.html": "django-html",
+//     "*.py": "python",
+//     ".env.*": "dotenv",
+//     ".prettierrc": "json",
+//     "**/templates/**/*.html": "django-html",
+//     "**/templates/**/*": "django-txt"
+//   },
+//   // --- Configurações Específicas por Linguagem ---
+//   "[css]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[django-html]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode", // Prettier para HTML em Django
+//     "editor.formatOnSave": false,
+//     "editor.insertSpaces": true,
+//     "editor.quickSuggestions": {
+//       "comments": true,
+//       "other": true,
+//       "strings": true
+//     },
+//     "editor.tabSize": 2, // Tab size específico para Django HTML
+//     "emmet.showAbbreviationSuggestions": true,
+//     "emmet.triggerExpansionOnTab": true,
+//     "prettier.tabWidth": 2 // Prettier tabWidth para JavaScript
+//   },
+//   "[html]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode", // DJLint para HTML puro (se for o caso)
+//     "editor.suggest.insertMode": "replace",
+//     "djlint.enableLinting": true // Habilita linting do DJLint para HTML
+//   },
+//   "[javascript]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode",
+//     "editor.formatOnSave": true,
+//     "editor.tabSize": 2, // Tab size específico para JavaScript
+//   },
+//   "[json]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode",
+//     "editor.formatOnSave": true,
+//     "editor.quickSuggestions": {
+//       "strings": true
+//     },
+//     "editor.suggest.insertMode": "replace",
+//     "editor.tabSize": 2
+//   },
+//   "[jsonc]": {
+//     "editor.defaultFormatter": "vscode.json-language-features",
+//     "editor.formatOnSave": true,
+//     "editor.tabSize": 2
+//   },
+//   "[prisma]": {
+//     "editor.formatOnSave": true
+//   },
+//   "[python]": {
+//     "editor.codeActionsOnSave": { // Ações ao salvar para Python (organizar imports, etc.)
+//       "source.fixAll": "explicit",
+//       "source.fixAll.unusedImports": "explicit",
+//       "source.organizeImports": "explicit"
+//     },
+//     "editor.defaultFormatter": "esbenp.prettier-vscode",
+//     "editor.formatOnSave": true,
+//     "editor.insertSpaces": true,
+//     "editor.tabSize": 4, // Tab size específico para Python
+//     "python.analysis.typeCheckingMode": "basic" // Modo de checagem de tipo do Pylance
+//   },
+//   // --- Configurações Específicas para Linguagens sem Formatação por Arquivo ---
+//   "javascript.suggest.autoImports": true,
+//   "javascript.updateImportsOnFileMove.enabled": "always",
+//   "python.analysis.autoImportCompletions": true,
+//   "python.analysis.diagnosticSeverityOverrides": { // Sobrescreve a severidade de diagnósticos do Pylance
+//     "reportUnknownArgumentType": "none",
+//     "reportUnknownLambdaType": "none",
+//     "reportUnknownMemberType": "none",
+//     "reportUnknownParameterType": "none",
+//     "reportUnknownVariableType": "none"
+//   },
+//   "python.languageServer": "Pylance", // Servidor de linguagem para Python
+//   "python.testing.pytestEnabled": true,
+//   "python.testing.unittestEnabled": false,
+//   "typescript.suggest.autoImports": true,
+//   "typescript.tsserver.log": "off",
+//   "typescript.updateImportsOnFileMove.enabled": "always",
+//   "editor.codeActionsOnSave": {}
+// }
+// {
+//   "window.zoomLevel": 0,
+//   "breadcrumbs.enabled": true,
+//   "editor.fontSize": 24,
+//   "debug.console.fontSize": 24,
+//   "terminal.integrated.fontSize": 24,
+//   "editor.glyphMargin": true,
+//   "workbench.activityBar.location": "default",
+//   "editor.lineNumbers": "on",
+//   "files.eol": "\n", // Final de linha sempre será LF
+//   "workbench.editor.labelFormat": "short",
+//   "editor.tabSize": 2,
+//   "editor.rulers": [79, 120],
+//   "workbench.iconTheme": "vscode-jetbrains-icon-theme-2023-dark",
+//   "workbench.colorTheme": "OM Theme (Default Dracula Italic)",
+//   "explorer.compactFolders": false,
+//   "editor.minimap.enabled": false,
+//   "workbench.editor.enablePreview": false,
+//   "code-runner.clearPreviousOutput": true,
+//   "code-runner.ignoreSelection": true,
+//   "code-runner.saveFileBeforeRun": true,
+//   "code-runner.runInTerminal": true,
+//   "code-runner.preserveFocus": false,
+//   "code-runner.executorMap": {
+//     "python": "clear ; python -u",
+//     "typescript": "npx tsx"
+//   },
+//   "tailwindCSS.experimental.classRegex": [
+//     ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+//   ],
+//   // Python
+//   "[python]": {
+//     "editor.defaultFormatter": "charliermarsh.ruff",
+//     "editor.formatOnSave": true,
+//     "editor.tabSize": 4,
+//     "editor.insertSpaces": true,
+//     "editor.codeActionsOnSave": {
+//       "source.fixAll.ruff": "explicit",
+//       "source.organizeImports.ruff": "explicit"
+//     }
+//   },
+//   "python.defaultInterpreterPath": ".\\.venv\\Scripts\\python.exe", // ou ./.venv/bin/python Mac/Linux
+//   "python.analysis.autoImportCompletions": true,
+//   "python.terminal.activateEnvInCurrentTerminal": true,
+//   "python.terminal.activateEnvironment": true,
+//   "python.languageServer": "Pylance",
+//   "python.venvPath": ".venv",
+//   // 🛠 Formatação e Lint
+//   "editor.defaultFormatter": "esbenp.prettier-vscode",
+//   "editor.formatOnSave": true,
+//   "emmet.includeLanguages": {
+//     "django-html": "html",
+//     "javascript": "javascriptreact",
+//     "typescript": "typescriptreact"
+//   },
+//   "editor.codeActionsOnSave": {
+//     "source.fixAll.eslint": "explicit"
+//   },
+//   "[javascript]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[typescript]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[xml]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[svg]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[html]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "[django-html]": {
+//     "editor.formatOnSave": false,
+//     "editor.defaultFormatter": "esbenp.prettier-vscode",
+//     "editor.quickSuggestions": {
+//       "other": true,
+//       "comments": true,
+//       "strings": true
+//     }
+//   }
+// }

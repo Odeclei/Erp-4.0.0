@@ -1,0 +1,108 @@
+{% load static %}
+<section id="dados_cadastrados" class="container">
+  <div class="container-title text-center justify-content-center mb-5">
+    <h1>Cadastro de Produtos</h1>
+  </div>
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}
+    </div>
+  {% endif %}
+  <div class="form-group">
+    <form action="{{ form_action }}" method="POST">
+      {% csrf_token %}
+      {% if form.non_fields_errors %}
+        <!-- gera novo aviso para cada erro -->
+        {% for error in form.non_fields_errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+      {% endif %}
+      <div class="row g-3 justify-content-center mb-4">
+        <div class="col col-3 position-relative">
+          <input type="text"
+                 name="item_cod"
+                 id="id_item_cod"
+                 class="form-control form-control-lg border border-success pt-3">
+          <label for="id_item_cod"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Código do Item</strong>
+          </label>
+          {% if form.item_cod.help_text %}<small class="form-text text-muted">{{ form.item_cod.help_text }}</small>{% endif %}
+        </div>
+        <div class="col col-7 position-relative">
+          <input type="text"
+                 name="name_prod"
+                 id="id_name_prod"
+                 class="form-control form-control-lg border border-success pt-3">
+          <label for="id_name_prod"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Item</strong>
+          </label>
+        </div>
+      </div>
+      <div class="row g-3 justify-content-center mb-4">
+        <div class="col col-3 position-relative">
+          <input type="text"
+                 name="semi_code"
+                 id="id_semi_code"
+                 class="form-control form-control-lg border border-success pt-3">
+          <label for="id_semi_code"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Código SemiAcabado</strong>
+          </label>
+        </div>
+        <div class="col col-7 position-relative">
+          <input type="text"
+                 name="name_abrev"
+                 id="id_name_abrev"
+                 class="form-control form-control-lg border border-success pt-3">
+          <label for="id_name_abrev"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Item Abreviado</strong>
+          </label>
+        </div>
+      </div>
+      <div class="row g-3 justify-content-center mb-4">
+        <div class="col col-3 position-relative">
+          <input type="number"
+                 name="qtd_per_day"
+                 class="form-control form-control-lg border border-success pt-3"
+                 min="0"
+                 step="1"
+                 required=""
+                 id="id_qtd_per_day">
+          <label for="id_qtd_per_day"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Quantidade por Dia</strong>
+          </label>
+        </div>
+        <div class="col col-5 position-relative">
+          <input class="form-control form-control-lg border border-success pt-3"
+                 list="datalistFamilyOptions"
+                 id="family_search"
+                 placeholder='Buscar Familia...'>
+          <datalist id="datalistFamilyOptions">
+            {% for familia in family_list %}
+              {# O `value` é o texto que o usuário vê e seleciona. #}
+              {# O `data-pk` é o ID que queremos enviar para o backend. #}
+              <option value="{{ familia.description }}" data-pk="{{ familia.pk }}"></option>
+            {% endfor %}
+          </datalist>
+          <label for="family_search"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Familia</strong>
+          </label>
+          {# Este campo oculto guardará o ID da família selecionada para ser enviado no formulário. #}
+          {# O `name` deve corresponder ao que o seu formulário Django espera. #}
+          <input type="hidden" name="family" id="id_family_hidden">
+        </div>
+        <div class="col col-2 form-check form-switch d-flex align-items-center">
+          <input class="mx-2 form-check-input form-control-lg border border-success" style="height: 2rem;width: 5rem;" name="is_active" type="checkbox" role="switch" id="switchCheckDefault">
+          <label class="form-check-label fs-4" for="switchCheckDefault"><strong>Ativo</strong></label>
+        </div>
+      </div>
+      <div class="row g-3 justify-content-center my-3">
+        <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg">Cadastrar Produto</button>
+        <button type="reset" class="col-md-5 btn btn-secondary mx-2 btn-lg">Limpar Campos</button>
+      </div>
+    </form>
+  </div>
+</section>

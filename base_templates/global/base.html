@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme='auto'>
+<head>
+  {% include "global/partials/_head.html" %}
+  <title>{{site_setup}}</title>
+</head>
+<body class="bg-body-tertiary my-auto container-lg">
+  <header class="p-3 mb-3 border-bottom">
+    {% include "global/partials/_header.html" %}
+  </header>
+
+  {% if messages %}
+    <div class="messages">
+      {% include "global/partials/_messages.html" %}
+    </div>
+  {% endif %}
+  {% if user.is_superuser %}
+      {% include "global/partials/_sidebar.html" %}
+  {% endif %}
+  <div class='row d-flex justify-content-center'>
+    <main class='col-11'>
+      {% block content %}{% endblock content %}
+    </main>
+  </div>
+  
+  <footer class="footer mt-auto py-3 bg-body-tertiary"> 
+    {% include "global/partials/_footer.html" %}
+  </footer>
+
+
+  <script type="text/javascript" src="{% static "global/js/bootstrap.bundle.min.js" %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script type="text/javascript" src="{% static "global/js/prism.js" %}"></script>
+  <script type="text/javascript" src="{% static "global/js/custom.js" %}"></script>
+
+  {% block scripts %}
+  {% endblock scripts %}
+</body>
+</html>

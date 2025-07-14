@@ -1,0 +1,27 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="detail-content h-center">
+
+
+	<section class="container">
+	
+		<form
+			action="#"
+			method="post">
+			{% csrf_token %}
+			<h3>{{object}} </h3>
+			<br>	
+			<h2>Confirmar exclusão?</h2>
+
+
+			<div class="d-flex m-2 pt-3">
+				<button class='btn btn-success btn-lg mr-4' type="submit">Confirmar</button>
+				<a href="{% url "order:update_item" object.produto_programado.pk object.programacao.order_number %}" class='btn btn-danger btn-lg'>Cancelar</a>
+			</div>
+		</form>
+	</section>
+
+
+{% endblock content %}

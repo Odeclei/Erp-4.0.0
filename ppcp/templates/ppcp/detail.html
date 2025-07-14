@@ -1,0 +1,238 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="row">
+  <div class="col-7">
+    <secion>
+      <div class="row">
+        <h2>Dados da programação {{ item.order_number }}</h2>
+      </div>
+      <div class="row g-2 align-items-center">
+        <div class="col-3">
+          <h3 class="col-form-label">Código:</h3>
+        </div>
+        <div class="col-6">
+          <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            name="code-detail" 
+            value="{{item.order_number}}"
+            aria-label="Disabled input example" disabled readonly>
+        </div>
+      </div>
+      <div class="row g-2 align-items-center">
+        <div class="col-3">
+          <h3 class='col-form-label'>Descrição: </h3>
+        </div>
+        <div class="col-6">
+          <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            name="description" 
+            value="{{item.description}}"
+            aria-label="Disabled input example" disabled readonly>
+        </div>
+      </div>
+      <div class="row g-2 align-items-center">
+        <div class="col-3">
+          <h3 class='col-form-label'>Status: </h3>
+        </div>
+        <div class="col-6">
+          <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            name="status_detail" 
+            value="{{item.status}}"
+            aria-label="Disabled input example" disabled readonly>
+        </div>
+      </div>
+      <div class="row g-2 align-items-center">
+        <div class="col-3">
+          <h3 class='col-form-label'>Cadastrado por: </h3>
+        </div>
+        <div class="col-6">
+          <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            name="created_by" 
+            value="{{item.created_by.first_name}} {{item.created_by.last_name}}"
+            aria-label="Disabled input example" disabled readonly>
+        </div>
+      </div>
+      {% if item.changed_by%}
+        <div class="row g-2 align-items-center">
+          <div class="col-3">
+            <h3 class='col-form-label'>Alterado por: </h3>
+          </div>
+          <div class="col-5">
+            <input 
+            type="text" 
+            class="form-control form-control-lg" 
+            name="updated_by" 
+            value="{{item.changed_by.first_name}} {{item.changed_by.last_name}}"
+            aria-label="Disabled input example" disabled readonly>
+          </div>
+        </div>
+      {% endif %}
+    
+      <div class="row my-3 justify-content-center">
+        <div class="col">
+          <a class="btn btn-success container" href="{% url "order:update" item.pk %}"><h3>Alterar Item</h3></a>
+        </div>
+        <div class="col">
+          <a class="btn btn-secondary container" href="{% url "order:list" %}"><h3>Voltar</h3></a>
+        </div>
+      </div>
+    </secion>
+    
+    <div onclick="exibir_form_add_item('1')" class="my-4 d-flex justify-content-center">
+      <p class="btn btn-lg btn-info col-9">Adicionar Produto</p>
+    </div>
+
+    <section id='form-add-item'class='row container ' style='display:none;'>
+      <form action="{% url "order:add_item" item.pk %}" method="post">
+        {% csrf_token %}
+
+        <div class="row">
+          <select name="programacao" id="id_programacao" hidden="hidden" >
+            <option value="{{item.pk}}">{{item.order_number}}</option>
+          </select>
+        </div>
+
+
+        <div class="form-float">
+          <label for="id_item" class="form-label">Item</label>
+          <select name="item" id="id_item" class="form-control form-control-lg select2-ajax"></select>
+        </div>
+
+        <p class="form-label mt-3">Quantidade</p>
+        <div class="form-floating mb-3">
+          <input 
+            type="number" 
+            name="quantidade" 
+            class="form-control form-control-lg" 
+            onchange="altera_quantidade()" 
+            min="0" required id="id_quantidade">
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-md">
+            <div class="form-group">
+              <label for="id_start_at" class="form-label">Data Prevista Início</label>
+              <input type="date" name="id_start_at" class="form-control form-control-lg" id="id_start_at">
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="form-group">
+              <label for="id_ends_at" class="form-label">Data Prevista Término</label>
+              <input type="date" name="id_ends_at" class="form-control form-control-lg" id="id_ends_at">
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-field btn-detail mt-5">
+          <button id='add-item-order' type="submit" class="col-3 mx-2 btn btn-lg btn-primary">Salvar</button>
+          <input onclick="exibir_form_add_item('0')" id='cancel-add-item'class="col-3 mx-2 btn btn-lg btn-secondary" value="Cancelar">
+        </div>
+      </form>
+    </section>
+  </div>
+  <asside class="col-5">
+    {% if itens_list %}
+      <table class="table table-hover caption-top">
+        <caption class="table-caption">
+          <h3>Lista de Itens Cadastrados</h3>
+        </caption>
+        <thead>
+          <tr class="table-row-header">
+            <th class="table-header">Código</th>
+            <th class="table-header">Descrição</th>
+            <th class="table-header">Quantidade</th>
+            <th class="table-header">Alterar</th>
+            <th class="table-header">Deletar</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for produto in itens_list %}
+            <tr class="table-row">
+              <td 
+                class='table-cel table-text-center'
+                data-mdb-popover-init
+                title="Cadastro do produto"
+                data-mdb-trigger="hover">
+                <a 
+                  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                  target="_blank" rel="noopener noreferrer"
+                  href="{% url "cad_item:detail" produto.item.pk %}">
+                  {{produto.item.item_cod}}</a>
+              </td>
+              <td class="table-cel table-text-left">{{produto.item.name_prod}}</td>
+              <td class="table-cel table-text-center">{{produto.quantidade}}</td>
+              <td 
+                class="table-cel table-text-center"
+                data-mdb-popover-init
+                title="Alterar Item Cadastrado na Programação"
+                data-mdb-trigger="hover">
+                <a class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover'href="{% url "order:update_item" produto.pk item.order_number  %}" >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                  </svg>
+                </a></td>
+              <td 
+                class="table-cel table-text-center"
+                data-mdb-popover-init
+                title="Deletar Item Cadastrado na Programação"
+                data-mdb-trigger="hover">
+                <a class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover'href="{% url "order:delete_item" produto.pk item.order_number  %}" >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                  </svg>
+                </a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </asside>
+</div>
+
+  {% endblock content %}
+  
+  {% block scripts %}
+    <script src="{% static "global/js/order_add_item.js" %}"></script>
+    <script>
+      $(document).ready(function() {
+        $('#id_item').select2({
+          width: '100%',
+          placeholder: "Digite o código do produto...",
+          minimumInputLength: 2, // Quantidade mínima de caracteres para começar a buscar
+          allowClear: true,
+          ajax: {
+            url: "{% url 'order:busca_item' %}", // URL da sua view Django para busca
+            dataType: 'json',
+            delay: 250, // Atraso em milissegundos para a busca (evita muitas requisições rápidas)
+            data: function (params) {
+              return {
+                q: params.term // Parâmetro de busca que será enviado para a view (q é o padrão do Select2)
+              };
+            },
+            processResults: function (data) {
+              console.log("Dados recebidos:", data);
+              return {
+                results: data.results // A view já está retornando no formato correto
+              };
+            },
+            cache: true
+          }
+        });
+      });
+    </script>
+
+    <script>
+      $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();   
+      });
+    </script>
+
+  {% endblock scripts %}

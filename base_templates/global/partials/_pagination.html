@@ -1,0 +1,30 @@
+{% if is_paginated %}
+
+<div class="pd-top pd-btm"></div>
+
+<div class="pagination-container">
+  <span class="step-links">
+    <div class="pagination-previous">
+      {% if page_obj.has_previous %}
+          <a href="?page=1">&laquo; Primeira</a>
+          <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+      {% endif %}
+    </div>
+    <div class="pagination-current">
+      <span class="pagination-current">
+        <p>
+          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </p>
+      </span>
+    </div>
+    <div class="pagination-next">
+      {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+      {% endif %}
+    </div>
+  </span>
+</div>
+
+
+{% endif %}

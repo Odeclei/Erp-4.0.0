@@ -1,0 +1,29 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section id="stop_group">
+  <div class="container d-flex mt-3 flex-wrap">
+    {% for stops in stops_group %}
+    <div class="card d-flex mt-1 ml-1 mb-1 ml-1" style="width: 25rem; cursor: pointer">
+      <div onclick="select_group({{stops.id}})" class="card-body d-flex df-center ">
+        <h3 class="card-title">{{stops}}</h3>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id='stop_subgrupo'>
+  
+</section>
+
+<input type="text" hidden="hidden" id='hr_parada' value='{{momento_parada}}'>
+<input type="text" hidden='hidden' id='id_machine' value={{mac_id.machine.id}}>
+<input type="text" hidden='hidden' id='name_machine' value={{mac_id.machine}}>
+<input type="text" hidden='hidden' id='user_id' value={{user.id}}>
+
+<script src="{% static "global/js/select_stop.js" %}"></script>
+
+{% endblock  %}

@@ -1,0 +1,146 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <main class="container row col-12 mx-auto">
+    <section id="dados_item" class="col-6">
+      <div class="row justify-content-center mb-5">
+        <h2>
+          Dados do produto: <strong>{{ item.item_cod }} - {{ item.name }}</strong>
+        </h2>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.item_cod }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Código Item</strong></span>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.name_prod }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Descrição Produto</strong></span>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.semi_code }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Código Semi Acabado</strong></span>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.qtd_per_day }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Quantidade por dia</strong></span>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.family }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Família Comercial</strong></span>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="position-relative">
+          <input type="text"
+                 class="form-control form-control-lg border border-success-subtle fs-3"
+                 value="{{ item.created_by.first_name }} {{ item.created_by.last_name }}"
+                 readonly>
+          <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+            <strong>Cadastrado por</strong></span>
+        </div>
+      </div>
+      {% if item.updated_by %}
+        <div class="row justify-content-center mb-4">
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-lg border border-success-subtle fs-3"
+                   value="{{ item.updated_by.first_name }} {{ item.updated_by.last_name }}"
+                   readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Atualizado por</strong></span>
+          </div>
+        </div>
+        <div class="row justify-content-center mb-4">
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-lg border border-success-subtle fs-3"
+                   value="{{ item.updated_at }}"
+                   readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Cadastrado em</strong></span>''
+              </div>
+            </div>
+          {% endif %}
+          <div class="row my-5">
+            <a class='col btn btn-primary btn-lg mx-2'
+               href="{% url 'cad_item:update' item.id %}">Alterar item</a>
+            <a class='col btn btn-success btn-lg mx-2'
+               href="{% url 'cad_item:creat' %}">Cadastrar Novo</a>
+            <a class='col btn btn-secondary btn-lg mx-2'
+               href="{% url 'cad_item:read' %}">Voltar</a>
+          </div>
+          <div class="row container justify-content-center">
+            <a class="btn btn-lg btn-info col-9"
+               href="{% url 'cad_item:estrutura' item.id %}">Criar Estrutura</a>
+          </div>
+        </section>
+        <secction id="subitens" class="col-6">
+        <div class="d-flex" style="height: 100%;">
+          <div class="vr mx-2"></div>
+          <aside class="container-fluid justify-content-center align-items-center">
+            {% if estrutura_list %}
+              <table class="table table-hover caption-top">
+                <caption class="table-caption text-center">
+                  <h3 class='text-'>Lista de Subitens Cadastrados</h3>
+                </caption>
+                <thead>
+                  <tr class="table-row-header">
+                    <th class="table-header fs-3">Código</th>
+                    <th class="table-header fs-3">Descrição</th>
+                    <th class="table-header fs-3">Quantidade</th>
+                  </tr>
+                </thead>
+                <tbody class='table-group-divider'>
+                  {% for subitem in estrutura_list %}
+                    <tr class="table-row">
+                      <td class='table-cel table-text-center fs-4'>
+                        <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                           href="{% url 'cad_item:subitem_detail' subitem.subitem.pk %}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                          {{ subitem.subitem.subitem_cod }}
+                        </td>
+                      </a>
+                      <td class="table-cel table-text-left fs-4">{{ subitem.subitem.name_subitem }}</td>
+                      <td class="table-cel text-center fs-4">
+                        <strong>{{ subitem.qntde_pre }}</strong>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+          </aside>
+        </div>
+        </secction>
+      </main>
+    {% endblock content %}

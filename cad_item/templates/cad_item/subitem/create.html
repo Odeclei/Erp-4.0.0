@@ -1,0 +1,51 @@
+{% extends 'global/base.html' %}
+{% load static %}
+{% block content %}
+  <section class="container">
+    <div class="row justify-content-center text-center">
+      {% if form.subitem_cod.value %}
+        <h2>Alterção do Subitem: {{ form.name_subitem }}</h2>
+      {% else %}
+        <h2>Cadastro Novo Subitem</h2>
+      {% endif %}
+    </div>
+  </section>
+  <section class="container container-fluid row mt-5 justify-content-center">
+    {% if form.subitem_cod.value %}
+      {% include "cad_item/subitem/partials/_update.html" %}
+    {% else %}
+      {% include "cad_item/subitem/partials/_addnew.html" %}
+    {% endif %}
+  {% endblock %}
+  {% block scripts %}
+    <script>
+    // Aguarda o documento carregar completamente
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Seleciona os elementos do DOM que vamos manipular
+      const materialSearchInput = document.getElementById('material_search');
+      const hiddenMaterialInput = document.getElementById('id_material_hidden');
+      const datalist = document.getElementById('datalistMaterialOptions');
+
+      // 2. Adiciona um 'escutador' de eventos ao campo de busca.
+      //    O evento 'input' é disparado sempre que o valor do campo muda.
+      materialSearchInput.addEventListener('input', function (event) {
+        const inputValue = event.target.value;
+
+        // 3. Procura por uma <option> dentro do <datalist> cujo valor (a descrição)
+        //    seja exatamente igual ao que o usuário digitou ou selecionou.
+        const option = Array.from(datalist.options).find(opt => opt.value === inputValue);
+
+        if (option) {
+          // 4. Se encontrou uma opção correspondente, pega o ID do atributo 'data-pk'
+          const pk = option.getAttribute('data-pk');
+          //    E define o valor do nosso campo oculto com esse ID.
+          hiddenMaterialInput.value = pk;
+        } else {
+          // 5. Se não encontrou (ex: o usuário está digitando algo que não existe),
+          //    limpa o valor do campo oculto para não enviar um ID inválido ao servidor.
+          hiddenMaterialInput.value = '';
+        }
+      });
+    });
+    </script>
+  {% endblock scripts %}

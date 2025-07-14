@@ -1,0 +1,25 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="detail-content h-center">
+
+
+	<section class="container">
+
+    <h3>Você tem certeza que deseja excluir o item <strong>{{object}}</strong> da programação <strong>{{ object.programacao }}</strong>?</h3>
+    <p class='lead'>Esta ação não pode ser desfeita.</p>
+	
+    <form
+			action="{% url 'order:delete_item' object.pk object.programacao.order_number %}"
+      method="post">
+			{% csrf_token %}
+      <div class="row  my-4 pt-3">
+        <button class='col col-3 btn btn-success btn-lg mx-3' type="submit">Confirmar</button>
+        <a href="{% url 'order:detail' object.programacao.pk %}" class='col col-3 btn btn-danger btn-lg mx-3'>Cancelar</a>
+      </div>
+		</form>
+	</section>
+
+
+{% endblock content %}

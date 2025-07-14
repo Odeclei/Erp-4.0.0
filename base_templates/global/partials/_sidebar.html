@@ -1,0 +1,112 @@
+<!-- Botão para abrir a sidebar -->
+<button
+  class="btn btn-dark position-fixed top-0 start-0 m-3 rounded-circle shadow"
+  type="button"
+  data-bs-toggle="offcanvas"
+  data-bs-target="#offcanvasSidebar"
+  aria-controls="offcanvasSidebar"
+  id="sidebarToggleTheme"
+  style="z-index: 1051; width: 48px; height: 48px"
+>
+  <i class="bi bi-list fs-2"></i>
+</button>
+
+<!-- Sidebar Offcanvas Bootstrap 5.3 -->
+<div
+  class="offcanvas offcanvas-start"
+  tabindex="-1"
+  id="offcanvasSidebar"
+  aria-labelledby="offcanvasSidebarLabel"
+  style="width: 270px"
+>
+  <div class="offcanvas-header bg-dark text-white" id="sidebarHeader">
+    <h5 class="offcanvas-title" id="offcanvasSidebarLabel">
+      <i class="bi bi-grid me-2"></i>Menu
+    </h5>
+    <button
+      type="button"
+      class="btn-close btn-close-white"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body px-0 py-3" id="sidebarBody">
+    <nav class="nav flex-column">
+      <a
+        class="nav-link px-4 py-3 fs-5 fw-semibold rounded-pill mb-2 sidebar-link"
+        href="#"
+      >
+        <i class="bi bi-house-door me-2"></i>Dashboard
+      </a>
+      <a
+        class="nav-link px-4 py-3 fs-5 fw-semibold rounded-pill mb-2 sidebar-link"
+        href="#"
+      >
+        <i class="bi bi-box-seam me-2"></i>Produtos
+      </a>
+      <a
+        class="nav-link px-4 py-3 fs-5 fw-semibold rounded-pill mb-2 sidebar-link"
+        href="#"
+      >
+        <i class="bi bi-people me-2"></i>Usuários
+      </a>
+      <a
+        class="nav-link px-4 py-3 fs-5 fw-semibold rounded-pill mb-2 sidebar-link"
+        href="#"
+      >
+        <i class="bi bi-gear me-2"></i>Configurações
+      </a>
+      <hr />
+      <a
+        class="nav-link px-4 py-3 fs-5 fw-semibold rounded-pill sidebar-link text-danger"
+        href="{% url "site_setup:logout" %}"
+      >
+        <i class="bi bi-box-arrow-right me-2"></i>Sair
+      </a>
+      <hr />
+      <!-- Botão para alternar tema -->
+    </nav>
+  </div>
+</div>
+
+<script>
+    // Alterna entre dark e light na sidebar
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle_to_lightmode = document.getElementById("toggle_to_lightmode");
+      const toggle_to_darkmode = document.getElementById("toggle_to_darkmode");
+
+      const toggleBtn = document.getElementById("sidebarToggleTheme");
+      const sidebar = document.getElementById("offcanvasSidebar");
+      const sidebarHeader = document.getElementById("sidebarHeader");
+      const sidebarBody = document.getElementById("sidebarBody");
+      // let darkMode = true;
+
+      toggle_to_lightmode.addEventListener("click", function () {
+        console.log("clicado para white theme");
+        sidebar.classList.remove("bg-body-tertiary");
+        sidebar.classList.add("bg-light");
+        sidebarHeader.classList.remove("bg-dark", "text-white");
+        sidebarHeader.classList.add("bg-light", "text-dark");
+        sidebarBody.classList.remove("bg-body-tertiary");
+        sidebarBody.classList.add("bg-light", "text-dark");
+        toggleBtn.classList.remove("btn-light");
+        toggleBtn.classList.add("btn-dark");
+
+      });
+
+      toggle_to_darkmode.addEventListener("click", function () {
+        console.log("clicado para dark theme");
+        sidebar.classList.remove("bg-light");
+        sidebar.classList.add("bg-body-tertiary");
+        sidebarHeader.classList.remove("bg-light", "text-dark");
+        sidebarHeader.classList.add("bg-dark", "text-white");
+        sidebarBody.classList.remove("bg-light", "text-dark");
+        sidebarBody.classList.add("bg-body-tertiary");
+        toggleBtn.classList.remove("btn-dark");
+        toggleBtn.classList.add("btn-light");
+
+      });
+    });
+
+</script>
+

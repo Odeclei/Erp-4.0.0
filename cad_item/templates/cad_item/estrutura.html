@@ -1,0 +1,198 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<section class="container" id="dados_produto">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="shadow-lg p-5 mb-5 bg-body-tertiary rounded ">
+        <div class="container-title mb-5">
+          {% if produto.item_cod %}
+            <h1>Alteração de Estrutura de Produto: <strong> {{ produto.name_prod }}</strong></h1>
+          {% else %}
+            <h1>Criar Estrutura de Produto:<strong> {{ produto.name_prod }}</strong></h1>
+          {% endif %}
+        </div>
+
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="message {{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-group row my-3 pt-2">
+          <div class="col col-md-10 position-relative">
+            <input type="text" 
+              class="form-control form-control-lg border border-success-subtle fs-3" 
+              value="{{produto.item_cod}}"
+              id="id_item_cod" 
+              readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Código Item:</strong></span>
+          </div>
+        </div>
+
+        <div class="form-group row my-3 pt-2">
+          <div class="col col-md-10 position-relative">
+            <input type="text" 
+              class="form-control form-control-lg border border-success-subtle fs-3" 
+              value="{{produto.name_prod}}"
+              id="id_name_prod"
+              readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Nome Produto:</strong></span>
+          </div>
+        </div>
+
+        <div class="form-group row my-3 pt-2">
+          <div class="col col-md-10 position-relative">
+            <input type="text" 
+              class="form-control form-control-lg border border-success-subtle fs-3" 
+              value="{{produto.semi_code}}"
+              id="id_semi_code"
+              readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Código Semi-Acabado:</strong></span>
+          </div>
+        </div>
+        <div class="form-group row my-3 pt-2">
+          <div class="col col-md-10 position-relative">
+            <input type="text" 
+              class="form-control form-control-lg border border-success-subtle fs-3" 
+              value="{{produto.qtd_per_day}}"
+              id="id_qtd_per_day" 
+              readonly>
+            <span class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+              <strong>Quantidade por dia:</strong></span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="shadow-lg p-5 mb-5 bg-body-tertiary rounded ">
+        <form action="{{form_action}}" method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col col-md-10">
+              {{form.item}}
+            </div>
+          </div>
+          <div class="row form-group">
+            <div class="col col-md-11">
+              <label for="{{form.subitem.id_for_label}}" class='form-label fs-4'>Subitem:</label>
+              {{form.subitem}}
+            </div>
+          </div>
+          <div class="row form-group g-3 mt-3">
+            <div class="col">
+              <label for="{{form.subitem.id_for_label}}" class='form-label fs-4'>Qtde Preparação:</label>
+              {{form.qntde_pre}}
+            </div>
+            <div class="col">
+              <label for="{{form.subitem.id_for_label}}" class='form-label fs-4'>Qtde Usinagem:</label>
+              {{form.qntde_usi}}
+            </div>
+            <div class="col">
+              <label for="{{form.subitem.id_for_label}}" class='form-label fs-4'>Qtde Lixação:</label>
+              {{form.qntde_lix}}
+            </div>
+          </div>
+          <div class="container row col justify-content-center mt-5">
+            {% if form.errors %}
+              <div class="alert alert-danger">
+                <strong>Erro!</strong> Verifique os campos obrigatórios.
+              </div>
+            {% endif %}
+            <button class='btn btn-success btn-lg col mx-2' type="submit">Salvar</button>
+            <a 
+              href="{% url "cad_item:detail" produto.pk %}"
+              class='btn btn-secondary btn-lg col mx-2'>
+                Detalhes</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex" style="height: 100%;">
+      <div class="vr mx-2"></div>
+      <table class="table table-hover caption-top">
+        <caption class="table-caption">
+          <h3 class='text-center'>Lista Subitens Cadastrados</h3>
+        </caption>
+        <thead>
+          <tr class="table-row-header">
+            <th class="table-header text-center fs-4">Código</th>
+            <th class="table-header text-center fs-4">Descrição</th>
+            <th class="table-header text-center fs-4">Qtde Prep.</th>
+            <th class="table-header text-center fs-4">Qtde Usi.</th>
+            <th class="table-header text-center fs-4">Qtde Lix.</th>
+            <th class="table-header text-center fs-4">Deletar</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for subitem in estrutura_list %}
+            <tr>
+              <td class='text-center'>
+                <a 
+                  class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-5"
+                  href="{% url "cad_item:subitem_detail" subitem.subitem.pk %}"
+                  target='blank'>
+                  {{subitem.subitem.subitem_cod}}
+                </a>
+              </td>
+              <td>{{subitem.subitem.name_subitem}}</td>
+              <td class='text-center fs-5'>{{subitem.qntde_pre}}</td>
+              <td class='text-center fs-5'>{{subitem.qntde_usi}}</td>
+              <td class='text-center fs-5'>{{subitem.qntde_lix}}</td>
+              <td 
+                class="justify-content-center text-center"
+                data-mdb-popover-init
+                title="Deletar Item Cadastrado na Programação"
+                data-mdb-trigger="hover">
+                <a class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover'href="{% url "cad_item:estrutura_delete" subitem.pk%}" >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                  </svg>
+                </a></td>
+
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#id_subitem').select2({
+        width: '100%',
+        minimumInputLength: 2,
+        ajax: {
+          url: '{{ajax_url}}',
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              q: params.term, // search term
+            };
+          },
+          processResults: function (data) {
+            console.log(data);
+            return {
+              results: data.results
+            };
+          },
+          cache: true
+        }
+      });
+    });
+
+  </script>
+{% endblock scripts %}

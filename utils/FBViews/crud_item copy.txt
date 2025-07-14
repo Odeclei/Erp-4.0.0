@@ -1,0 +1,186 @@
+
+from typing import Any
+
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.forms import BaseModelForm
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, FormView, ListView
+
+from cad_item.forms import FamiliForm, ItemForm
+from cad_item.models import Item
+
+PER_PAGE = 25
+
+
+class ItemListView(ListView):
+    model = Item
+    template_name = "cad_item/index.html"
+    context_object_name = "itens"
+    ordering = '-item_cod',
+    paginate_by = PER_PAGE
+    queryset = Item.objects.filter(is_active=True)
+
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     queryset = queryset.filter(is_active=True)
+    #     return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+# class ItemCreateView(ListView):
+#     model = Item
+#     template_name = 'cad_item/create.html'
+#     context_object_name = 'itens'
+#     ...
+
+
+class ItemCreateView(CreateView):
+    model = Item
+    template_name = "cad_item/teste.html"
+    form_class = ItemForm
+    context_object_name = 'form_item'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        form_action = reverse('cad_item:creat')
+        ctx.update({
+            'form_action': form_action,
+        })
+        return ctx
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+
+        return super().form_valid(form)
+
+
+def formitem(request):
+    form_action = reverse('cad_item:creat')
+
+    if request.method == 'POST':
+        itemform = ItemForm(request.POST)
+        familyprod = FamiliForm(request.POST)
+
+        context = {
+            'form_item': itemform,
+            'form_family': familyprod,
+            'form_action': form_action,
+        }
+        usuario_logado = request.user
+        usuario = get_object_or_404(User, pk=usuario_logado.pk)
+
+        if itemform.is_valid():
+            item = itemform.save(commit=False)
+            item.created_by = usuario
+            item.save()
+            return redirect('cad_item:read')               # 'cad_item:creat'
+            #     'cad_item:create', item_id=item.pk
+            # )
+
+        return render(
+            request,
+            'cad_item/create.html',
+            context
+        )
+
+    itemform = ItemForm()
+    familyprod = FamiliForm()
+
+    context = {
+        'form_item': itemform,
+        'form_family': familyprod,
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'cad_item/create.html',
+        context
+    )
+
+
+def updateItem(request, item_id):
+    item = get_object_or_404(
+        Item, pk=item_id, is_active=True)
+    form_action = reverse('cad_item:update', args=(item_id,))
+
+    if request.method == "POST":
+        itemform = ItemForm(request.POST, instance=item)
+        context = {
+            'form_item': itemform,
+            # 'form_family': familyprod,
+            'form_action': form_action,
+        }
+        usuario_logado = request.user
+        usuario = get_object_or_404(User, pk=usuario_logado.pk)
+
+        if itemform.is_valid():
+            form = itemform.save(commit=False)
+            form.updated_by = usuario
+            form.save()
+            return redirect('cad_item:detail', item_id=item_id)
+            # return redirect('cad_item:read')
+
+        return render(
+            request,
+            'cad_item/create.html',
+            context
+        )
+
+    context = {
+        'form_item': ItemForm(instance=item),
+        # 'form_family': familyprod,
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'cad_item/create.html',
+        context,
+    )
+
+
+def item_detail(request, item_id):
+    item = get_object_or_404(
+        Item, pk=item_id, is_active=True)
+    form_action = reverse('cad_item:detail', args=(item_id,))
+
+    context = {
+        'item': item,
+        'form_action': form_action,
+    }
+    return render(
+        request,
+        'cad_item/detail.html',
+        context,
+    )
+
+
+def search(request):
+    search_value = request.GET.get("search", "").strip()
+    item = (Item.objects.filter(
+        Q(item_cod__icontains=search_value) |
+        Q(name__icontains=search_value) |
+        Q(name_abrev__icontains=search_value) |
+        Q(semi_code__icontains=search_value) |
+        Q(family__description__icontains=search_value)
+    )
+    )
+
+    context = {
+        'itens': item,
+        'search_value': search_value,
+    }
+
+    if len(search_value) == 0:
+        return redirect('cad_item:read')
+
+    return render(
+        request,
+        'cad_item/index.html',
+        context,
+    )

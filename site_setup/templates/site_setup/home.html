@@ -1,0 +1,26 @@
+{% extends "global/base.html" %} {% load static %} {% block content %}
+
+<div class="container">
+  {% if user.is_superuser %} {% include "site_setup/partials/_superuser.html" %}
+  {% endif %} {% if user.is_authenticated %}
+  <div class="row container-lg my-5">
+    <h2>Bem vindo ao Sistema de Apontamento da Móveis James.</h2>
+  </div>
+  <div class="row container-lg my-5">
+    <p class="lead fs-4">
+      Para começar, por favor, selecione uma das opções no menu.
+    </p>
+    {% else %}
+    <div class="row container-lg my-5">
+      <h2>Bem vindo ao Sistema de Apontamento da Móveis James.</h2>
+    </div>
+    <div class="row container-lg my-5">
+      <p class="lead">Para acessar o sistema, por favor, faça login.</p>
+    </div>
+    <div class="row container-lg my-5">
+      <a href="{% url 'site_setup:login' %}" class="btn btn-primary">Login</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}

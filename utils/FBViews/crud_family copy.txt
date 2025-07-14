@@ -1,0 +1,150 @@
+
+# flake8: noqa
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
+
+from cad_item.forms import FamiliForm
+from cad_item.models import FamilyProd
+
+PER_PAGE = 25
+
+
+class FamilyProdView(ListView):
+    model = FamilyProd
+    template_name = "cad_item/family/index.html"
+    context_object_name = "form_family"
+    ordering = '-description',
+    paginate_by = PER_PAGE
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class FamilyCreateView(CreateView):
+    model = FamilyProd
+    template_name = "cad_item/family/create.html"
+    form_class = FamiliForm
+    context_object_name = 'form_family'
+
+    def get_success_url(self):
+        return reverse_lazy('cad_item:family_list')  # type: ignore
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        form_action = reverse('cad_item:family_create')
+        ctx.update({
+            'form_action': form_action,
+        })
+        return ctx
+
+
+def family_create(request):
+    form_action = reverse('cad_item:family_list')
+
+    if request.method == 'POST':
+        familyprod = FamiliForm(request.POST)
+
+        context = {
+            'form_family': familyprod,
+            'form_action': form_action,
+        }
+
+        if familyprod.is_valid():
+            familyprod.save()
+            return redirect('cad_item:family_list')
+
+        return render(
+            request,
+            'cad_item/family/create.html',
+            context
+        )
+
+    familyprod = FamiliForm()
+
+    context = {
+        'form_family': familyprod,
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'cad_item/family/create.html',
+        context
+    )
+
+
+def update_family(request, family_id):
+    item = get_object_or_404(
+        FamilyProd, pk=family_id)
+    form_action = reverse('cad_item:family_update', args=(family_id,))
+
+    if request.method == "POST":
+        familyprod = FamiliForm(request.POST, instance=item)
+        context = {
+            'form_family': familyprod,
+            'form_action': form_action,
+        }
+        if familyprod.is_valid():
+            familyprod.save()
+            return redirect('cad_item:family_list')
+            # return redirect('cad_item:read')
+
+        return render(
+            request,
+            'cad_item/family/create.html',
+            context
+        )
+
+    context = {
+        'form_family': FamiliForm(instance=item),
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'cad_item/family/create.html',
+        context
+    )
+
+
+# def item_detail(request, item_id):
+#     item = get_object_or_404(
+#         Item, pk=item_id, is_active=True)
+#     form_action = reverse('cad_item:detail', args=(item_id,))
+
+#     context = {
+#         'item': item,
+#         'form_action': form_action,
+#     }
+#     return render(
+#         request,
+#         'cad_item/detail.html',
+#         context,
+#     )
+
+
+def family_search(request):
+    search_value = request.GET.get("searchf", "").strip()
+    item = (FamilyProd.objects.filter(
+        Q(refer__icontains=search_value) |
+        Q(description__icontains=search_value)
+    )
+    )
+
+    context = {
+        'form_family': item,
+        'search_valuef': search_value,
+    }
+
+    if len(search_value) == 0:
+        return redirect('cad_item:family_list')
+
+    return render(
+        request,
+        'cad_item/family/index.html',
+        context,
+    )

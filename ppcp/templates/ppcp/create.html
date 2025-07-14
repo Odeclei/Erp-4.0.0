@@ -1,0 +1,57 @@
+{% extends "global/base.html" %} {% load static %} {% block content %}
+<section class="container">
+  <p class="fs-1">
+    {% if form.order_number.value %} Alteração de Programação {% else %}
+    Cadastro Nova Programação {% endif %}
+  </p>
+</section>
+
+<section class="form-group">
+  <form action="{{form_action}}" method="post">
+    {% csrf_token %} {% for field in form %}
+    <div class="row g-2 align-items-center">
+      <div class="col-2">
+        <label for="{{field.id_for_label}}" class="col-form-label fs-4"
+          >{{field.label}}:</label
+        >
+      </div>
+      <div class="col-6">{{field}}</div>
+    </div>
+    {% endfor %}
+    <div class="btn-field center my-3">
+      {% if form.order_number.value %}
+      <button class="btn btn-lg btn-primary mx-3" type="submit">
+        Atualizar Programação
+      </button>
+      {% else %}
+      <button class="btn btn-lg btn-primary mx-3" type="submit">
+        Cadastrar Programação
+      </button>
+      {% endif %}
+      <button class="btn btn-lg btn-secondary mx-3" type="reset">
+        Limpar Campos
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock content %} {% block scripts %}
+
+<script>
+  $(document).ready(function () {
+    $("#id_family").select2({
+      ajax: {
+        url: "http://127.0.0.1:8000/item/creat/",
+        dataType: "json",
+        processResults: function (data) {
+          return {
+            results: $.map(data, function (item) {
+              return { id: item.id, text: item.description };
+            }),
+          };
+        },
+      },
+      minimumInputLength: 1,
+    });
+  });
+</script>
+{% endblock scripts %}

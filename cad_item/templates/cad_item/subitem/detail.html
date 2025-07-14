@@ -1,0 +1,126 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="row container">
+  <section class="col-md-8">
+    <div class="row my-5">
+      <h2 class="text-center"> Dados do Subitem: <strong>{{ item }}</strong></h2>
+    </div>
+    <div class="row mb-4 g-4">
+      <div class="position-relative col-6">
+        <input 
+        type="text" 
+        name="code_subitem" id='code_subitem'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.subitem_cod}}" 
+        readonly>
+        <label for='code_subitem'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Código</strong>
+        </label>
+      </div>
+      <div class="position-relative col-6">
+        <input 
+        type="text" 
+        name="nome_subitem" id='nome_subitem'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.name_subitem}}" 
+        readonly>
+        <label for='nome_subitem'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Descrição</strong>
+        </label>
+      </div>
+    </div>
+    <div class="row mb-4 g-4">
+      <div class="position-relative col-6">
+        <input 
+        type="text" 
+        name="material" id='material'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.material}}" 
+        readonly>
+        <label for='material'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Material</strong>
+        </label>
+      </div>
+      <div class="position-relative col-6">
+        <input 
+        type="text" 
+        name="Variação" id='Variação'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.variation}}" 
+        readonly>
+        <label for='Variação'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Variação</strong>
+        </label>
+      </div>
+    </div>
+    <div class="fs-3 mt-5 mb-3"><strong>Medidas</strong></div>
+    <div class="row mb-4 g-4">
+      <div class="position-relative col-4">
+        <input 
+        type="text" 
+        name="comprimento" id='comprimento'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.comprimento}}" 
+        readonly>
+        <label for='comprimento'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Comprimento</strong>
+        </label>
+      </div>
+      <div class="position-relative col-4">
+        <input 
+        type="text" 
+        name="largura" id='largura'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.largura}}" 
+        readonly>
+        <label for='largura'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Largura</strong>
+        </label>
+      </div>
+      <div class="position-relative col-4">
+        <input 
+        type="text" 
+        name="espessura" id='espessura'
+        class="form-control form-control-lg border border-success-subtle fs-3" 
+        value="{{item.espessura}}" 
+        readonly>
+        <label for='espessura'class='position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4'>
+          <strong>Espessura</strong>
+        </label>
+      </div>
+    </div>
+    <section class="container">
+      <div class="row my-5 justify-content-center">
+          <a 
+            class="btn btn-lg btn-success col-md-5 mx-3 fs-3"
+            href="{% url "cad_item:subitem_update" item.id %}">Alterar item</a>
+          <a 
+            class="btn btn-lg btn-danger col-md-5 mx-3 fs-3"
+            href="{% url "cad_item:subitem_list" %}">Voltar</a>    
+      </div>
+      <div class="row justify-content-center">
+          <a
+            class="btn btn-info btn-lg col-md-9 mx-3 fs-3"
+            href="{% url "cad_item:subitem_create" %}">Cadastrar Novo</a>
+      </div>
+    </section>
+  </section>
+
+  <aside class="col-md-4 justify-content-start">
+    {% if item.ficha_tecnica %}
+    <a
+      href="{{item.ficha_tecnica.url}}" 
+      class=""
+      rel = 'noopener noreferrer'
+      target="_blank">
+      <img src="{{item.ficha_tecnica.url}}" class="img-fluid" alt="">
+    </a>
+    {% endif %}
+  </aside>
+</div>
+
+{% endblock content %}

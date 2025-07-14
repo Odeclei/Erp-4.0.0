@@ -1,0 +1,51 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+
+  <section class="row">
+    <span class="col id_user_machine">
+      <h3>Usuário: {{user.first_name}} {{user.last_name}} </h3>
+      <h3 id='maquina'>Máquina: {{mac_id.machine}} - {{mac_id.machine.name}}</h3>
+      <input type="text" hidden='hidden' id='id_machine' value={{mac_id.machine.id}}>
+      <input type="text" hidden='hidden' id='name_machine' value={{mac_id.machine}}>
+    </span>
+    <span class="col justify-content-end align-items-center">
+      {% include "global/partials/_hour.html" %}
+    </span>
+  </section>
+
+  <section class="row my-5 hd_50">
+    <form 
+      action="{{form_action}}" 
+      method="post">
+      {% csrf_token %}
+
+      <div class="row form-floating mb-3">
+        <input 
+          type="text" name="barcode_inicial" id="barcode_inicial" class='form-control'
+          minlength="13" maxlength="18" placeholder='Código de barras'
+          required>
+        <label for="barcode_inicial">CÓDIGO DE BARRAS: </label>
+        <input type="hidden" name='machine_id' id='machine_id' value='{{mac_id.machine.pk}}'>
+      </div>
+      <div class='row justify-content-md-center'>
+        <div class="col-2">
+          <button class='btn btn-success rounded-pill px-3 btn-lg' id="btn_send"type="submit">Iniciar Setup</button>
+        </div>
+        <div class="col-2">
+          <button class='btn btn-secondary rounded-pill px-3 btn-lg' id="btn_clear"type="reset">Limpar</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  </div class="row">
+    {% include "./partials/_oee.html" %}
+  </div>
+  <script>
+    localStorage.setItem(`status_{{mac_id.machine}}`, 'parada')
+    localStorage.setItem(`tempoParada_{{mac_id.machine}}`, 0)
+  </script>
+
+{% endblock content %}

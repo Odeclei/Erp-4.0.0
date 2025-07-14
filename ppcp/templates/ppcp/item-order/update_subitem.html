@@ -1,0 +1,48 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="detail-content h-center">
+
+
+	<section class="container">
+	<header>
+		<h2>Alterar SubItem na Ordem de Produção</h2><br>
+		<h3>Programação: {{sub_programado.programacao.order_number}}</h3><br>
+		<h3>Produto Programado: {{sub_programado.produto_programado}}</h3>
+	</header>
+
+
+		<form
+			action="{{form_action}}"
+			method="post"
+			class='form-group flex-column'
+			>
+			{% csrf_token %}
+						
+			{% for field in form %}
+				<div class="form-group">
+					<label for="{{field.id_for_label}}" class='form-label'>{{field.label}}</label>
+					{{field}}
+					{% if field.help_text %}
+						<p>{{field.help_text}}</p>
+					{% endif %}
+					{{field.errors}}
+				</div>
+			{% endfor %}
+
+			<div class="d-flex justify-content-around">
+				<button class= 'btn btn-success btn-lg'type="submit">Salvar</button>
+				<a 
+					class= 'btn btn-secondary btn-lg' 
+					href="{% url "order:update_item" sub_programado.produto_programado.pk sub_programado.programacao.order_number %}">Cancelar</a>
+				<a 
+					href="{% url "order:delete" sub_programado.pk  %}"  
+					class='btn btn-danger btn-lg'>Deletar</a>
+				</div>
+			</form>
+
+	</section>
+
+
+{% endblock %}

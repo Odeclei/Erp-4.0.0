@@ -1,0 +1,25 @@
+[data-bs-theme="light"] {
+    --bs-body-bg: #f5fefe; /* Um azul bebê bem claro para o light mode */
+    --bs-body-color: #212529; /* Cor do texto padrão Bootstrap */
+
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: #212529; /* Um cinza escuro para o dark mode */
+    --bs-body-color: #F8F9FA; /* Cor do texto claro para o dark mode */
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    transform: translateY(-50%);
+    color: #888;
+}
+.search-container {
+    position: relative;
+}
+
+#form-add-item{
+    display: none;
+    cursor: pointer;
+}
+

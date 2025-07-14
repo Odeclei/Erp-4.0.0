@@ -1,0 +1,71 @@
+{% extends "global/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<section>
+    <form action="{% url "cad_item:subitem_search" %}" method="get">
+      <div class="container">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <div class="row search-container">
+              <div class="col-auto d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>
+              </div>
+              <div class="col-7">
+                <input 
+                  id='query' 
+                  class="form-control form-control-lg search-input"
+                  type="search" 
+                  placeholder="Procurar Produtos..."
+                  name="search" 
+                  value="{{ search_value }}"/>
+              </div>
+              <div class='col-auto mx-3' >
+                <button type="submit" class='btn btn-primary btn-lg'>Buscar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+<section class="table table-container">
+  {% if itens %}
+  <table class="table table-hover caption-top">
+    <caption class="table-caption">
+      <h3>Subitens Cadastrados</h3>
+    </caption>
+    <thead>
+      <tr class="table-row-header">
+        <th scope="col" class="table-header fs-2">Código</th>
+        <th scope="col" class="table-header fs-2">Descrição Produto</th>
+        <th scope="col" class="table-header fs-2">Variação</th>
+      </tr>
+    </thead>
+    <tbody class='table-group-divider'>
+      {% for item in itens %}
+        <tr class="table-row">
+          <td class="table-cel table-text-center">
+            <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-3" href="{% url "cad_item:subitem_detail" item.pk %}">{{item.subitem_cod}}</a>
+          </td>
+          <td class="table-cel table-text-left fs-3">{{item.name_subitem}}</td>
+          <td class="table-cel table-text-left fs-3">{{item.variation}}</td>
+        </tr>
+      
+      {% endfor %}
+    </tbody>
+
+  </table>
+  {% else %}
+    <h1> nenhum item encontrado</h1>
+  {% endif %}
+</section>
+
+
+
+{% endblock content %}

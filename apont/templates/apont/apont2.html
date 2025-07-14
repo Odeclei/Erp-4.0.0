@@ -1,0 +1,173 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="under_header">
+    <span class="id_user_machine">
+      <h3>Usuário: {{user.first_name}} {{user.last_name}} </h3>
+      <h3 id='maquina'>Máquina: {{mac_id.machine}} - {{mac_id.machine.name}}</h3>
+      <input type="text" hidden='hidden' id='id_machine' value={{mac_id.machine.id}}>
+      <input type="text" hidden='hidden' id='name_machine' value={{mac_id.machine}}>
+    </span>
+    <span class='hour_clock'>
+      {% include "global/partials/_hour.html" %}
+    </span>
+  </div>
+
+  <main class=' align-self-center d-flex oee_g mt-4 hd_70 wd_90 '>
+    <span class = 'pl-3 wd_60'>
+      <section class='apont_inicial mt-2 mb-2 d-flex'>
+
+        <div class='d-flex flex-column w_1000'>
+          <div class='d-flex'>
+            <div class='d-flex flex-column'>
+              <div class="form-group d-flex flex-column">
+                <label for="barcode_stepone" class='form-label'>CÓDIGO DE BARRAS: </label>
+                <input 
+                  type="text" name="barcode_stepone" id="barcode_stepone" class='form-control'
+                  value='{{barcode}}' readonly='true' deactivate 
+                  >
+              </div>
+
+              <div class="form-group d-flex flex-column">
+                <label for="Produto_pai" class='form-label'>Produto: </label>
+                <input 
+                  type="text" name="Produto_pai" id="Produto_pai" class='form-control'
+                  value='{{item_prog}}' readonly='true' deactivate>
+              </div>
+  
+              <div class="form-group d-flex flex-column">
+                <label for="Subproduto" class='form-label'>Subproduto: </label>
+                <input 
+                  type="text" name="Subproduto" id="Subproduto" class='form-control'
+                  value='{{subitem_prog}}' readonly='true' deactivate>
+              </div>
+            </div>
+
+
+            <div class="d-flex flex-column mt-5">
+              <div class="form-check d-flex">
+                <input 
+                  class="form-input sz_smlr mr-3" type="radio" 
+                  name="flexRadioDefault" id="id_Producao" value='Producao'checked>
+                <label class="form-label mr-3" for="id_Producao">
+                  <h3>Produção</h3></label>
+              </div>
+
+              <div class="form-check d-flex">
+                <input 
+                  class="form-input sz_smlr mr-3 mt-3" type="radio" 
+                  name="flexRadioDefault" id="id_Retrabalho" value='Retrabalho'>
+                <label class="form-label mr-3 mt-3" for="id_Retrabalho">
+                  <h3>Retrabalho</h3></label>
+              </div>
+
+              <div class='apont_motive' id='div_apont_motive'>
+                <div class="form-group d-flex flex-column">
+                  <label for="apont_motive" class='form-label'>Motivo: </label>
+                  <select class='ml-3 wdt_sml' name="apont_motive" id="apont_motive">
+                    <option value="" selected> ----- Selecione ----- </option>
+                  {% for motivo in rework_motive %}
+                    <option value="{{ motivo.id }}">{{ motivo.motive }}</option>
+                  {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div id='iniciar_container' class='d-flex justify-content-center h_6'>
+            <input type="button" class='btn btn-success btn-lg link_extra '
+            value="INICIAR PRODUÇÃO" id='iniciar_producao'onclick='iniciar_producao()'>
+          </div>
+        </div>
+
+      </section>
+
+      <section class='apont_produção' id='aponta_container'>
+        <div class='form-container'>
+          <form action="{{form_action}}" method="post"class='d-flex flex-column wd_30 flex-wrap' > {% csrf_token %}
+            <div class='form-content'>
+              <div class="form-group d-flex flex-column">
+                <label for="qtde_boa" class='form-label'>Quantidade Boa: </label>
+                <input 
+                  type="number" class='form-control wd_30'name="qtde_boa" id="qtde_boa" minlength="1" 
+                  maxlength="4" value='0'>
+              </div>
+              <div class="form-group d-flex flex-column">
+                <label for="qtde_ruim" class='form-label'>Quantidade Ruim: </label>
+                <input 
+                  type="number" class='form-control wd_30' name="qtde_ruim" id="qtde_ruim" minlength="1" 
+                  maxlength="4"value='0'>
+              </div>
+            </div>
+            
+            <div class='d-flex justify-content-center h_6'>
+              <input type="button" class='btn btn-success btn-lg link_extra'
+              value="FINALIZAR PRODUÇÃO" id='finalizar_producao' onclick="fim_producao()">
+            </div>
+          </form>
+        </div>
+        
+        {% include "./partials/_num_pad.html" %}
+        <input type="hidden" name="id_apont" id='id_apont' value={{id_apont}}>
+      </section>
+
+    </span>
+
+
+    <aside class='wd_30'>
+      {% include "./partials/_des_tecnico.html" %}
+    </aside>
+  </main>
+
+    
+    <div>
+      {% include "./partials/_oee.html" %}
+    </div> 
+
+{% endblock content %}
+
+{% block page_scripts  %}
+    <script>
+
+      const prod = document.getElementById('id_Producao');
+      const ret = document.getElementById('id_Retrabalho');
+      const div = document.getElementById('div_apont_motive');
+      const select = document.querySelector('select[name="apont_motive"]');
+
+      ret.addEventListener('change', () => {
+          if (ret.checked) {
+              div.style.display = 'block';
+          } else {
+              div.style.display = 'none';
+              select.value = '';
+          }
+      });
+      prod.addEventListener('change',()=>{
+        if (prod.checked) {
+          div.style.display = 'none';
+          select.value = '';
+      } else {
+          div.style.display = 'block';
+      }
+      })
+
+      // Função para alterar o status da máquina
+      function alterarStatus(maquinaId, novoStatus) {
+        localStorage.setItem(`status_${maquinaId}`, novoStatus);
+        if (novoStatus === 'producao') {
+          localStorage.setItem(`tempoParada_${maquinaId}`, 0);
+        }else if(novoStatus === 'setup'){
+          localStorage.setItem(`tempoParada_${maquinaId}`, 0);
+        }
+      }
+
+      alterarStatus('{{mac_id.machine}}','setup')
+
+      const finaliza = document.getElementById(finalizar_producao)
+      finaliza.addEventListener('click', alterarStatus('{{mac_id.machine}}',))
+
+    </script>
+{% endblock  %}

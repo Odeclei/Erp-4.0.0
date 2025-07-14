@@ -1,0 +1,44 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+
+  {% if form.item_cod.value %}
+    {% include "cad_item/partials/_update.html" %}
+  {% else %}
+    {% include "cad_item/partials/_addnew.html" %}
+  {% endif %}
+{% endblock content %}
+
+{% block scripts %}
+  <script>
+    // Aguarda o documento carregar completamente
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Seleciona os elementos do DOM que vamos manipular
+      const familySearchInput = document.getElementById('family_search');
+      const hiddenFamilyInput = document.getElementById('id_family_hidden');
+      const datalist = document.getElementById('datalistFamilyOptions');
+
+      // 2. Adiciona um 'escutador' de eventos ao campo de busca.
+      //    O evento 'input' é disparado sempre que o valor do campo muda.
+      familySearchInput.addEventListener('input', function (event) {
+        const inputValue = event.target.value;
+
+        // 3. Procura por uma <option> dentro do <datalist> cujo valor (a descrição)
+        //    seja exatamente igual ao que o usuário digitou ou selecionou.
+        const option = Array.from(datalist.options).find(opt => opt.value === inputValue);
+
+        if (option) {
+          // 4. Se encontrou uma opção correspondente, pega o ID do atributo 'data-pk'
+          const pk = option.getAttribute('data-pk');
+          //    E define o valor do nosso campo oculto com esse ID.
+          hiddenFamilyInput.value = pk;
+        } else {
+          // 5. Se não encontrou (ex: o usuário está digitando algo que não existe),
+          //    limpa o valor do campo oculto para não enviar um ID inválido ao servidor.
+          hiddenFamilyInput.value = '';
+        }
+      });
+    });
+  </script>
+  
+{% endblock scripts %}

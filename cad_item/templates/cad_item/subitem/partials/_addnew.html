@@ -1,0 +1,130 @@
+{% load static %}
+<form action="{{ form_action }}"
+      method="post"
+      enctype="multipart/form-data">
+  {% csrf_token %}
+  <!-- se houver erros de validação -->
+  {% if form.non_fields_errors %}
+    <!-- gera novo aviso para cada erro -->
+    {% for error in form.non_fields_errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+  {% endif %}
+  <!-- gera novo aviso para cada erro -->
+  <div class="row g-3 justify-content-center mb-4">
+    <div class="col-md-5 position-relative">
+      <input type="text"
+             name="subitem_cod"
+             id="subitem_cod"
+             class="form-control form-control-lg border border-success" />
+      <label for="subitem_cod"
+             class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Código</strong>
+      </label>
+    </div>
+    <div class="col-md-5 position-relative">
+      <input type="text"
+             name="name_subitem"
+             id="name_subitem"
+             class="form-control form-control-lg border border-success" />
+      <label for="name_subitem"
+             class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Subitem</strong>
+      </label>
+    </div>
+  </div>
+  <div class="row g-3 justify-content-center mb-4 ">
+    <div class="col-md-5 position-relative">
+      <input type="text"
+             name="variation"
+             id="variation"
+             class="form-control form-control-lg border border-success" />
+      <label for="variation"
+             class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Variação</strong>
+      </label>
+    </div>
+    <div class="col-md-5 align-content-center">
+      <input type="checkbox"
+             value=""
+             name="is_active"
+             id="is_active"
+             class="form-check-input border border-success mx-2"
+             style="height: 2rem;
+                    width: 2rem" />
+      <label for="is_active" class="form-check-label fs-4">
+        <strong>Ativo:</strong>
+      </label>
+    </div>
+  </div>
+  <div class="row col-md-10 pt-3 mx-auto mb-4 position-relative">
+    <input class="form-control form-control-lg border border-success pt-3"
+            list="datalistMaterialOptions"
+            id="material_search"
+            name="material"
+            placeholder='Buscar Material...'>
+    <datalist id="datalistMaterialOptions">
+      {% for material in material_list %}
+        <option value="{{ material.material_description }}" data-pk="{{ material.pk }}"></option>
+      {% endfor %}
+    </datalist>
+    <label for="material_search"
+            class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+      <strong>Material:</strong>
+    </label>
+    <input type="hidden" name="material" id="id_material_hidden">
+  </div>
+  <div class="row g-3 col-md-10 mx-auto mb-4">
+    <div class="col position-relative">
+      <input type="number"
+              name="comprimento"
+              id="comprimento"
+              class="form-control form-control-lg border border-success" />
+      <label for="comprimento"
+              class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Comprimento (mm)</strong>
+      </label>
+    </div>
+    <div class="col position-relative">
+      <input type="number"
+             name="largura"
+             id="largura"
+             class="form-control form-control-lg border border-success" />
+      <label for="largura"
+             class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Largura (mm)</strong>
+      </label>
+    </div>
+    <div class="col position-relative">
+      <input type="number"
+             name="espessura"
+             id="espessura"
+             class="form-control form-control-lg border border-success" />
+      <label for="espessura"
+             class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+        <strong>Espessura (mm)</strong>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-10 mx-auto position-relative mb-4">
+    <input type="file"
+           name="ficha_tecnica"
+           id="ficha_tecnica"
+           class="form-control form-control-lg border border-success pt-3">
+    <label for="ficha_tecnica"
+           class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+      <strong>Ficha Técinca:</strong>
+    </label>
+  </div>
+  <div class="col-md-10 mx-auto position-relative mb-4">
+    <textarea name="observation"
+              id="observation"
+              class='form-control form-control-lg border border-success pt-3'></textarea>
+    <label for="observation"
+           class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+      <strong>Observações:</strong>
+    </label>
+  </div>
+  <div class="row g-3 col-md-10 justify-content-center my-5">
+    <button type="submit" class="btn btn-primary btn-lg col-auto mx-2">Cadastrar Subitem</button>
+    <button type="reset" class="btn btn-secondary btn-lg col-auto mx-2">Limpar Campos</button>
+  </div>
+</form>

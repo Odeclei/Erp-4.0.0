@@ -1,0 +1,13 @@
+{% load static %}
+
+<figure class='wd_30'>
+  {% if  subitem_prog.subproduto.ficha_tecnica %}
+    <a target="_blank" rel="noopener noreferrer"
+    href="{{subitem_prog.subproduto.ficha_tecnica.url}}">
+    <img 
+      class='wd_30'
+      src="{{subitem_prog.subproduto.ficha_tecnica.url}}" 
+      alt="Desenho técnico do subitem em produção"></a>
+  {% endif %}
+</figure>
+

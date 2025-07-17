@@ -1,127 +1,175 @@
-:root{
-/* cores Base Visual da Marca */
---bckg-bg-dkst:hsl(49, 46%,51%);
---bckg-bg-dkr:hsl(49, 46%,61%);
---bckg-bg-dk:hsl(49, 46%,71%);
---bckg-bg:hsl(49, 46%,81%);
---bckg-bg-lt:hsl(49, 46%,91%);
---bckg-bg-ltr:hsl(49, 46%,99%);
+:root {
+    /* cores Base Visual da Marca */
+    --bckg-bg-dkst: hsl(49, 46%, 51%);
+    --bckg-bg-dkr: hsl(49, 46%, 61%);
+    --bckg-bg-dk: hsl(49, 46%, 71%);
+    --bckg-bg: hsl(49, 46%, 81%);
+    --bckg-bg-lt: hsl(49, 46%, 91%);
+    --bckg-bg-ltr: hsl(49, 46%, 99%);
 
---clr-gre-ltst:hsl(146 44% 80%);
---clr-gre-ltr:hsl(146 44% 70%);
---clr-gre-lt:hsl(146 44% 60%);
---clr-gre-base:hsl(146 44% 50%);
---clr-gre-dk:hsl(146 44% 40%);
---clr-gre-dkr:hsl(146 44% 30%);
---clr-gre-dkst:hsl(146 44% 20%);
+    --clr-gre-ltst: hsl(146 44% 80%);
+    --clr-gre-ltr: hsl(146 44% 70%);
+    --clr-gre-lt: hsl(146 44% 60%);
+    --clr-gre-base: hsl(146 44% 50%);
+    --clr-gre-dk: hsl(146 44% 40%);
+    --clr-gre-dkr: hsl(146 44% 30%);
+    --clr-gre-dkst: hsl(146 44% 20%);
 
+    --clr-eb-dkr: hsl(42, 23%, 71%);
+    --clr-eb-dk: hsl(42, 23%, 76%);
+    --clr-eb-base: hsl(42, 23%, 81%);
+    --clr-eb-lt: hsl(42, 23%, 86%);
+    --clr-eb-ltr: hsl(42, 23%, 91%);
 
---clr-eb-dkr:hsl(42, 23%, 71%);
---clr-eb-dk:hsl(42, 23%, 76%);
---clr-eb-base:hsl(42, 23%, 81%);
---clr-eb-lt:hsl(42, 23%, 86%);
---clr-eb-ltr:hsl(42, 23%, 91%);
+    /* FONT FAMILY */
+    --ff-regular: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    --ff-headings: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    --ff-mono: monospace;
 
+    /* FONT-SIZES */
+    /* Syntax: clamp(minimum, preferred, maximum) */
+    --fs-smlst: clamp(
+        1.2rem,
+        1.092307692307692rem + 0.256410256410256vw,
+        1.4rem
+    );
+    --fs-smlr: clamp(
+        1.4rem,
+        1.292307692307692rem + 0.2564102564102566vw,
+        1.6rem
+    );
+    --fs-sm: clamp(
+        1.6rem,
+        1.4923076923076923rem + 0.25641025641025633vw,
+        1.8rem
+    );
+    --fs-base: clamp(
+        1.8rem,
+        1.6923076923076923rem + 0.25641025641025633vw,
+        2rem
+    );
+    --fs-bg: clamp(2rem, 1.7846153846153847rem + 0.5128205128205127vw, 2.4rem);
+    --fs-bgr: clamp(2.4rem, 1.969230769230769rem + 1.025641025641026vw, 3.2rem);
+    --fs-bgst: clamp(3.2rem, 2.876923076923rem + 0.7692307692307687vw, 3.8rem);
 
-/* FONT FAMILY */
---ff-regular: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
---ff-headings: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
---ff-mono: monospace;
-
-/* FONT-SIZES */
-/* Syntax: clamp(minimum, preferred, maximum) */
---fs-smlst: clamp(1.2rem, 1.092307692307692rem + 0.256410256410256vw, 1.4rem);
---fs-smlr: clamp(1.4rem, 1.292307692307692rem + 0.2564102564102566vw, 1.6rem);
---fs-sm: clamp(1.6rem, 1.4923076923076923rem + 0.25641025641025633vw, 1.8rem);
---fs-base: clamp(1.8rem, 1.6923076923076923rem + 0.25641025641025633vw, 2rem);
---fs-bg: clamp(2rem, 1.7846153846153847rem + 0.5128205128205127vw, 2.4rem);
---fs-bgr: clamp(2.4rem, 1.969230769230769rem + 1.025641025641026vw, 3.2rem);
---fs-bgst: clamp(3.2rem, 2.876923076923rem + 0.7692307692307687vw, 3.8rem);
-
-/* --fs-h1: clamp(3.2rem, 3.2615384615384615rem + 1.282051282051282vw, 4.4rem);
+    /* --fs-h1: clamp(3.2rem, 3.2615384615384615rem + 1.282051282051282vw, 4.4rem);
 --fs-h2: clamp(2.8rem, 1.938461538461538rem + 2.051282051282052vw, .0rem); */
---fs-h1: clamp(2.4rem, 1.969230769230769rem + 1.025641025641026vw, 3.2rem);
---fs-h2: clamp(2.2rem, 1.8769230769230774rem + 0.7692307692307687vw, 2.8rem);
---fs-h3: clamp(1.8rem, 1.476923076923077rem + 0.769230769230769vw, 2.4rem);
---fs-h4: clamp(1.6rem, 1.2769230769230768rem + 0.7692307692307694vw, 2.2rem);
+    --fs-h1: clamp(2.4rem, 1.969230769230769rem + 1.025641025641026vw, 3.2rem);
+    --fs-h2: clamp(
+        2.2rem,
+        1.8769230769230774rem + 0.7692307692307687vw,
+        2.8rem
+    );
+    --fs-h3: clamp(1.8rem, 1.476923076923077rem + 0.769230769230769vw, 2.4rem);
+    --fs-h4: clamp(
+        1.6rem,
+        1.2769230769230768rem + 0.7692307692307694vw,
+        2.2rem
+    );
 
+    /* ALTURA DE LINHA */
+    --lh-regular: 1.5;
+    --lh-headings: 1.2;
+    --lh-mono: 1.2;
 
-/* ALTURA DE LINHA */
---lh-regular: 1.5;
---lh-headings: 1.2;
---lh-mono: 1.2;
+    /* ESPAÇAMENTOS */
+    --spacing-micro: 0.8rem;
+    --spacing-smlst: 1.5rem;
+    --spacing-smlr: 2rem;
+    --spacing-sm: 2.5rem;
+    --spacing-base: 3rem;
+    --spacing-bg: 4rem;
+    --spacing-bgr: 5rem;
+    --spacing-bgst: 6rem;
 
-/* ESPAÇAMENTOS */
---spacing-micro: 0.8rem;
---spacing-smlst: 1.5rem;
---spacing-smlr: 2rem;
---spacing-sm: 2.5rem;
---spacing-base: 3rem;
---spacing-bg: 4rem;
---spacing-bgr: 5rem;
---spacing-bgst: 6rem;
+    --size-h-smlst: 2rem;
+    --size-h-smlr: 2.4rem;
+    --size-h-sm: 2.8rem;
+    --size-h-base: 3.2rem;
+    --size-h-bg: 3.6rem;
+    --size-h-bgr: 4rem;
+    --size-h-bgst: 4.4rem;
 
---size-h-smlst: 2rem;
---size-h-smlr: 2.4rem;
---size-h-sm: 2.8rem;
---size-h-base: 3.2rem;
---size-h-bg: 3.6rem;
---size-h-bgr: 4rem;
---size-h-bgst: 4.4rem;
-
---size-w-smlst: 2rem;
---size-w-smlr: 2.4rem;
---size-w-sm: 2.8rem;
---size-w-base: 3.2rem;
---size-w-bg: 3.6rem;
---size-w-bgr: 4rem;
---size-w-bgst: 4.4rem;
-
+    --size-w-smlst: 2rem;
+    --size-w-smlr: 2.4rem;
+    --size-w-sm: 2.8rem;
+    --size-w-base: 3.2rem;
+    --size-w-bg: 3.6rem;
+    --size-w-bgr: 4rem;
+    --size-w-bgst: 4.4rem;
 }
 
-.hd_50{height: 50dvh;}
-.hd_60{height: 60dvh;}
-.hd_70{height: 70dvh;}
-.hd_80{height: 80dvh;}
-.hd_90{height: 90dvh;}
+.hd_50 {
+    height: 50dvh;
+}
+.hd_60 {
+    height: 60dvh;
+}
+.hd_70 {
+    height: 70dvh;
+}
+.hd_80 {
+    height: 80dvh;
+}
+.hd_90 {
+    height: 90dvh;
+}
 
-.wd_30{width: 30dvw !important;}
-.wd_40{width: 40dvw !important;}
-.wd_50{width: 50dvw !important;}
-.wd_60{width: 60dvw !important;}
-.wd_70{width: 70dvw !important;}
-.wd_80{width: 80dvw !important;}
-.wd_90{width: 90dvw !important;}
+.wd_30 {
+    width: 30dvw !important;
+}
+.wd_40 {
+    width: 40dvw !important;
+}
+.wd_50 {
+    width: 50dvw !important;
+}
+.wd_60 {
+    width: 60dvw !important;
+}
+.wd_70 {
+    width: 70dvw !important;
+}
+.wd_80 {
+    width: 80dvw !important;
+}
+.wd_90 {
+    width: 90dvw !important;
+}
 
-.sz_smlst{
+.sz_smlst {
     height: var(--size-h-smlst);
-    width: var(--size-w-smlst)
+    width: var(--size-w-smlst);
 }
-.sz_smlr{
+.sz_smlr {
     height: var(--size-h-smlr);
-    width: var(--size-w-smlr)
+    width: var(--size-w-smlr);
 }
-.sz_sm{
+.sz_sm {
     height: var(--size-h-sm);
-    width: var(--size-w-sm)
+    width: var(--size-w-sm);
 }
-.sz_base{
+.sz_base {
     height: var(--size-h-base);
-    width: var(--size-w-base)
+    width: var(--size-w-base);
 }
-.sz_bg{
+.sz_bg {
     height: var(--size-h-bg);
     width: var(--size-w-bg);
 }
-.sz_bgr{
+.sz_bgr {
     height: var(--size-h-bgr);
     width: var(--size-w-bgr);
 }
-.sz_bgst{
+.sz_bgst {
     height: var(--size-h-bgst);
     width: var(--size-w-bgst);
 }
 
-.mt-auto{
+/* .mt-auto{
     margin-top: auto !important;
-}
+} */

@@ -1,0 +1,39 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+    <div class="messages my-3">
+      {% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}
+    </div>
+  {% endif %}
+{% if form.cnpj.value %}
+  {% include "clientes/partials/_update.html" %}
+{% else %}
+  {% include "clientes/partials/_addnew.html" %}
+{% endif %}
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cnpjInput = document.getElementById('id_cnpj');
+
+        cnpjInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            if (value.length > 14) { // Limita a 14 dígitos (CNPJ puro)
+                value = value.substring(0, 14);
+            }
+
+            // Adiciona a máscara
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+
+            e.target.value = value;
+        });
+    });
+</script>
+
+{% endblock scripts %}

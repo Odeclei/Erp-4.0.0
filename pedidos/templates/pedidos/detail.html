@@ -1,0 +1,208 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <section id="pedidos" class="container-fluid">
+    <div class="container-title text-center justify-content-center mb-5">
+      <h1>
+        Detalhes do Pedido: <strong>{{ pedido.pedido_number }} - {{ pedido.cliente }}</strong>
+      </h1>
+    </div>
+    <div class="row">
+      <section class="col col-md-6">
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-5 position-relative">
+            <input type="text"
+                   name="pedido_number"
+                   id="id_pedido_number"
+                   value="{{ pedido.pedido_number }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_pedido_number"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Número do Pedido:</strong>
+            </label>
+          </div>
+          <div class="col col-5 position-relative">
+            <input type="text"
+                   name="pedido_cliente"
+                   id="id_pedido_cliente"
+                   value="{{ pedido.pedido_cliente }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_pedido_cliente"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Pedido do Cliente:</strong>
+            </label>
+          </div>
+        </div>
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-8 position-relative">
+            <input type="text"
+                   name="cliente"
+                   id="id_cliente"
+                   value="{{ pedido.cliente }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_cliente"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Cliente:</strong>
+            </label>
+          </div>
+          <div class="col col-2 position-relative">
+            <input type="text"
+                   name="status"
+                   id="id_status"
+                   value="{{ pedido.get_status_display }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_status"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Status:</strong>
+            </label>
+          </div>
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-5 position-relative">
+            <input type="text"
+                   name="lacre_number"
+                   id="id_lacre_number"
+                   value="{{ pedido.lacre_number }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_lacre_number"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Número do Lacre:</strong>
+            </label>
+          </div>
+          <div class="col col-5 position-relative">
+            <input type="text"
+                   name="cargo_number"
+                   id="id_cargo_number"
+                   value="{{ pedido.get_cargo_number_display }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_cargo_number"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Número da Carga:</strong>
+            </label>
+          </div>
+        </div>
+        <div class="row my-5 justify-content-center">
+          <a 
+            class="btn btn-lg btn-success col-md-5 mx-3 fs-3"
+            href="{% url 'pedidos:update' pedido.pk %}">Alterar Pedido</a>
+          <a 
+            class="btn btn-lg btn-secondary col-md-5 mx-3 fs-3"
+            href="{% url 'pedidos:index' %}">Voltar</a>
+        </div>
+        <div class="row justify-content-center"></div>
+          <a 
+            class="btn btn-lg btn-info col-md-5 mx-3 fs-3"
+            href="{% url 'pedidos:add_item' pedido.pk %}">Adicionar item ao Pedido</a>
+        </div>
+
+      </section>
+
+      <section class="col col-md-6">
+        <div class="table table-container">
+        {% if itens_pedido %}
+          <table class="table table-hover caption-top">
+            <caption class="table-caption">
+              <h3 class="my-4 text-center">Itens Cadastrados Pedido</h3>
+            </caption>
+            <thead>
+              <tr class="table-row-header">
+                <th scope="col" class="col col-md-2 text-center table-header fs-4">Código</th>
+                <th scope="col" class="col col-md-6 text-center table-header fs-4">Descrição</th>
+                <th scope="col" class="col col-md-3 text-center table-header fs-4">Acabamento</th>
+                <th scope="col" class="col col-md-2 text-center table-header fs-4">Quantidade</th>
+                <th scope="col" class="col col-md-1 text-center table-header fs-4"></th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              {% for item in itens_pedido %}
+                <tr class="table-row align-items-center">
+                  <td class="table-cel text-center fs-5">{{ item.item.item_cod }}</td>  <!-- Codigo Item -->
+                  <td class="table-cel fs-5">{{ item.item.name_prod }}</td>             <!-- Nome Item -->
+                  <td class="table-cel fs-5">{{ item.finish.name_finish }}</td>         <!-- Acabamento Item -->
+                  <td class="table-cel text-center  fs-5">{{ item.quantity }}</td>      <!-- Quantidade Item -->
+                  <td class="table-cel text-center  fs-5 d-flex justify-content-between">
+                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3" 
+                      href="{% url 'pedidos:update_item' item.pk pedido.pedido_number %}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-pen"
+                           viewBox="0 0 16 16">
+                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z" />
+                      </svg>
+                    </a>
+                    <a class="link-offset-2 link-offset-3-hover text-danger link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
+                       href="#">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-x-circle"
+                           viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="container justify-content-center">
+            <div class="row mb-5">
+              <h1>Nenhum item encontrado</h1>
+            </div>
+          </div>
+        {% endif %}
+        </div>
+      </section>
+    </div>
+  </section>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  // Suponha que você tenha um elemento HTML com um ID "id_status"
+  const statusElement = document.getElementById('id_status');
+
+  // Defina os valores de status e as cores correspondentes
+  const statusColors = {
+    'Ativo': 'bg-light',
+    'Carregando': 'bg-primary text-white',
+    'Cancelado': 'bg-danger text-white',
+    'Concluído': 'bg-success text-white',
+  };
+
+  // Função para alterar a cor de fundo com base no status
+  function changeBackgroundColor(status) {
+    const classesToAdd = statusColors[status];
+    if (classesToAdd) {
+      // Agora, adicione as novas classes
+      console.log(`Adding classes: ${classesToAdd}`);
+      statusElement.classList.add(...classesToAdd.split(' '));
+    } else {
+      // Opcional: lide com status desconhecidos, talvez removendo todas as classes de cor
+      console.log(`Status "${status}" not found in statusColors.`);
+      for (const key in statusColors) {
+          const classesToRemove = statusColors[key].split(' ');
+          statusElement.classList.remove(...classesToRemove);
+      }
+    }
+  }
+
+  // Exemplo de uso:
+  // Certifique-se de que statusElement.value realmente contém um dos status ('Ativo', 'Carregando', etc.)
+  if (statusElement) { // Adicione uma verificação para garantir que o elemento existe
+      changeBackgroundColor(statusElement.value); 
+  } else {
+      console.error("Element with ID 'id_status' not found.");
+  }
+</script>
+{% endblock scripts %}

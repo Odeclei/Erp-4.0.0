@@ -5,23 +5,19 @@ from django.forms import ChoiceField
 # Create your models here.
 
 
-
-
 class Clientes(models.Model):
     class Meta:
-        verbose_name = 'Cliente'
-        verbose_name_plural = 'Clientes'
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
 
     MARKET_CHOICES = [
-        ('M.I.', 'Mercado Interno'),
-        ('M.E.', 'Mercado Externo'),
+        ("M.I.", "Mercado Interno"),
+        ("M.E.", "Mercado Externo"),
     ]
 
-    cnpj = models.CharField(max_length=20, unique= True)
-    razao_social = models.CharField(
-        max_length=100, default="", blank=True, null=True
-    )
-    nome_fantasia =models.CharField(max_length=50)
+    cnpj = models.CharField(max_length=20, unique=True)
+    razao_social = models.CharField(max_length=100, default="", blank=True, null=True)
+    nome_fantasia = models.CharField(max_length=50)
     address = models.CharField(max_length=100)
     bairro = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -30,11 +26,9 @@ class Clientes(models.Model):
     e_mail = models.EmailField(max_length=254)
     market = models.CharField(
         choices=MARKET_CHOICES,
-        default='M.I.',
+        default="M.I.",
         max_length=50,
     )
-
-
 
     def __str__(self) -> str:
         return self.nome_fantasia

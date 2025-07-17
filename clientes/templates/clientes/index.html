@@ -1,0 +1,64 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <section>
+    <form action="{% url 'clientes:busca' %}" method="get">
+      <div class="container-fluid">
+        <div class="row justify-content-end">
+          <div class="col-md-5">
+            <div class="row search-container">
+              <div class="col-auto d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="16"
+                     height="16"
+                     fill="currentColor"
+                     class="bi bi-search"
+                     viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+              </div>
+              <div class="col-6">
+                <input id="query"
+                       class="form-control form-control-lg search-input"
+                       type="search"
+                       placeholder="Procurar Produtos..."
+                       name="search"
+                       value="{{ search_value }}" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+  <section class="table table-container">
+    {% if clientes %}
+      <table class="table table-hover caption-top">
+        <caption class="table-caption">
+          <h2>Clientes Cadastrados</h2>
+        </caption>
+        <thead>
+          <tr class="table-row-header">
+            <th scope="col" class="table-header fs-2">CNPJ</th>
+            <th scope="col" class="table-header fs-2">Nome Fantasia</th>
+            <th scope="col" class="table-header fs-2">Mercado</th>
+          </tr>
+        </thead>
+        <tbody class='table-group-divider'>
+          {% for cliente in clientes %}
+            <tr class="table-row">
+              <td class="table-cel table-text-center">
+                <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-3"
+                   href="{% url 'clientes:detail' cliente.pk %}">{{ cliente.cnpj }}</a>
+              </td>
+              <td class="table-cel table-text-left fs-3">{{ cliente.nome_fantasia }}</td>
+              <td class="table-cel table-text-left fs-3">{{ cliente.market }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <h1>Nenhum item encontrado</h1>
+    {% endif %}
+  </section>
+{% endblock content %}

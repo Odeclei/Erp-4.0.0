@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "dashboard",
     "carregamento",
     "clientes",
+    "pedidos",
     # third aps
     "rest_framework",
 ]

@@ -1,0 +1,107 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <div class="row shadow-lg p-5 mb-5 bg-body-tertiary rounded ">
+    <div class="row container text-center mb-5">
+      <h2>Atualizar Dados: {{ item_pedido.item }}</h2>
+    </div>
+    <div class="row form-group">
+      <form action="{% url 'pedidos:update_item' item_pedido.pk item_pedido.proforma.pedido_number %}"
+            method="post">
+        {% csrf_token %}
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-3 position-relative">
+            <input type="text"
+                   id="id_proforma"
+                   
+                   value="{{ item_pedido.proforma.pedido_number }}"
+                   readonly
+                   class="form-control form-control-lg border border-success pt-3">
+            <label for="id_proforma"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Pedido:</strong>
+            </label>
+            <input type="hidden" name="proforma" value="{{ item_pedido.proforma.pk }}">
+          </div>
+          <div class="col col-8 position-relative">
+            <input type="text"
+                   id="item_search"
+                   value="{{ item_pedido.item }}"
+                   readonly
+                   list="datalistItensOptions"
+                   class="form-control form-control-lg border border-success pt-3">
+            <datalist id="datalistItensOptions">
+              {% for item in item_list %}<option value="{{ item.name_prod }}" data-pk="{{ item.pk }}"></option>{% endfor %}
+            </datalist>
+            <label for="item_search"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Item:</strong>
+            </label>
+            <input type="hidden"
+                   name="item"
+                   id="id_item_hidden"
+                   value="{{ item_pedido.item.pk }}">
+          </div>
+        </div>
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-3 position-relative">
+            <input type="number"
+                   id="id_quantity"
+                   value="{{ item_pedido.quantity }}"
+                   name="quantity"
+                   class="form-control form-control-lg border bg-primary-subtle border-success pt-3">
+            <label for="id_quantity"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Quantidade:</strong>
+            </label>
+          </div>
+          <div class="col col-8 position-relative">
+            <input type="text"
+                   id="finish_search"
+                   value="{{ item_pedido.finish }}"
+                   list="datalistFinishOptions"
+                   class="form-control form-control-lg bg-primary-subtle border border-success pt-3">
+            <datalist id="datalistFinishOptions">
+              {% for finish in finish_list %}
+                <option value="{{ finish.name_finish }}" data-pk="{{ finish.pk }}"></option>
+              {% endfor %}
+            </datalist>
+            <label for="finish_search"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Acabamento:</strong>
+            </label>
+            <input type="hidden" name="finish" id="id_finish_hidden" value="{{ item_pedido.finish.pk }}">
+          </div>
+        </div>
+        <div class="row g-2 justify-content-center my-4">
+          <button type="submit" class="col btn btn-success mx-2 fs-4">Alterar Item</button>
+          <a href="{% url 'pedidos:detail' item_pedido.proforma.pk %}" class="col btn btn-secondary mx-2 fs-4">Voltar à programação</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+{% block scripts %}
+  <script>
+    // Aguarda o documento carregar completamente
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Seleciona os elementos do DOM que vamos manipular
+      const finishSearchInput = document.getElementById('finish_search');
+      const hiddenFinishInput = document.getElementById('id_finish_hidden');
+      const datalistFinish = document.getElementById('datalistFinishOptions');
+
+      // 2. Adiciona um 'escutador' de eventos ao campo de busca.
+      //    O evento 'input' é disparado sempre que o valor do campo muda.
+      finishSearchInput.addEventListener('input', function (event) {
+        const inputValue = event.target.value;
+        const option = Array.from(datalistFinish.options).find(opt => opt.value === inputValue);
+        if (option) {
+          const pk = option.getAttribute('data-pk');
+          hiddenFinishInput.value = pk;
+        } else {
+          hiddenFinishInput.value = '';
+        }
+      })
+    });
+  </script>
+{% endblock scripts %}

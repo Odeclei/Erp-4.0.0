@@ -1,0 +1,107 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+  <div class="messages my-3">
+    {% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}
+  </div>
+{% endif %}
+
+<section id="cadastro_pedido" class="container">
+  <div class="container-tilte text-center justify-content-center mb-5">
+    <h1>Cadastro de Pedidos</h1>
+  </div>
+  <div class="form-group mb-4">
+    <form action="{{ form_action }}" method="post">
+      {% csrf_token %}
+
+      {% if form.non_fields_errors %}
+        {% for error in form.non_fields_errors %}<div class="alert alert-{{ alert.tags }}">{{ error }}</div>{% endfor %}
+      {% endif %}
+
+      {% for field in form %}
+        <div class="position-relative mb-4">
+
+          {% if field.id_for_label == 'id_cliente' %}
+            <input 
+              class="form-control form-control-lg border border-success pt-3"
+              list="datalistClientesOptions"
+              id="cliente_search"
+              placeholder='Buscar Cliente...'>
+
+            <datalist id="datalistClientesOptions">
+            {% for cliente in clientes_list %}
+              {# O `value` é o texto que o usuário vê e seleciona. #}
+              {# O `data-pk` é o ID que queremos enviar para o backend. #}
+              <option value="{{ cliente.nome_fantasia }}" data-pk="{{ cliente.pk }}"></option>
+            {% endfor %}
+          </datalist>
+          <label for="cliente_search"
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>Cliente</strong>
+          </label>
+          {# Este campo oculto guardará o ID da família selecionada para ser enviado no formulário. #}
+          {# O `name` deve corresponder ao que o seu formulário Django espera. #}
+          <input type="hidden" name="{{ field.name }}" id="id_cliente_hidden">
+          {% else %}
+          {{ field }}
+          <label for="{{ field.id_for_label }} "
+                 class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+            <strong>{{ field.label }}</strong>
+          </label>
+          {% endif %}
+          {% if field.errors %}
+            <ul class="erorlist">
+              {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div class="row mt-5 justify-content-center">
+        {% if form.instance.pk %}
+        <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg p-2 fs-3">Alterar Pedido</button>
+        {% else %}
+        <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg p-2 fs-3">Cadastrar Pedido</button>
+        {% endif %}
+        <button type="reset" class="col-md-5 btn btn-secondary mx-2 btn-lg p-2 fs-3">Limpar Campos</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock content %}
+
+{% block scripts %}
+  <script>
+    // Aguarda o documento carregar completamente
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Seleciona os elementos do DOM que vamos manipular
+      const clienteSearchInput = document.getElementById('cliente_search');
+      const hiddenClienteInput = document.getElementById('id_cliente_hidden');
+      const datalist = document.getElementById('datalistClientesOptions');
+
+      // 2. Adiciona um 'escutador' de eventos ao campo de busca.
+      //    O evento 'input' é disparado sempre que o valor do campo muda.
+      clienteSearchInput.addEventListener('input', function (event) {
+        const inputValue = event.target.value;
+
+        // 3. Procura por uma <option> dentro do <datalist> cujo valor (a descrição)
+        //    seja exatamente igual ao que o usuário digitou ou selecionou.
+        const option = Array.from(datalist.options).find(opt => opt.value === inputValue);
+
+        if (option) {
+          // 4. Se encontrou uma opção correspondente, pega o ID do atributo 'data-pk'
+          const pk = option.getAttribute('data-pk');
+          //    E define o valor do nosso campo oculto com esse ID.
+          hiddenClienteInput.value = pk;
+        } else {
+          // 5. Se não encontrou (ex: o usuário está digitando algo que não existe),
+          //    limpa o valor do campo oculto para não enviar um ID inválido ao servidor.
+          hiddenClienteInput.value = '';
+        }
+      });
+    });
+  </script>
+  
+{% endblock scripts %}

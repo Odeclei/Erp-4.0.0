@@ -9,7 +9,7 @@
     </div>
   {% endif %}
   <div class="form-group">
-    <form action="{{ form_action }}" method="POST">
+    <form action="{{ form_action }}" method="post">
       {% csrf_token %}
       {% if form.non_fields_errors %}
         <!-- gera novo aviso para cada erro -->

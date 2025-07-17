@@ -1,0 +1,152 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  {% load static %}
+  <section id="detail_cliente" class="container">
+    <div class="container-title text-center justify-content-center mb-5">
+      <h1>
+        Cadastro de Clientes: <strong>{{ cliente.nome_fantasia }}</strong>
+      </h1>
+    </div>
+    <div class="row g-3 justify-content-center mb-4">
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="cnpj"
+               id="id_cnpj"
+               value="{{ clientes.cnpj }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_cnpj"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>CNPJ:</strong>
+        </label>
+      </div>
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="razao_social"
+               id="id_razao_social"
+               value="{{ clientes.razao_social }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_razao_social"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Razão Social:</strong>
+        </label>
+      </div>
+    </div>
+    <div class="row g-3 justify-content-center mb-4">
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="nome_fantasia"
+               id="id_nome_fantasia"
+               value="{{ clientes.nome_fantasia }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_nome_fantasia"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Nome Fantasia:</strong>
+        </label>
+      </div>
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="city"
+               id="id_city"
+               value="{{ clientes.city }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_city"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Cidade:</strong>
+        </label>
+      </div>
+    </div>
+    <div class="row g-3 justify-content-center mb-4">
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="address"
+               id="id_address"
+               value="{{ clientes.address }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_address"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Endereço:</strong>
+        </label>
+      </div>
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="bairro"
+               id="id_bairro"
+               value="{{ clientes.bairro }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_bairro"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Bairro:</strong>
+        </label>
+      </div>
+    </div>
+    <div class="row g-3 justify-content-center mb-4">
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="state"
+               value="{{ clientes.state }}"
+               readonly
+               id="id_state"
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_state"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Estado:</strong>
+        </label>
+      </div>
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="country"
+               id="id_country"
+               value="{{ clientes.country }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_country"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>País:</strong>
+        </label>
+      </div>
+    </div>
+    <div class="row g-3 justify-content-center mb-4">
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="e_mail"
+               id="id_e_mail"
+               value="{{ clientes.e_mail }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_e_mail"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>E_mail:</strong>
+        </label>
+      </div>
+      <div class="col col-5 position-relative">
+        <input type="text"
+               name="market"
+               id="id_market"
+               value="{{ clientes.market }}"
+               readonly
+               class="form-control form-control-lg border border-success pt-3">
+        <label for="id_market"
+               class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Mercado:</strong>
+        </label>
+      </div>
+    </div>
+
+    <div class="row container justify-content-center my-5 h-100">
+      <a class="col col-md-3 btn btn-primary btn-lg p-3 mx-2 fs-3 "
+          href="{% url 'clientes:update' clientes.pk %}">Alterar Cadastro</a>
+      <a class="col col-md-3 btn btn-success btn-lg p-3 mx-2 fs-3"
+          href="{% url 'clientes:create' %}">Cadastrar Novo</a>
+      <a class="col col-md-3 btn btn-secondary btn-lg p-3 mx-2 fs-3"
+           href="{% url 'clientes:read' %}">Voltar</a>
+    </div>
+
+  </section>
+{% endblock content %}

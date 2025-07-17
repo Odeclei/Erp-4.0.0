@@ -8,3 +8,36 @@ python-json-logger>=3.3, <3.4
 django-appconf>=1.1, <1.2
 django-select2>=8.4, <8.5
 
+
+
+
+
+asgiref==3.8.1
+click==8.2.1
+colorama==0.4.6
+cssbeautifier==1.15.4
+Django==4.2.23
+django-appconf==1.1.0
+djangorestframework==3.16.0
+djlint==1.36.4
+dlint==0.16.0
+EditorConfig==0.17.1
+flake8==7.3.0
+getmac==0.9.5
+jsbeautifier==1.15.4
+json5==0.12.0
+mccabe==0.7.0
+pathspec==0.12.1
+pillow==10.4.0
+pycodestyle==2.14.0
+pyflakes==3.4.0
+PyPDF2==3.0.1
+python-dotenv==1.0.1
+python-json-logger==3.3.0
+PyYAML==6.0.2
+redis==6.2.0
+regex==2024.11.6
+six==1.17.0
+sqlparse==0.5.3
+tqdm==4.67.1
+tzdata==2025.2

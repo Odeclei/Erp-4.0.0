@@ -8,6 +8,8 @@ from pedidos import models
 @admin.register(models.Pedidos)
 class ProformasAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
+        "pk",
         "pedido_number",
         "cliente",
         "pedido_cliente",

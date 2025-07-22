@@ -1,4 +1,3 @@
-from webbrowser import get
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
@@ -14,7 +13,6 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
-from django.db.models import Q
 
 from pedidos.models import Pedidos
 
@@ -67,8 +65,9 @@ class PedidoUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        pedido_pk = self.object.pk
         form_action = reverse("pedidos:update", kwargs={"pk": self.object.pk})
-        context.update({"form_action": form_action})
+        context.update({"form_action": form_action, "pedido_pk": pedido_pk})
         return context
 
     def form_valid(self, form):
@@ -106,7 +105,7 @@ class ItemPedidoCreateView(CreateView):
     context_object_name = "form"
 
     def get_success_url(self):
-        return reverse("pedidos:detail", kwargs={"pk": self.object.pk})
+        return reverse("pedidos:add_item", kwargs={"pk": self.kwargs["pk"]})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -7,8 +7,13 @@ class Carregamento(models.Model):
         verbose_name = "Carregamento"
         verbose_name_plural = "Carregamentos"
 
-    proforma_data = models.ForeignKey(Pedidos, on_delete=models.DO_NOTHING)
+    pedido_data = models.ForeignKey(Pedidos, on_delete=models.DO_NOTHING)
     item = models.ForeignKey(ItemPedido, on_delete=models.DO_NOTHING)
     data_inicio = models.DateTimeField(auto_now_add=True)
     data_fim = models.DateTimeField(auto_now=True)
     qtde_carregada = models.IntegerField()
+    operador = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        cargo_name = f"{self.pedido_data.pedido_number} - {self.pedido_data.cliente}"
+        return cargo_name

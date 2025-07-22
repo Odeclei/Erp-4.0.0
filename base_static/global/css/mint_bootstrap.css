@@ -7746,6 +7746,13 @@ textarea.form-control-lg {
     background-color: currentcolor;
     opacity: .25
 }
+.vh {
+    display: inline-block;
+    align-self: stretch;
+    min-height: 1em;
+    background-color: currentcolor;
+    opacity: .5;
+}
 
 .align-baseline {
     vertical-align: baseline !important

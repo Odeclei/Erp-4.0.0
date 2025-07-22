@@ -86,6 +86,34 @@
             </label>
           </div>
         </div>
+        <div class="row g-3 justify-content-center mb-4">
+          <div class="col col-5 position-relative">
+            <input 
+              type="datetime-local" 
+              name="data_inicio" 
+              id="id_data_inicio" 
+              value="{{ pedido.data_inicio|date:'Y-m-d\TH:i' }}" 
+              readonly 
+              class="form-control form-control-lg border border-success pt-3">
+            <label for="id_data_inicio"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Inicio Carregamento:</strong>
+            </label>
+          </div>
+          <div class="col col-5 position-relative">
+            <input 
+              type="datetime-local" 
+              name="data_inicio" 
+              id="id_data_inicio" 
+              value="{{ pedido.data_fim|date:'Y-m-d\TH:i' }}" 
+              readonly 
+              class="form-control form-control-lg border border-success pt-3">
+            <label for="id_data_inicio"
+                   class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+              <strong>Fim Carregamento:</strong>
+            </label>
+          </div>
+        </div>
         <div class="row my-5 justify-content-center">
           <a 
             class="btn btn-lg btn-success col-md-5 mx-3 fs-3"
@@ -185,11 +213,9 @@
     const classesToAdd = statusColors[status];
     if (classesToAdd) {
       // Agora, adicione as novas classes
-      console.log(`Adding classes: ${classesToAdd}`);
       statusElement.classList.add(...classesToAdd.split(' '));
     } else {
       // Opcional: lide com status desconhecidos, talvez removendo todas as classes de cor
-      console.log(`Status "${status}" not found in statusColors.`);
       for (const key in statusColors) {
           const classesToRemove = statusColors[key].split(' ');
           statusElement.classList.remove(...classesToRemove);

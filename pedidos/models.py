@@ -1,3 +1,4 @@
+from enum import auto
 from django.db import models
 
 # Create your models here.
@@ -46,6 +47,8 @@ class Pedidos(models.Model):
         default="OPE",
         verbose_name="Status",
     )
+    data_inicio = models.DateTimeField(null=True, blank=True)
+    data_fim = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         prof = f"{self.pedido_number} - {self.cliente}"

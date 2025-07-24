@@ -115,7 +115,10 @@
                          list="datalistItensOptions"
                          class="form-control form-control-lg border bg-primary-subtle border-success pt-3">
                   <datalist id="datalistItensOptions">
-                    {% for item in item_list %}<option value="{{ item.name_prod }}" data-pk="{{ item.pk }}"></option>{% endfor %}
+                    {% for item in item_list %}
+                      <option value="{{ item.item_cod }} - {{ item.name_prod }}"
+                              data-pk="{{ item.pk }}"></option>
+                    {% endfor %}
                   </datalist>
                   <label for="item_search"
                          class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
@@ -156,119 +159,152 @@
                 <button type="submit" class="col btn btn-success mx-2 fs-4">Adicionar Item</button>
                 <button type="reset" class="col btn btn-warning mx-2 fs-4">Limpar Campos</button>
                 <a href="{% url 'pedidos:detail' pedido.pk %}"
-                   class="col btn btn-info mx-2 fs-4">Voltar ao Pedido</a>
+                   class="col btn bg-info mx-2 fs-4">Voltar ao Pedido</a>
               </div>
             </form>
           </div>
         </div>
+        <div class="row justify-content-center">
+          {% if pedido.pedido_editable %}
+            <button class="btn btn-danger col-md-5 mx-3 fs-3"
+                    id="btn-finalizar-edicao"
+                    onclick='finalizarEdicao()'>Finalizar Edição de Pedido</button>
+          {% else %}
+            <button class="btn btn-info col-md-5 mx-3 fs-3 none"
+                    id="btn-imprime-etiqueta"
+                    onclick='imprimirEtiquetas()'>Imprimir Etiquetas</button>
+          {% endif %}
+        </div>
       </section>
       <section class="col col-md-6">
         <div class="table table-container">
-        {% if itens_pedido %}
-          <table class="table table-hover caption-top">
-            <caption class="table-caption">
-              <h3 class="my-5 text-center">Itens Cadastrados Pedido</h3>
-            </caption>
-            <thead>
-              <tr class="table-row-header">
-                <th scope="col" class="col col-md-2 text-center table-header fs-4">Código</th>
-                <th scope="col" class="col col-md-6 text-center table-header fs-4">Descrição</th>
-                <th scope="col" class="col col-md-3 text-center table-header fs-4">Acabamento</th>
-                <th scope="col" class="col col-md-2 text-center table-header fs-4">Quantidade</th>
-                <th scope="col" class="col col-md-1 text-center table-header fs-4"></th>
-              </tr>
-            </thead>
-            <tbody class="table-group-divider">
-              {% for item in itens_pedido %}
-                <tr class="table-row align-items-center">
-                  <td class="table-cel text-center fs-5">{{ item.item.item_cod }}</td>  <!-- Codigo Item -->
-                  <td class="table-cel fs-5">{{ item.item.name_prod }}</td>             <!-- Nome Item -->
-                  <td class="table-cel fs-5">{{ item.finish.name_finish }}</td>         <!-- Acabamento Item -->
-                  <td class="table-cel text-center  fs-5">{{ item.quantity }}</td>      <!-- Quantidade Item -->
-                  <td class="table-cel text-center  fs-5 d-flex justify-content-between">
-                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3" 
-                      href="{% url 'pedidos:update_item' item.pk pedido.pedido_number %}">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="16"
-                           height="16"
-                           fill="currentColor"
-                           class="bi bi-pen"
-                           viewBox="0 0 16 16">
-                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z" />
-                      </svg>
-                    </a>
-                    <a class="link-offset-2 link-offset-3-hover text-danger link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
-                       href="#">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="16"
-                           height="16"
-                           fill="currentColor"
-                           class="bi bi-x-circle"
-                           viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-                      </svg>
-                    </a>
-                  </td>
+          {% if itens_pedido %}
+            <table class="table table-hover caption-top">
+              <caption class="table-caption">
+                <h3 class="my-5 text-center">Itens Cadastrados Pedido</h3>
+              </caption>
+              <thead>
+                <tr class="table-row-header">
+                  <th scope="col" class="col col-md-2 text-center table-header fs-4">Código</th>
+                  <th scope="col" class="col col-md-6 text-center table-header fs-4">Descrição</th>
+                  <th scope="col" class="col col-md-3 text-center table-header fs-4">Acabamento</th>
+                  <th scope="col" class="col col-md-2 text-center table-header fs-4">Quantidade</th>
+                  <th scope="col" class="col col-md-1 text-center table-header fs-4"></th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <div class="container justify-content-center">
-            <div class="row mb-5">
-              <h1>Nenhum item encontrado</h1>
+              </thead>
+              <tbody class="table-group-divider">
+                {% for item in itens_pedido %}
+                  <tr class="table-row align-items-center">
+                    <td class="table-cel text-center fs-5">{{ item.item.item_cod }}</td>
+                    <td class="table-cel fs-5">{{ item.item.name_prod }}</td>
+                    <td class="table-cel fs-5">{{ item.finish.name_finish }}</td>
+                    <td class="table-cel text-center fs-5">{{ item.quantity }}</td>
+                    <td class="table-cel text-center fs-5 d-flex justify-content-between">
+                      <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
+                         href="{% url 'pedidos:update_item' item.pk pedido.pedido_number %}">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-pen"
+                             viewBox="0 0 16 16">
+                          <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z" />
+                        </svg>
+                      </a>
+                      <a class="link-offset-2 link-offset-3-hover text-danger link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
+                         href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-x-circle"
+                             viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                        </svg>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="container justify-content-center">
+              <div class="row mb-5">
+                <h1>Nenhum item encontrado</h1>
+              </div>
             </div>
-          </div>
-        {% endif %}
+          {% endif %}
         </div>
       </section>
     </div>
   </section>
 {% endblock content %}
 {% block scripts %}
+  <script src="{% static 'global/js/pedido_fill.js' %}"></script>
   <script>
-    // Aguarda o documento carregar completamente
-    document.addEventListener('DOMContentLoaded', function () {
-      // 1. Seleciona os elementos do DOM que vamos manipular
-      const itemSearchInput = document.getElementById('item_search');
-      const finishSearchInput = document.getElementById('finish_search');
-      const hiddenItemInput = document.getElementById('id_item_hidden');
-      const hiddenFinishInput = document.getElementById('id_finish_hidden');
-      const datalisItem = document.getElementById('datalistItensOptions');
-      const datalistFinish = document.getElementById('datalistFinishOptions');
+    function finalizarEdicao() {
+      const csrfToken = document.querySelector(
+          "[name=csrfmiddlewaretoken]"
+      ).value;
+      console.log("Iniciando finaliza o de edicao");
+      console.log("csrfToken:", csrfToken);
 
-      // 2. Adiciona um 'escutador' de eventos ao campo de busca.
-      //    O evento 'input' é disparado sempre que o valor do campo muda.
-      itemSearchInput.addEventListener('input', function (event) {
-        const inputValue = event.target.value;
-
-        // 3. Procura por uma <option> dentro do <datalist> cujo valor (a descrição)
-        //    seja exatamente igual ao que o usuário digitou ou selecionou.
-        const option = Array.from(datalisItem.options).find(opt => opt.value === inputValue);
-
-        if (option) {
-          // 4. Se encontrou uma opção correspondente, pega o ID do atributo 'data-pk'
-          const pk = option.getAttribute('data-pk');
-          //    E define o valor do nosso campo oculto com esse ID.
-          hiddenItemInput.value = pk;
-        } else {
-          // 5. Se não encontrou (ex: o usuário está digitando algo que não existe),
-          //    limpa o valor do campo oculto para não enviar um ID inválido ao servidor.
-          hiddenItemInput.value = '';
-        }
+      $.ajax({
+          type: "GET",
+          url: "{% url 'pedidos:finalizar_edicao' pedido.pk %}",
+          headers: {
+              "X-CSRFToken": csrfToken,
+          },
+          success: function (data) {
+              console.log("finalizarEdicao() success callback:", data);
+              if (data.success) {
+                  console.log("Finaliza o de edicao realizada com sucesso!");
+                  window.location.reload();
+              } else {
+                  console.error(
+                      "Finaliza o de edicao falhou:",
+                      data.message || "Erro desconhecido."
+                  );
+              }
+          },
+          error: function (xhr, status, error) {
+              console.error("Erro na requisi o AJAX:", status, error, xhr);
+          },
       });
+    }
 
-      finishSearchInput.addEventListener('input', function (event) {
-        const inputValue = event.target.value;
-        const option = Array.from(datalistFinish.options).find(opt => opt.value === inputValue);
-        if (option) {
-          const pk = option.getAttribute('data-pk');
-          hiddenFinishInput.value = pk;
-        } else {
-          hiddenFinishInput.value = '';
-        }
-      })
-    });
+    function imprimirEtiquetas() {
+        const btn_print_labels = document.getElementById("btn-imprime-etiqueta");
+        const csrfToken = document.querySelector(
+            "[name=csrfmiddlewaretoken]"
+        ).value;
+        event.preventDefault();
+        btn_print_labels.disabled = true;
+        btn_print_labels.innerText = "Imprimindo...";
+        $.ajax({
+            type: "POST",
+            url: "{% url 'pedidos:imprimir_etiquetas' pedido.pk %}",
+            headers: {
+                "X-CSRFToken": csrfToken,
+            },
+            success: function (data) {
+                console.log(data);
+                if (data.success) {
+                    console.log("Etiquetas impressas com sucesso.");
+                } else {
+                    console.error(
+                        "Finalização da edição falhou:",
+                        data.message || "Erro desconhecido."
+                    );
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Erro na requisição AJAX:", status, error, xhr);
+            },
+        });
+    }
   </script>
+
+
 {% endblock scripts %}

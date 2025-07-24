@@ -123,9 +123,14 @@
             href="{% url 'pedidos:index' %}">Voltar</a>
         </div>
         <div class="row justify-content-center"></div>
+          {% if pedido.pedido_editable %}
           <a 
             class="btn btn-lg btn-info col-md-5 mx-3 fs-3"
             href="{% url 'pedidos:add_item' pedido.pk %}">Adicionar item ao Pedido</a>
+          {% else %}
+          <a href="#"
+            class="btn btn-lg btn btn-dark col-md-5 mx-3 fs-3">Liberar Pedido para Edição</a>
+          {% endif %}
         </div>
 
       </section>

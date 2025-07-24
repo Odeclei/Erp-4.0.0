@@ -1,12 +1,18 @@
 [data-bs-theme="light"] {
     --bs-body-bg: #f5fefe; /* Um azul bebê bem claro para o light mode */
     --bs-body-color: #212529; /* Cor do texto padrão Bootstrap */
-
+    --bg-btn-purple: rgb(70, 31, 149);
+}
 
 [data-bs-theme="dark"] {
     --bs-body-bg: #212529; /* Um cinza escuro para o dark mode */
-    --bs-body-color: #F8F9FA; /* Cor do texto claro para o dark mode */
+    --bs-body-color: #f8f9fa; /* Cor do texto claro para o dark mode */
+    --bg-btn-purple: rgb(175, 139, 246);
+}
 
+/* .btn-purple {
+    background-color: var(--bg-btn-purple);
+} */
 .search-icon {
     position: absolute;
     top: 50%;
@@ -18,8 +24,7 @@
     position: relative;
 }
 
-#form-add-item{
+#form-add-item {
     display: none;
     cursor: pointer;
 }
-

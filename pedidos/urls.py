@@ -8,6 +8,8 @@ from pedidos.views import (
     PedidoSearchView,
     ItemPedidoCreateView,
     ItemPedidoUpdateView,
+    EndPedidoView,
+    ImprimeEtiquetas,
 )
 
 app_name = "pedidos"
@@ -28,6 +30,8 @@ urlpatterns = [
         ItemPedidoUpdateView.as_view(),
         name="update_item",
     ),
+    path("<int:pk>/finalizar_edicao/", EndPedidoView, name="finalizar_edicao"),
+    path("<int:pk>/imprime_etiquetas/", ImprimeEtiquetas, name="imprimir_etiquetas"),
     # path(
     #     "<int:pk>/<int:order_number>/delete_item/",
     #     ItemPedidoDeleteView.as_view(),

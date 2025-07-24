@@ -49,6 +49,7 @@ class Pedidos(models.Model):
     )
     data_inicio = models.DateTimeField(null=True, blank=True)
     data_fim = models.DateTimeField(null=True, blank=True)
+    pedido_editable = models.BooleanField(default=True, blank=True, null=True)
 
     def __str__(self) -> str:
         prof = f"{self.pedido_number} - {self.cliente}"

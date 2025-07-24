@@ -63,6 +63,23 @@ class ClienteReadView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        paginator = context["paginator"]
+        page = context["page_obj"]
+        num_pages = paginator.num_pages
+
+        current_page = page.number
+
+        start_index = max(1, current_page - 2)
+        if start_index == 1:
+            end_index = min(
+                num_pages, 5
+            )  # show up to 5 pages if we're near the beginning
+        else:
+            end_index = min(num_pages, current_page + 2)
+
+        page_range = range(start_index, end_index + 1)
+
+        context["page_range"] = page_range
         return context
 
 

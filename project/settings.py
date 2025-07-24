@@ -5,6 +5,7 @@ import os
 
 from django.contrib.messages import constants as messages
 from getmac import get_mac_address as gma
+from import_export.formats.base_formats import XLSX
 
 # from unittest import expectedFailure
 
@@ -75,8 +76,10 @@ INSTALLED_APPS = [
     "carregamento",
     "clientes",
     "pedidos",
+    "utility",
     # third aps
     "rest_framework",
+    "import_export",
 ]
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -227,6 +230,8 @@ LOGGING = {
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 5,
             "formatter": "json",
+            "encoding": "utf8",
+            # "console": {"level": "DEBUG", "class": "logging.StreamHandler"},
         },
         "console": {
             "level": "INFO",
@@ -246,6 +251,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+        "django.db.backends": {"level": "INFO", "handlers": ["console"]},
+        "import_export": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
         "": {  # Root logger - catches everything not caught by more specific loggers
             "handlers": ["json_file"],
             "level": "WARNING",
@@ -253,3 +263,5 @@ LOGGING = {
         },
     },
 }
+
+# IMPORT_EXPORT_FORMATS = [XLSX]

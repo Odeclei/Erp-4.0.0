@@ -42,6 +42,7 @@
           <th scope="col" class="table-header fs-2">Código</th>
           <th scope="col" class="table-header fs-2">Descrição Produto</th>
           <th scope="col" class="table-header fs-2">Família</th>
+          <th scope="col" class="table-header fs-2">Qtde dia</th>
         </tr>
       </thead>
       <tbody class='table-group-divider'>
@@ -55,7 +56,8 @@
               </a>
             </td>
             <td class="table-cel table-text-left fs-3">{{item.name_prod}}</td>
-            <td class="table-cel table-text-left fs-3">{{item.family}}</td>
+            <td class="table-cel table-text-left fs-3">{{item.family}}</td> 
+            <td class="table-cel text-center fs-3">{{item.qtd_per_day}}</td> 
           </tr>
         
         {% endfor %}

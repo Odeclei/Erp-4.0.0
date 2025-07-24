@@ -25,6 +25,9 @@
     </main>
   </div>
   
+  {% if is_paginated %}
+    {% include "global/partials/_pagination.html" %}
+  {% endif %}
   <footer class="fixed-bottom mt-5 p-3 bg-dark-subtle"> 
     {% include "global/partials/_footer.html" %}
   </footer>

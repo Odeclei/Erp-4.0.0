@@ -6,7 +6,7 @@ from pedidos import models
 
 
 @admin.register(models.Pedidos)
-class ProformasAdmin(admin.ModelAdmin):
+class PedidosAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "pk",
@@ -14,9 +14,13 @@ class ProformasAdmin(admin.ModelAdmin):
         "cliente",
         "pedido_cliente",
         "status",
+        "pedido_editable",
     )
     ordering = ("-pedido_number",)
-    list_editable = ("status",)
+    list_editable = (
+        "status",
+        "pedido_editable",
+    )
     search_fields = (
         "pedido_number",
         "pedido_cliente",
@@ -36,6 +40,7 @@ class ItemProformaAdmin(admin.ModelAdmin):
         "finish",
         "quantity",
     )
+    list_editable = ('quantity',)
     list_display_links = (
         "id",
         "proforma",

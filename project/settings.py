@@ -276,3 +276,8 @@ LOGGING = {
 }
 
 # IMPORT_EXPORT_FORMATS = [XLSX]
+
+try:
+    from project.local_settings import *
+except ImportError:
+    ...

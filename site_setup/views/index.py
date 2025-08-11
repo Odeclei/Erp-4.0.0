@@ -5,7 +5,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.models import User, UserManager
-from site_setup.forms import UserCustomCreateForm
 
 # Create your views here.
 
@@ -56,22 +55,3 @@ def login_view(request):
 def home_view(request):
     # Aqui você pode definir a lógica para a página inicial após o login
     return render(request, "site_setup/home.html")
-
-
-@login_required
-def adicionar_usuario(request):
-    if request.method == "POST":
-        form = UserCustomCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("site_setup:home")
-    else:
-        form = UserCustomCreateForm()
-        print()
-        print()
-        print()
-        print("get", request.GET)
-        print("post", request.POST)
-        print()
-        print()
-    return render(request, "site_setup/new_user.html", {"form": form})

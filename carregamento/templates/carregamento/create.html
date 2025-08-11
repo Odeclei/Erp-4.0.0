@@ -1,7 +1,14 @@
 {% extends "global/base.html" %}
 {% load static %}
 {% block content %}
-  <section class="container shadow p-3 mb-5 bg-body-tertiary rounded-3">
+  <section class="container shadow p-3 mb-5 bg-body-tertiary card rounded-3">
+    {% if pedido.ucc_label %}
+    <div class="alert alert-dismissible alert-warning card mt-2 mb-5 mx-5 p-3 shadow">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <h4 class="alert-heading"><strong>Atenção!</strong></h4>
+      <p class="mb-0 fs-4">Esse pedido possui Etiqueta UCC.</p>
+    </div>
+    {% endif %}
     {% if pedido %}
       {% include "carregamento/partials/_create.html" %}
     {% else %}
@@ -23,15 +30,8 @@
   </div>
   <form method="post">
     {% csrf_token %}
-    <div class="row container justify-content-evenly align-items-center mt-5 py-5">
+    <div class="row container justify-content-evenly align-items-center my-5 py-5">
       <div class="col col-md-6 justify-content-around">
-        <button id="salvar-itens"
-                onclick="salvarItens()"
-                class=" btn btn-success btn-lg col col-5 mx-2 py-2 px-4 fs-4">Salvar Itens</button>
-                <a href="{% url 'carregamento:carga_create_pk' pedido.pk %}"
-                   class="btn btn-secondary btn-lg col col-5 mx-2 py-2 px-4 fs-4">Reset</a>
-      </div>
-      <div class="col col-md-6 justify-content-end">
         <button 
           id="encerrar-carregamento"
           onclick="encerrarCarregamento()"
@@ -60,8 +60,12 @@
       var itemId = progressBar.id.replace('progress-', '');
 
       // Obt er a quantidade carregada e a quantidade total
-      var qtdeCarregada = document.getElementById('qtde-' + itemId).textContent;
-      var qtdeTotal = document.getElementById('qtde-total-' + itemId).textContent;
+      var qtdeCarregada = document.getElementById('qtde-' + itemId);
+      var qtdeTotal = document.getElementById('qtde-total-' + itemId);
+
+      qtdeCarregada = parseInt(qtdeCarregada.innerHTML) || 0;
+      qtdeTotal = parseInt(qtdeTotal.innerHTML) || 0;
+      console.log(qtdeCarregada, qtdeTotal);
       // Calcular o valor da progressbar
       var valor = (qtdeCarregada / qtdeTotal) * 100;
 
@@ -69,11 +73,10 @@
         progressBar.classList.remove("bg-info");
         progressBar.classList.add("bg-danger");
       }
-      if (valor > 100) {
+      if (valor == 100) {
         progressBar.classList.remove("bg-info");
         progressBar.classList.add("bg-success");
       }
-
 
       // Atualizar a progressbar
       progressBar.style.width = valor + '%';
@@ -92,24 +95,16 @@
         'pedido_pk': {{ pedido.pk }},
       },
       success: function(data) {
-        if (data.error){
-          location.reload();
-          return
-        }
         var itemId = data.item_id;
+        var qtdeNova = data.qtde_nova;
         var qtdeInput = document.getElementById("qtde-" + itemId)
-        var qtde = parseInt(qtdeInput.innerHTML) || 0; // obtém o valor atual ou 0 se estiver vazio
+        //var qtde = parseInt(qtdeInput.innerHTML) || 0; // obtém o valor atual ou 0 se estiver vazio
         var progressBar = document.getElementById("progress-" + itemId);
         var qtdeTotal = document.getElementById("qtde-total-" + itemId).textContent;
+        var status = document.getElementById("id_status")
+        qtdeInput.innerHTML = qtdeNova; // atualiza o valor no elemento
 
-        // calcular o valor da progressbar
-        
-        
-
-        qtde += 1; // incrementa o valor em 1
-        qtdeInput.innerHTML = qtde; // atualiza o valor no elemento
-
-        var valor = (qtde / qtdeTotal) * 100
+        var valor = (qtdeNova / qtdeTotal) * 100
         // Atualizar a progressBar
         progressBar.style.width = valor + '%';
         progressBar.ariaValueNow = valor;
@@ -122,52 +117,76 @@
           progressBar.classList.remove("bg-info");
           progressBar.classList.add("bg-success");
         }
-
-
-        
-
+        status.value = "Carregando";
         document.getElementById("id_barcode").value = '';
         document.getElementById("id_barcode").focus();
       },error: function(xhr, status, error) {
+        let inputbarcode = document.getElementById("id_barcode")
+        let errorData = xhr.responseJSON;
+        if (errorData && errorData.error) {
+          switch (errorData.code){
+            case "ALREADY_PROCESSED":
+                window.confirm("Atenção: Este código de barras já foi lido!");
+                if (confirm("Deseja limpar o campo?")) {
+                    inputbarcode.value = '';
+                    inputbarcode.focus();
+                } else {
+                  window.location.reload()
+                }
+                break;
+            case "INVALID_FORMAT":
+                alert("Erro: O código digitado não segue um formato válido.");
+                inputbarcode.value = '';
+                inputbarcode.focus();
+                // Peça para o usuário verificar o formato ou limpe o campo.
+                break;
+            case "ITEM_NOT_FOUND":
+                alert("Erro: O item correspondente a este código não foi encontrado no pedido.");
+                inputbarcode.value = '';
+                inputbarcode.focus();
+                break;
+            case "DB_ERROR":
+                alert("Erro interno: Não foi possível registrar o código de barras. Tente novamente.");
+                inputbarcode.value = '';
+                inputbarcode.focus();
+                break;
+            case "QTD_ERROR":
+                alert("Erro: Quantidade excede a quantidade no pedido.\nVerificar com Comercial.\n\nTente novamente.");
+                inputbarcode.value = '';
+                inputbarcode.focus();
+                break;
+            default:
+                alert("Ocorreu um erro desconhecido: " + errorData.error);
+                break;
+          }
+        } else {
+            alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
+        }
         location.reload();
-
-        console.error("Erro ao ler codigo de barras:", error);
-        // Handle errors, e.g., display an error message to the user
       }
     });
   }
-  function salvarItens() {
-    const botao_salvar = document.getElementById("salvar-itens");
-    botao_salvar.addEventListener("click", function(event) {
-      event.preventDefault();
-      console.log("Salvando itens...");
-    })
-    $.ajax({
-      type:'POST',
-      url: "{% url 'carregamento:salvar_itens' %}",
-      data: {
-        'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        'quantidades': JSON.stringify(quantidades),
-        'pedido_pk': {{ pedido.pk }},
-      },
-      success: function(data) {
-        //...
-        location.reload();
-
-      },
-      error: function(xhr, status, error) {
-          console.error("Erro ao salvar itens:", error);
-          // Handle errors, e.g., display an error message to the user
-      }
-    });
-  }
+  
   function encerrarCarregamento(){
+    const numeroCarregamento = prompt("Insira o Número do Carregamento: ")
+
+    if (!numeroCarregamento) {
+      numeroCarregamento == null;
+    }
+    const numeroLacre = prompt("Insira o Número do Lacre: ")
+
+    if (!numeroLacre) {
+      numeroLacre == null;
+    }
+
     $.ajax({
       type:'POST',
       url: "{% url 'carregamento:encerrar_carregamento' %}",
       data: {
         'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
         'pedido_pk': {{ pedido.pk }},
+        'numero_carregamento': numeroCarregamento,
+        'numero_lacre': numeroLacre
       },
       success: function(data) {
         if (data.success){
@@ -180,9 +199,9 @@
           // Handle errors, e.g., display an error message to the user
       }
     });
-
   }
   </script>
+
   <script>
     // Suponha que você tenha um elemento HTML com um ID "id_status"
     const statusElement = document.getElementById('id_status');

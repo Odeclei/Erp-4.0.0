@@ -1,7 +1,7 @@
 {% extends "global/base.html" %}
 {% load static %}
 {% block content %}
-  <section id="pedidos" class="container-fluid">
+  <section id="pedidos" class="container-fluid  mb-5">
     <div class="container-title text-center justify-content-center mb-5">
       <h1>
         Adicionar Item ao Pedido: <strong>{{ pedido.pedido_number }} - {{ pedido.cliente }}</strong>
@@ -9,7 +9,7 @@
     </div>
     <div class="row g-5">
       <section class="col col-md-6">
-        <div class="row shadow-lg p-5 mb-5 bg-body-tertiary rounded ">
+        <div class="row shadow-lg p-5 mb-4 bg-body-tertiary rounded-3 ">
           <div class="row g-3 justify-content-center mb-4">
             <div class="col col-5 position-relative">
               <input type="text"
@@ -89,7 +89,7 @@
             </div>
           </div>
         </div>
-        <div class="row shadow-lg p-5 mb-5 bg-body-tertiary rounded ">
+        <div class="row shadow-lg p-5 mb-4 bg-body-tertiary rounded-3 ">
           <div class="row container text-center mb-5">
             <h2>Selecionar Dados</h2>
           </div>
@@ -140,6 +140,7 @@
                 </div>
                 <div class="col col-8 position-relative">
                   <input type="text"
+                         name="finish_custom"
                          id="finish_search"
                          list="datalistFinishOptions"
                          class="form-control form-control-lg bg-primary-subtle border border-success pt-3">
@@ -155,9 +156,17 @@
                   <input type="hidden" name="finish" id="id_finish_hidden">
                 </div>
               </div>
+              <div class="row justify-content-center">
+                <div class="col-11 position-relative">
+                  <textarea name="observation" id="id_observation" rows="3" cols="50" wrap="soft"
+                  class="form-control form-control-lg bg-primary-subtle border border-success pt-3"></textarea>
+                  <label for="id_observation"class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+                    <strong>Observação:</strong></label>
+                </div>
+              </div>
               <div class="row g-2 justify-content-center my-4">
-                <button type="submit" class="col btn btn-success mx-2 fs-4">Adicionar Item</button>
-                <button type="reset" class="col btn btn-warning mx-2 fs-4">Limpar Campos</button>
+                <button type="submit" id="btn-add-item" class="col btn btn-success mx-2 fs-4">Adicionar Item</button>
+                <button type="reset" id="btn-clear-fields" class="col btn btn-warning mx-2 fs-4">Limpar Campos</button>
                 <a href="{% url 'pedidos:detail' pedido.pk %}"
                    class="col btn bg-info mx-2 fs-4">Voltar ao Pedido</a>
               </div>
@@ -199,6 +208,7 @@
                     <td class="table-cel fs-5">{{ item.item.name_prod }}</td>
                     <td class="table-cel fs-5">{{ item.finish.name_finish }}</td>
                     <td class="table-cel text-center fs-5">{{ item.quantity }}</td>
+                    {% if pedido.status != 'CAN' and pedido.status != 'FIN' and pedido.pedido_editable == True %}      <!-- Quantidade Item -->
                     <td class="table-cel text-center fs-5 d-flex justify-content-between">
                       <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
                          href="{% url 'pedidos:update_item' item.pk pedido.pedido_number %}">
@@ -212,7 +222,7 @@
                         </svg>
                       </a>
                       <a class="link-offset-2 link-offset-3-hover text-danger link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
-                         href="#">
+                         href="{% url 'pedidos:delete_item' item.pk %}">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              width="16"
                              height="16"
@@ -224,6 +234,7 @@
                         </svg>
                       </a>
                     </td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>
@@ -244,12 +255,13 @@
   <script src="{% static 'global/js/pedido_fill.js' %}"></script>
   <script>
     function finalizarEdicao() {
+      const btn_add_item = document.getElementById("btn-add-item");
+      const btn_clear_fields = document.getElementById("btn-clear-fields");
       const csrfToken = document.querySelector(
           "[name=csrfmiddlewaretoken]"
       ).value;
-      console.log("Iniciando finaliza o de edicao");
-      console.log("csrfToken:", csrfToken);
-
+      btn_add_item.disabled = true;
+      btn_clear_fields.disabled = true;
       $.ajax({
           type: "GET",
           url: "{% url 'pedidos:finalizar_edicao' pedido.pk %}",
@@ -257,16 +269,16 @@
               "X-CSRFToken": csrfToken,
           },
           success: function (data) {
-              console.log("finalizarEdicao() success callback:", data);
-              if (data.success) {
-                  console.log("Finaliza o de edicao realizada com sucesso!");
-                  window.location.reload();
-              } else {
-                  console.error(
-                      "Finaliza o de edicao falhou:",
-                      data.message || "Erro desconhecido."
-                  );
-              }
+            if (data.success) {
+              window.location.reload();
+            } else {
+              alert(
+                "Finaliza o de edicao falhou:",
+                data.message || "Erro desconhecido."
+              );
+              btn_add_item.disabled = false;
+              btn_clear_fields.disabled = false;
+            }
           },
           error: function (xhr, status, error) {
               console.error("Erro na requisi o AJAX:", status, error, xhr);
@@ -279,7 +291,7 @@
         const csrfToken = document.querySelector(
             "[name=csrfmiddlewaretoken]"
         ).value;
-        event.preventDefault();
+//        event.preventDefault();
         btn_print_labels.disabled = true;
         btn_print_labels.innerText = "Imprimindo...";
         $.ajax({
@@ -289,14 +301,14 @@
                 "X-CSRFToken": csrfToken,
             },
             success: function (data) {
-                console.log(data);
                 if (data.success) {
-                    console.log("Etiquetas impressas com sucesso.");
-                } else {
-                    console.error(
-                        "Finalização da edição falhou:",
-                        data.message || "Erro desconhecido."
-                    );
+                    alert("Etiquetas impressas com sucesso.");
+                    btn_print_labels.disabled = false;
+                    btn_print_labels.disabled = false;
+                    btn_print_labels.innerText = "Imprimir Etiquetas";
+                  } else {
+                    btn_print_labels.disabled = false;
+                    btn_print_labels.innerText = "Imprimir Etiquetas";
                 }
             },
             error: function (xhr, status, error) {

@@ -63,9 +63,7 @@ class Item(models.Model):
         null=True,
         related_name="updated_by",
     )
-    qtde_volume = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+    qtde_volume = models.FloatField(
         blank=True,
         null=True,
     )

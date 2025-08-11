@@ -28,12 +28,11 @@
               class="form-control form-control-lg border border-success pt-3"
               list="datalistClientesOptions"
               id="cliente_search"
-              placeholder='Buscar Cliente...'>
+              placeholder='Buscar Cliente...'
+              value="{{ object.cliente }}">
 
             <datalist id="datalistClientesOptions">
             {% for cliente in clientes_list %}
-              {# O `value` é o texto que o usuário vê e seleciona. #}
-              {# O `data-pk` é o ID que queremos enviar para o backend. #}
               <option value="{{ cliente.nome_fantasia }}" data-pk="{{ cliente.pk }}"></option>
             {% endfor %}
           </datalist>
@@ -41,9 +40,18 @@
                  class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
             <strong>Cliente</strong>
           </label>
-          {# Este campo oculto guardará o ID da família selecionada para ser enviado no formulário. #}
-          {# O `name` deve corresponder ao que o seu formulário Django espera. #}
-          <input type="hidden" name="{{ field.name }}" id="id_cliente_hidden">
+          <input 
+            type="hidden" 
+            name="{{ field.name }}" 
+            id="id_cliente_hidden"
+            value="{% if object.cliente %} {{ object.cliente.pk }} {% endif %}">
+          {% elif field.name == 'ucc_label' %}
+          <div class="form-check form-switch">
+            <label class="form-check-label fs-4 align-center" for="{{ field.id_for_label }}">
+              <strong>{{ field.label }}</strong>
+            </label>
+            {{ field }}
+          </div>
           {% else %}
           {{ field }}
           <label for="{{ field.id_for_label }} "
@@ -61,10 +69,12 @@
       <div class="row mt-5 justify-content-center">
         {% if form.instance.pk %}
         <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg p-2 fs-3">Alterar Pedido</button>
+        <a href="{% url 'pedidos:detail' object.pk %}" class="col-md-5 btn btn-secondary mx-2 btn-lg p-2 fs-3">Voltar</a>
         {% else %}
-        <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg p-2 fs-3">Cadastrar Pedido</button>
+        <button type="submit" class="col-md-3 btn btn-success mx-2 btn-lg p-2 fs-3">Cadastrar Pedido</button>
+        <button type="reset" class="col-md-3 btn btn-warning mx-2 btn-lg p-2 fs-3">Limpar Campos</button>
+        <a href="{% url 'pedidos:index' %}" class="col-md-3 btn btn-secondary mx-2 btn-lg p-2 fs-3">Voltar</a>
         {% endif %}
-        <button type="reset" class="col-md-5 btn btn-secondary mx-2 btn-lg p-2 fs-3">Limpar Campos</button>
       </div>
     </form>
   </div>
@@ -81,18 +91,23 @@
       const hiddenClienteInput = document.getElementById('id_cliente_hidden');
       const datalist = document.getElementById('datalistClientesOptions');
 
+      console.log(clienteSearchInput);
+      console.log(hiddenClienteInput);
+      console.log(datalist);
+
       // 2. Adiciona um 'escutador' de eventos ao campo de busca.
       //    O evento 'input' é disparado sempre que o valor do campo muda.
-      clienteSearchInput.addEventListener('input', function (event) {
+      clienteSearchInput.addEventListener('blur', function (event) {
         const inputValue = event.target.value;
-
+        console.log('inputValue', inputValue);
         // 3. Procura por uma <option> dentro do <datalist> cujo valor (a descrição)
         //    seja exatamente igual ao que o usuário digitou ou selecionou.
         const option = Array.from(datalist.options).find(opt => opt.value === inputValue);
-
+        console.log(option);
         if (option) {
           // 4. Se encontrou uma opção correspondente, pega o ID do atributo 'data-pk'
           const pk = option.getAttribute('data-pk');
+          console.log(pk);
           //    E define o valor do nosso campo oculto com esse ID.
           hiddenClienteInput.value = pk;
         } else {

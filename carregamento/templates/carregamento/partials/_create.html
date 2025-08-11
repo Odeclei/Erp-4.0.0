@@ -31,16 +31,20 @@
         </tr>
       </thead>
       <tbody>
-        {% for item in list_itens_pedido %}
+        {% for item in itens_do_pedido %}
           <tr>
             <th scope="row" class="align-center py-2 fs-3">{{ item.item }}</th>
             <td class="align-center py-2 fs-3">{{ item.finish }}</td>
             <td class="align-center py-2 fs-3 text-center">
               <span>
                 <strong id="qtde-{{ item.id }}">
-                  {% for carregamento in carregamento_data %}
-                    {% if carregamento.item_id == item.id %}{{ carregamento.qtde_carregada }}{% endif %}
-                  {% endfor %}
+                  {% if item.id in qtde_lida_dict %}
+                    {% for key, value in qtde_lida_dict.items %}
+                      {% if key == item.id %}
+                        {{ value }}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
                 </strong></span> / <span id="qtde-total-{{ item.id }}"> {{ item.quantity }} </span>
               </td>
               <td>
@@ -60,5 +64,6 @@
           {% endfor %}
         </tbody>
       </table>
+
     </div>
   </section>

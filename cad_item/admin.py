@@ -24,24 +24,17 @@ class ItemResource(resources.ModelResource):
 @admin.register(models.Item)
 class ItemAdmin(ImportExportModelAdmin):
     resource_classes = [ItemResource]
-    list_display = (
-        "pk",
-        "item_cod",
-        "name_prod",
-        "is_active",
-        "qtde_volume"
-    )
-    list_editable = ('qtde_volume',)
+    list_display = ("pk", "item_cod", "name_prod", "is_active", "qtde_volume")
+    list_editable = ("qtde_volume",)
+    list_display_links = ("item_cod", "name_prod")
     ordering = ("-pk",)
     search_fields = (
+        "pk",
         "item_cod",
         "name_prod",
     )
     list_per_page = 50
-    list_filter = (
-        "family",
-        "is_active",
-    )
+    list_filter = ("is_active",)
     readonly_fields = (
         "created_at",
         "created_by",

@@ -4,19 +4,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.contrib.auth.models import User, UserManager
+from site_setup.forms import UserCustomCreateForm
 
 # Create your views here.
 
 
 def index(request):
-    return render(
-        request,
-        'site_setup/index.html'
-    )
+    return render(request, "site_setup/index.html")
 
 
-def login_view(request):  
-    if request.method == 'POST':
+def login_view(request):
+    if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
 
         if form.is_valid():
@@ -24,7 +23,7 @@ def login_view(request):
             auth_login(request, user)  # Realiza o login
 
             # Lógica de redirecionamento (incluindo o parâmetro 'next')
-            next_url = request.POST.get('next') or request.GET.get('next')
+            next_url = request.POST.get("next") or request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
@@ -38,28 +37,41 @@ def login_view(request):
         form = AuthenticationForm()
 
     # Passa o parâmetro 'next' do GET para o template, se existir
-    next_param = request.GET.get('next', '')
+    next_param = request.GET.get("next", "")
 
     # Define a ação do formulário usando reverse()
     # Certifique-se de que 'site_setup:login' está configurado no seu urls.py
-    form_action = reverse('site_setup:login')
+    form_action = reverse("site_setup:login")
 
     context = {
-        'form': form,
-        'next': next_param,  # Passa 'next' para o template
-        'form_action': form_action,
+        "form": form,
+        "next": next_param,  # Passa 'next' para o template
+        "form_action": form_action,
     }
 
-    return render(
-        request,
-        'site_setup/Login.html',
-        context
-    )
+    return render(request, "site_setup/Login.html", context)
+
 
 @login_required
 def home_view(request):
     # Aqui você pode definir a lógica para a página inicial após o login
-    return render(
-        request,
-        'site_setup/home.html'
-    )
+    return render(request, "site_setup/home.html")
+
+
+@login_required
+def adicionar_usuario(request):
+    if request.method == "POST":
+        form = UserCustomCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("site_setup:home")
+    else:
+        form = UserCustomCreateForm()
+        print()
+        print()
+        print()
+        print("get", request.GET)
+        print("post", request.POST)
+        print()
+        print()
+    return render(request, "site_setup/new_user.html", {"form": form})

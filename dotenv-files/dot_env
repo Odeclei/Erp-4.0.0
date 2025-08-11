@@ -1,0 +1,16 @@
+'''
+python -c "import string as s;from secrets import SystemRandom as SR;print(''.join(SR().choices(s.ascii_letters + s.digits + s.punctuation, k=64)));"
+'''
+
+SECRET_KEY="|L3o#0Ys}+G2Lu,18s5u6]oe+|z_S|qn{GflP4K=R),ld^mew%f_q(u^@j"
+
+DEBUG="False"
+
+ALLOWED_HOSTS="127.0.0.1", "localhost", "192.168.1.184"
+
+DB_ENGINE="django.db.backends.postgresql"
+POSTGRES_DB="mrp_James"
+POSTGRES_USER="postgres "
+POSTGRES_PASSWORD="James*1972"
+POSTGRES_HOST="localhost"
+POSTGRES_PORT="5432"

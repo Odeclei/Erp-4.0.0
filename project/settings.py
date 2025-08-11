@@ -80,7 +80,17 @@ INSTALLED_APPS = [
     # third aps
     "rest_framework",
     "import_export",
+    "axes",
 ]
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 5
+AXES_COLLOFF_TIME = 1
+AXES_RESET_ON_SUCCESS = True
+
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 # CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -95,6 +105,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # my middleware
     # 'site_setup.turno_middleware.GlobalSettingsMiddleware'
+    "axes.middleware.AxesMiddleware",
 ]
 
 

@@ -1,7 +1,8 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+import pedidos
 from pedidos.models import Pedidos, ItemPedido
 from pedidos.forms import PedidoForm, ItemPedidoForm
 from clientes.models import Clientes
@@ -93,8 +94,15 @@ class PedidoUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pedido_pk = self.object.pk
+        clientes_list = Clientes.objects.all().order_by("nome_fantasia")
         form_action = reverse("pedidos:update", kwargs={"pk": self.object.pk})
-        context.update({"form_action": form_action, "pedido_pk": pedido_pk})
+        context.update(
+            {
+                "form_action": form_action,
+                "pedido_pk": pedido_pk,
+                "clientes_list": clientes_list,
+            }
+        )
         return context
 
     def form_valid(self, form):
@@ -153,7 +161,28 @@ class ItemPedidoCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, "Item inserido no Pedido com Sucesso.")
+        finish = form.cleaned_data.get("finish")
+        pedido = form.cleaned_data.get("proforma").pk
+        finish_custom = form.cleaned_data.get("finish_custom")
+        finish_defined = ""
+        if finish:
+            finish_defined = finish
+            finish.save()
+        elif finish_custom:
+            finish_add = Finish.objects.create(
+                code_finish=pedido,
+                name_finish=finish_custom.upper(),
+            )
+            finish_defined = finish_add
+            finish_add.save()
+        else:
+            print("No finish found in form data")
+
+        item_pedido = form.save(commit=False)
+        item_pedido.finish = finish_defined
+        item_pedido.save()
+
+        messages.success(self.request, "Item Cadastrado com Sucesso.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -169,13 +198,13 @@ class ItemPedidoUpdateView(UpdateView):
 
     def get_object(self, queryset=...):
         item_pedido = get_object_or_404(ItemPedido, pk=self.kwargs["pk"])
-        # return super().get_object(queryset)
         return item_pedido
 
     def get_success_url(self):
         return reverse("pedidos:detail", kwargs={"pk": self.object.proforma.pk})
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         item_list = Item.objects.all().order_by("item_cod")
         finish_list = Finish.objects.all().order_by("name_finish")
@@ -188,6 +217,26 @@ class ItemPedidoUpdateView(UpdateView):
         return context
 
     def form_valid(self, form):
+        finish = form.cleaned_data.get("finish")
+        pedido = form.cleaned_data.get("proforma").pk
+        finish_custom = form.cleaned_data.get("finish_custom")
+        finish_defined = ""
+        if finish:
+            finish_defined = finish
+            finish.save()
+        elif finish_custom:
+            finish_add = Finish.objects.create(
+                code_finish=pedido,
+                name_finish=finish_custom.upper(),
+            )
+            finish_defined = finish_add
+            finish_add.save()
+        else:
+            print("No finish found in form data")
+
+        item_pedido = form.save(commit=False)
+        item_pedido.finish = finish_defined
+        item_pedido.save()
         messages.success(self.request, "Item Alterado com Sucesso.")
         return super().form_valid(form)
 
@@ -196,29 +245,31 @@ class ItemPedidoUpdateView(UpdateView):
         return super().form_invalid(form)
 
 
+class ItemPedidoDeleteView(DeleteView):
+    model = ItemPedido
+    template_name = "pedidos/delete_item.html"
+
+    def get_success_url(self):
+        messages.success(self.request, "Item Removido com Sucesso.")
+        return reverse_lazy("pedidos:detail", kwargs={"pk": self.object.proforma.pk})
+
+
 def EndPedidoView(request, pk):
-    print("Entrei em EndPedidoView")
     if request.method == "GET":
-        print("é um GET")
         pedido = get_object_or_404(Pedidos, pk=pk)
-        print("pedido:", pedido)
 
         try:
-            print("tentando finalizar pedido")
             pedido.pedido_editable = False
             pedido.save()
-            print("pedido finalizado com sucesso")
 
             return JsonResponse(
                 {"success": True, "message": "Pedido finalizado com sucesso!"}
             )
         except Exception as e:
-            print("erro ao finalizar pedido", e)
             return JsonResponse(
                 {"success": False, "message": f"Erro ao finalizar pedido: {e}"},
                 status=500,
             )
-    print("não é um GET, retornando 405")
     return JsonResponse(
         {"success": False, "message": "Método não permitido"}, status=405
     )
@@ -246,14 +297,18 @@ def ImprimeEtiquetas(request, pk):
                 item_name = item.item.name_prod
                 item_cod = item.item.item_cod
                 acabamento = item.finish.name_finish
+                if acabamento is None:
+                    acabamento = ""
                 pedido_number = item.proforma.pedido_number
                 volume_total = item.item.qtde_volume
                 volume_total = int(volume_total)
+                observation = item.observation
 
                 for i in range(1, item.quantity + 1):
                     for j in range(1, volume_total + 1):
                         index = f"{item.pk}-{i}-{j}"
                         volume_at = j
+
                         zpl_code = gerar_zpl_etiqueta(
                             item_name,
                             acabamento,
@@ -262,27 +317,25 @@ def ImprimeEtiquetas(request, pk):
                             item_cod,
                             volume_at,
                             volume_total,
+                            observation,
                         )
-
-                        print(f"--- Gerando ZPL para Impressão ---\n{zpl_code}")
-                        # imprimir_zpl(zpl_code) # Esta linha será usada no serviço de impressão
 
                         try:
                             response = requests.post(
-                                PRINT_SERVER_URL, json={"zpl": zpl_code}, timeout=5
+                                PRINT_SERVER_URL, json={"zpl": zpl_code}, timeout=20
                             )
-                            response.raise_for_status()  # Lança um erro para respostas 4xx/5xx
+                            response.raise_for_status()  # Lan a um erro para respostas 4xx/5xx
                         except requests.exceptions.RequestException as e:
-                            # Se não conseguir conectar ao serviço de impressão, retorna um erro claro.
+                            # Se n o conseguir conectar ao servi o de impress o, retorna um erro claro.
                             return JsonResponse(
                                 {
                                     "success": False,
-                                    "message": f"Erro ao conectar com o serviço de impressão: {e}",
+                                    "message": f"Erro ao conectar com o servi o de impress o: {e}",
                                 },
                                 status=503,
                             )
             return JsonResponse(
-                {"success": True, "message": "Etiquetas enviadas para impressão."}
+                {"success": True, "message": "Etiquetas enviadas para impress o."}
             )
 
         except Exception as e:
@@ -292,5 +345,28 @@ def ImprimeEtiquetas(request, pk):
             )
 
     return JsonResponse(
-        {"success": False, "message": "Método não permitido."}, status=405
+        {"success": False, "message": "M todo n o permitido."}, status=405
+    )
+
+
+def LiberarPedido(request, pk):
+    if request.method == "GET":
+        pedido_pk = request.GET.get("pedido_pk")
+
+        if pedido_pk:
+            pedido = get_object_or_404(Pedidos, pk=pedido_pk)
+
+            pedido.pedido_editable = True
+            pedido.save()
+
+            return JsonResponse(
+                {"success": True, "message": "Pedido liberado com sucesso."}
+            )
+        else:
+            return JsonResponse(
+                {"success": False, "message": "Pedido nao encontrado."}, status=404
+            )
+
+    return JsonResponse(
+        {"success": False, "message": "Metodo nao permitido."}, status=405
     )

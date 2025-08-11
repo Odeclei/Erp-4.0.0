@@ -50,6 +50,7 @@ class Pedidos(models.Model):
     data_inicio = models.DateTimeField(null=True, blank=True)
     data_fim = models.DateTimeField(null=True, blank=True)
     pedido_editable = models.BooleanField(default=True, blank=True, null=True)
+    ucc_label = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self) -> str:
         prof = f"{self.pedido_number} - {self.cliente}"
@@ -63,8 +64,11 @@ class ItemPedido(models.Model):
 
     proforma = models.ForeignKey(Pedidos, on_delete=models.DO_NOTHING)
     item = models.ForeignKey(Item, on_delete=models.DO_NOTHING)
-    finish = models.ForeignKey(Finish, on_delete=models.DO_NOTHING)
+    finish = models.ForeignKey(
+        Finish, on_delete=models.DO_NOTHING, default="-", null=True, blank=True
+    )
     quantity = models.IntegerField()
+    observation = models.TextField(null=True, blank=True)
 
     def __str__(self) -> str:
         prof = f"{self.proforma.pedido_number} - {self.item.name_prod}"

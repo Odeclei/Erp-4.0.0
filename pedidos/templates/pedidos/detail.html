@@ -122,17 +122,31 @@
             class="btn btn-lg btn-secondary col-md-5 mx-3 fs-3"
             href="{% url 'pedidos:index' %}">Voltar</a>
         </div>
-        <div class="row justify-content-center"></div>
-          {% if pedido.pedido_editable %}
+        <div class="row justify-content-center mt-5"></div>
+        {% comment %} Verifica se o pedido pode ser editado diretamente {% endcomment %}
+        {% if pedido.pedido_editable %}
           <a 
             class="btn btn-lg btn-info col-md-5 mx-3 fs-3"
             href="{% url 'pedidos:add_item' pedido.pk %}">Adicionar item ao Pedido</a>
-          {% else %}
-          <a href="#"
-            class="btn btn-lg btn btn-dark col-md-5 mx-3 fs-3">Liberar Pedido para Edição</a>
-          {% endif %}
-        </div>
 
+        {% comment %} 
+        Verifica se o status NÃO É 'concluido' E também NÃO É 'cancelado'.
+        Usa 'pedido.status' para a lógica, que é o valor real do banco.
+        {% endcomment %}
+        {% elif pedido.status != 'CAN' and pedido.status != 'FIN' %}
+          <button
+            class="btn btn-lg btn-dark col-md-5 mx-3 fs-3"
+            onclick="liberarPedido()">Liberar Pedido para Edição</button>
+          
+          <a class="btn btn-lg btn-info col-md-5 mx-3 fs-3"
+            href="{% url 'carregamento:carga_create_pk' pedido.pk %}">
+            Carregar Pedido 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+                <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2" />
+            </svg>
+          </a>
+        {% endif %}
+        </div>
       </section>
 
       <section class="col col-md-6">
@@ -146,7 +160,7 @@
               <tr class="table-row-header">
                 <th scope="col" class="col col-md-2 text-center table-header fs-4">Código</th>
                 <th scope="col" class="col col-md-6 text-center table-header fs-4">Descrição</th>
-                <th scope="col" class="col col-md-3 text-center table-header fs-4">Acabamento</th>
+                <th scope="col" class="col col-md-3 table-header fs-4">Acabamento</th>
                 <th scope="col" class="col col-md-2 text-center table-header fs-4">Quantidade</th>
                 <th scope="col" class="col col-md-1 text-center table-header fs-4"></th>
               </tr>
@@ -157,8 +171,10 @@
                   <td class="table-cel text-center fs-5">{{ item.item.item_cod }}</td>  <!-- Codigo Item -->
                   <td class="table-cel fs-5">{{ item.item.name_prod }}</td>             <!-- Nome Item -->
                   <td class="table-cel fs-5">{{ item.finish.name_finish }}</td>         <!-- Acabamento Item -->
-                  <td class="table-cel text-center  fs-5">{{ item.quantity }}</td>      <!-- Quantidade Item -->
+                  <td class="table-cel text-center  fs-5">{{ item.quantity }}</td>
+                  {% if pedido.status != 'CAN' and pedido.status != 'FIN' and pedido.pedido_editable == True %}      <!-- Quantidade Item -->
                   <td class="table-cel text-center  fs-5 d-flex justify-content-between">
+                    
                     <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3" 
                       href="{% url 'pedidos:update_item' item.pk pedido.pedido_number %}">
                       <svg xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +187,7 @@
                       </svg>
                     </a>
                     <a class="link-offset-2 link-offset-3-hover text-danger link-underline link-underline-opacity-0 link-underline-opacity-75-hover mx-1 fs-3"
-                       href="#">
+                       href="{% url 'pedidos:delete_item' item.pk  %}">
                       <svg xmlns="http://www.w3.org/2000/svg"
                            width="16"
                            height="16"
@@ -183,6 +199,7 @@
                       </svg>
                     </a>
                   </td>
+                  {% endif %}
                 </tr>
               {% endfor %}
             </tbody>
@@ -235,5 +252,23 @@
   } else {
       console.error("Element with ID 'id_status' not found.");
   }
+
+  function liberarPedido() {
+    $.ajax({
+      url: "{% url 'pedidos:liberar_pedido' pedido.id %}",
+      method: 'GET',
+      data:{
+        'pedido_pk': {{ pedido.pk }}
+      },
+      success: function(response) {
+        console.log('Pedido liberado com sucesso!');
+        window.location.reload();
+      },
+      error: function(xhr, status, error) {
+        console.error('Erro ao liberar pedido:', error);
+      }
+    });
+  }
+
 </script>
 {% endblock scripts %}

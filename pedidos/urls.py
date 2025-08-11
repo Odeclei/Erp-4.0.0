@@ -7,8 +7,10 @@ from pedidos.views import (
     PedidoDeleteView,
     PedidoSearchView,
     ItemPedidoCreateView,
+    ItemPedidoDeleteView,
     ItemPedidoUpdateView,
     EndPedidoView,
+    LiberarPedido,
     ImprimeEtiquetas,
 )
 
@@ -24,13 +26,15 @@ urlpatterns = [
     path("<int:pk>/delete", PedidoDeleteView.as_view(), name="delete"),
     path("busca/", PedidoSearchView.as_view(), name="search"),
     # add item pedido
-    path("<int:pk>/add-item/", ItemPedidoCreateView.as_view(), name="add_item"),
+    path("<int:pk>/add_item/", ItemPedidoCreateView.as_view(), name="add_item"),
+    path("<int:pk>/delete_item/", ItemPedidoDeleteView.as_view(), name="delete_item"),
     path(
         "<int:pk>/<str:pedido_number>/update-item/",
         ItemPedidoUpdateView.as_view(),
         name="update_item",
     ),
     path("<int:pk>/finalizar_edicao/", EndPedidoView, name="finalizar_edicao"),
+    path("<int:pk>/liberar_pedido/", LiberarPedido, name="liberar_pedido"),
     path("<int:pk>/imprime_etiquetas/", ImprimeEtiquetas, name="imprimir_etiquetas"),
     # path(
     #     "<int:pk>/<int:order_number>/delete_item/",

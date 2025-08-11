@@ -1,0 +1,32 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+<section clas="container">
+
+  <div class="title mb-5">
+    <h2>Detalhes do Carregamento: <strong>{{ object.item }} </strong></h2>
+  </div>
+
+  <div class="card col-8 rounded-4 p-3 shadow overflow-x-auto">
+    <div class="card-body">
+      <p class="card-text fs-4"><strong>Item:</strong> {{ object.item.item }}</p>
+      <p class="card-text fs-4"><strong>Acabamento:</strong> {{ object.item.finish }}</p>
+      <p class="card-text fs-4"><strong>Quantidade:</strong> {{ object.qtde_carregada }}</p>
+      <p class="card-text fs-4"><strong>Operador:</strong> {{ object.operador }}</p>
+      <p class="card-text fs-4"><strong>Inicio:</strong> {{ object.data_inicio }}</p>
+      <p class="card-text fs-4"><strong>Término:</strong> {{ object.data_fim }}</p>
+      <div class="mb-3">
+        <label for="observation" class="card-text fs-4"><strong>Observação:</strong></label>
+        <textarea 
+          class="border rounded border-success-subtle text-body fs-5" 
+          readonly 
+          cols="80"
+          rows="2"
+          name="observation" 
+          id="observation">{{ object.item.observation }}</textarea>
+      </div>
+    </div>
+  </div>
+
+</section>
+{% endblock content %}

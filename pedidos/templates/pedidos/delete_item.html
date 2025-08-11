@@ -1,0 +1,16 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class='container'>
+  <h2>Deletar item: {{ object.item }}</h2>
+  <p class="lead">Esta ação não poderá ser desfeita.</p>
+  <form action="{% url 'pedidos:delete_item' object.pk %}" method="post">
+    {% csrf_token %}
+    <div class="row  my-4 pt-3">
+      <button class='col col-3 btn btn-success btn-lg mx-3' type="submit">Confirmar</button>
+      <a href="{% url 'pedidos:detail' object.proforma.pk %}" class='col col-3 btn btn-danger btn-lg mx-3'>Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock content %}

@@ -4,50 +4,45 @@
 <html lang="pt-BR" data-bs-theme='auto'>
 <head>
   {% include "global/partials/_head.html" %}
-  <title>{{site_setup}}</title>
+  <title>{{ site_setup }}</title>
 </head>
 <body class="bg-body-tertiary my-auto container-lg">
-  <div class="container">
+  <div class="container justify-content-center my-5">
 
   {% if user.is_superuser %}
     {% include "site_setup/partials/_superuser.html" %}
   {% endif %} 
+    <div class="card p-5 rounded-4 shadow">
+      <div class="row caption justify-self-center my-5">
+        <h2 class="text-center fs-1">Bem vindo ao Sistema de Apontamento da Móveis James.</h2>
+      </div>
 
-  {% if user.is_authenticated %}
-    <div class="row container-lg my-5">
-      <h2>Bem vindo ao Sistema de Apontamento da Móveis James.</h2>
+      {% if user.is_authenticated %}
+      <div class="row container-lg my-5">
+        <script>
+          window.location.href = "{% url 'site_setup:home' %}";
+        </script>
+      </div>
+      {% else %}
+      <div class="row my-5">
+        <p class="lead text-center fs-3">Para acessar o sistema, por favor, faça login.</p>
+      </div>
+      <div class="row justify-content-center my-5">
+        <a href="{% url 'site_setup:login' %}" class="col col-4 btn btn-lg btn-primary p-3 fs-3 shadow-sm">Login</a>
+      </div>
+    {% endif %}
     </div>
-    <div class="row container-lg my-5">
-      <p class="lead fs-4">
-        Para começar, por favor, selecione uma das opções no menu.
-      </p>
-      <script>
-        // Redireciona usuários autenticados para a home
-        window.location.href = "{% url 'site_setup:home' %}";
-      </script>
-    </div>
-  {% else %}
-    <div class="row container-lg my-5">
-      <h2>Bem vindo ao Sistema de Apontamento da Móveis James.</h2>
-    </div>
-    <div class="row container-lg my-5">
-      <p class="lead">Para acessar o sistema, por favor, faça login.</p>
-    </div>
-    <div class="row container-lg my-5">
-      <a href="{% url 'site_setup:login' %}" class="btn btn-primary">Login</a>
-    </div>
-  {% endif %}
   </div>
 
   <footer class="footer mt-auto py-3 bg-body-tertiary"> 
     {% include "global/partials/_footer.html" %}
   </footer>
 
-  <script type="text/javascript" src="{% static "global/js/bootstrap.bundle.min.js" %}"></script>
+  <script type="text/javascript" src="{% static 'global/js/bootstrap.bundle.min.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script type="text/javascript" src="{% static "global/js/prism.js" %}"></script>
-  <script type="text/javascript" src="{% static "global/js/custom.js" %}"></script>
+  <script type="text/javascript" src="{% static 'global/js/prism.js' %}"></script>
+  <script type="text/javascript" src="{% static 'global/js/custom.js' %}"></script>
 
   {% block scripts %}
   {% endblock scripts %}

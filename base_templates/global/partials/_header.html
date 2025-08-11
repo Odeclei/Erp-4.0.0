@@ -132,9 +132,9 @@
           <li>
             <a class="dropdown-item h4" href="{% url 'carregamento:index' %}">Carregamentos</a>
           </li>
-          <li>
+          {% comment %} <li>
             <a class="dropdown-item h4" href="{% url 'carregamento:carga_create' %}">Novo Carregamento</a>
-          </li>
+          </li> {% endcomment %}
         </ul>
       </li>
     </ul>
@@ -220,3 +220,4 @@
     </div>
   </div>
 </div>
+

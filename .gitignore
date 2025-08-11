@@ -18,6 +18,10 @@ vscode
 /vscode/
 
 /data/
+/output/
+/project/logs/
+./utils/impressao/printserver/
+./utils/Etiquetas/
 
 
 

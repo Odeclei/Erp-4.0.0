@@ -24,9 +24,11 @@
         </div>
       {% endfor %}
       <div class="row mt-5 justify-content-center">
-        <button type="submit" class="col-md-5 btn btn-success mx-2 btn-lg">Cadastrar Cliente</button>
-        <button type="reset" class="col-md-5 btn btn-secondary mx-2 btn-lg">Limpar Campos</button>
+        <button type="submit" class="col-md-3 btn btn-success mx-2 btn-lg fs-3 py-3">Cadastrar Cliente</button>
+        <button type="reset" class="col-md-3 btn btn-warning mx-2 btn-lg fs-3 py-3">Limpar Campos</button>
+        <a href="{% url 'clientes:read' %}" class="col-md-3 btn btn-secondary mx-2 btn-lg fs-3 py-3">Voltar</a>
       </div>
     </form>
+  <div class="row" style='height:200px'></div>
   </div>
 </section>

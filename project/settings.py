@@ -39,6 +39,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RAIZ_DIR = os.path.dirname(BASE_DIR)
 DATA_DIR = os.path.join(RAIZ_DIR, "data", "web")
 
+print(BASE_DIR)
+print(RAIZ_DIR)
+print(DATA_DIR)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -183,8 +187,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
-MEDIA_URL = "media/"
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
 
 STATIC_ROOT = os.path.join(RAIZ_DIR, "static")
 MEDIA_ROOT = os.path.join(RAIZ_DIR, "media")
@@ -194,6 +198,9 @@ STATICFILES_DIRS = [
     os.path.join(RAIZ_DIR, "base_static"),
 ]
 
+print("static root", STATIC_ROOT)
+print("media root", MEDIA_ROOT)
+print("static dirs", STATICFILES_DIRS)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

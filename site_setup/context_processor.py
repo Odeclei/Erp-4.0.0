@@ -7,7 +7,7 @@ from site_setup.models import Category, SiteSetup
 
 # print(gma())
 
-logger = logging.getLogger('site_setup')
+logger = logging.getLogger("site_setup")
 
 
 # def log_mac_address(request):
@@ -26,13 +26,17 @@ logger = logging.getLogger('site_setup')
 
 
 def site_setup(request):
-    setup = SiteSetup.objects.order_by('-id').first()
+    setup = SiteSetup.objects.order_by("-id").first()
     category = Category.objects.all()
 
     try:
         mac_address = gma()
         logger.info(f"MAC Address: {mac_address}")
-        mac = MacId.objects.get(mac_id=mac_address)
+        if mac_address:
+            try:
+                mac = MacId.objects.get(mac_id=mac_address)
+            except MacId.DoesNotExist:
+                mac = MacId.objects.create(mac_id=mac_address)
     except Exception as e:
         logger.error(f"Erro ao obter o MAC Address: {e}")
 
@@ -49,18 +53,18 @@ def site_setup(request):
     #     mac = MacId.objects.create(mac_id=mac_address)
 
     return {
-        'site_setup':  setup,
-        'category': category,
-        'mac_id': mac,
+        "site_setup": setup,
+        "category": category,
+        "mac_id": mac,
     }
 
 
 def horario_turnos(request):
 
-    turno = Turno.objects.filter(name='Comercial').first()
+    turno = Turno.objects.filter(name="Comercial").first()
 
     return {
-        'hr_inicio_turno':  turno.hora_inicio,  # type: ignore
-        'hr_inicio_almoco': turno.hora_inicio_almoco,  # type: ignore
-        'hr_fim_almoco': turno.hora_fim_almoco,  # type: ignore
+        "hr_inicio_turno": turno.hora_inicio,  # type: ignore
+        "hr_inicio_almoco": turno.hora_inicio_almoco,  # type: ignore
+        "hr_fim_almoco": turno.hora_fim_almoco,  # type: ignore
     }

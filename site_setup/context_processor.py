@@ -61,19 +61,19 @@ def site_setup(request):
 
 def horario_turnos(request):
     try:
-        turno = Turno.objects.filter(name="Comercial").first()
-        if turno:
-            print(turno.hora_inicio)
-        else:
-            print("não tem turno")
+        # Tenta encontrar o turno
+        turno = Turno.objects.get(name="Comercial")
+
+        # Se o turno for encontrado, retorna os valores
         return {
-            "hr_inicio_turno": turno.hora_inicio,  # type: ignore
-            "hr_inicio_almoco": turno.hora_inicio_almoco,  # type: ignore
-            "hr_fim_almoco": turno.hora_fim_almoco,  # type: ignore
+            "hr_inicio_turno": turno.hora_inicio,
+            "hr_inicio_almoco": turno.hora_inicio_almoco,
+            "hr_fim_almoco": turno.hora_fim_almoco,
         }
     except Turno.DoesNotExist:
+        # Se o turno não for encontrado, retorna valores padrão
         return {
-            "hr_inicio_turno": "07:00:00",  # type: ignore
-            "hr_inicio_almoco": "12:00:00",  # type: ignore
-            "hr_fim_almoco": "13:00:00",  # type: ignore
+            "hr_inicio_turno": "00:00:00",
+            "hr_inicio_almoco": "00:00:00",
+            "hr_fim_almoco": "00:00:00",
         }

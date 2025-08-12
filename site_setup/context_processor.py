@@ -60,11 +60,16 @@ def site_setup(request):
 
 
 def horario_turnos(request):
-
-    turno = Turno.objects.filter(name="Comercial").first()
-
-    return {
-        "hr_inicio_turno": turno.hora_inicio,  # type: ignore
-        "hr_inicio_almoco": turno.hora_inicio_almoco,  # type: ignore
-        "hr_fim_almoco": turno.hora_fim_almoco,  # type: ignore
-    }
+    try:
+        turno = Turno.objects.filter(name="Comercial").first()
+        return {
+            "hr_inicio_turno": turno.hora_inicio,  # type: ignore
+            "hr_inicio_almoco": turno.hora_inicio_almoco,  # type: ignore
+            "hr_fim_almoco": turno.hora_fim_almoco,  # type: ignore
+        }
+    except Turno.DoesNotExist:
+        return {
+            "hr_inicio_turno": "00:00:00",  # type: ignore
+            "hr_inicio_almoco": "00:00:00",  # type: ignore
+            "hr_fim_almoco": "00:00:00",  # type: ignore
+        }

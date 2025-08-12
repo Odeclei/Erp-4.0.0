@@ -1,0 +1,75 @@
+###############################################################################
+# Replace
+# mrp4_0 the name of the gunicorn file you want
+# james your user name
+# mrp4.0app the folder name of your project
+# project the folder name where you find a file called wsgi.py
+#
+###############################################################################
+# Criando o arquivo mrp4_0.socket
+sudo nano /etc/systemd/system/mrp4_0.socket
+
+###############################################################################
+# Conteúdo do arquivo
+[Unit]
+Description=gunicorn mrp4_0 socket
+
+[Socket]
+ListenStream=/run/mrp4_0.socket
+
+[Install]
+WantedBy=sockets.target
+
+###############################################################################
+# Criando o arquivo mrp4_0.service
+sudo nano /etc/systemd/system/mrp4_0.service
+
+###############################################################################
+# Conteúdo do arquivo
+[Unit]
+Description=Gunicorn daemon (You can change if you want)
+Requires=mrp4_0.socket
+After=network.target
+
+[Service]
+User=james
+Group=www-data
+Restart=on-failure
+# EnvironmentFile=/home/james/mrp4.0app/.env
+WorkingDirectory=/home/james/mrp4.0app
+# --error-logfile --enable-stdio-inheritance --log-level and --capture-output
+# are all for debugging purposes.
+ExecStart=/home/james/mrp4.0app/venv/bin/gunicorn \
+          --error-logfile /home/james/mrp4.0app/gunicorn-error-log \
+          --enable-stdio-inheritance \
+          --log-level "debug" \
+          --capture-output \
+          --access-logfile - \
+          --workers 6 \
+          --bind unix:/run/mrp4_0.socket \
+          project.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+###############################################################################
+# Ativando
+sudo systemctl start mrp4_0.socket
+sudo systemctl enable mrp4_0.socket
+
+# Checando
+sudo systemctl status mrp4_0.socket
+curl --unix-socket /run/mrp4_0.socket localhost
+sudo systemctl status mrp4_0
+
+# Restarting
+sudo systemctl restart mrp4_0.service
+sudo systemctl restart mrp4_0.socket
+sudo systemctl restart mrp4_0
+
+# After changing something
+sudo systemctl daemon-reload
+
+# Debugging
+sudo journalctl -u mrp4_0.service
+sudo journalctl -u mrp4_0.socket

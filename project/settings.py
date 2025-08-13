@@ -39,11 +39,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RAIZ_DIR = os.path.dirname(BASE_DIR)
 DATA_DIR = os.path.join(RAIZ_DIR, "data", "web")
 
-print(BASE_DIR)
-print(RAIZ_DIR)
-print(DATA_DIR)
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -105,6 +100,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "site_setup.session_middleware.SessionTimeoutMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # my middleware
@@ -198,9 +194,6 @@ STATICFILES_DIRS = [
     os.path.join(RAIZ_DIR, "base_static"),
 ]
 
-print("static root", STATIC_ROOT)
-print("media root", MEDIA_ROOT)
-print("static dirs", STATICFILES_DIRS)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -211,9 +204,6 @@ LOG_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the logs directory exists
 
 LOGOUT_REDIRECT_URL = "site_setup:index"
-
-LOGIN_REDIRECT_URL = "/home/"
-LOGIN_URL = "/login/"
 
 LOGGING = {
     "version": 1,
@@ -273,6 +263,18 @@ LOGGING = {
         },
     },
 }
+
+LOGIN_REDIRECT_URL = "/home/"
+LOGIN_URL = "/login/"
+# LOGOUT_URL = "/logout/"
+
+# Configurações de Sessão
+# Tempo limite da sessão em segundos
+# 20 minutos = 20 * 60 = 1200 segundos
+SESSION_COOKIE_AGE = 1200
+
+# Atualiza o tempo da sessão a cada requisição
+SESSION_SAVE_EVERY_REQUEST = True
 
 # IMPORT_EXPORT_FORMATS = [XLSX]
 

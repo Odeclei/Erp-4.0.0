@@ -75,7 +75,7 @@ class ClienteForm(forms.ModelForm):
             "razao_social": "Razão Social",
             "nome_fantasia": "Nome Fantasia",
             "address": "Endereço",
-            "bairro": "Bairo",
+            "bairro": "Bairro",
             "city": "Cidade",
             "state": "Estado",
             "country": "País",

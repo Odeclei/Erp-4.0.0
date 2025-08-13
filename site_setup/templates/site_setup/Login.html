@@ -55,6 +55,10 @@
                    for="{{ form.password.id_for_label }}">
               <strong>Senha</strong>
             </label>
+            <button class="btn btn lg btn-light position-absolute top-50 start-100 translate-middle-y" type="button" id="togglePassword">
+                <i class="bi bi-eye-slash fs-4" id="toggleIcon"></i>
+            </button>
+
           </div>
           {% if form.password.errors %}
             <ul class="errorlist">
@@ -84,6 +88,21 @@
       document.addEventListener("DOMContentLoaded", function () {
         const loginButton = document.getElementById("submitLoginBtn");
         const loginForm = document.getElementById("loginForm");
+        const passwordInput = document.getElementById("id_password");
+        const togglePassword = document.getElementById("togglePassword");
+        const toggleIcon = document.getElementById("toggleIcon");
+
+        togglePassword.addEventListener("click", function (event) {
+          const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+          passwordInput.setAttribute("type", type);
+
+          if (type === "password") {
+            toggleIcon.classList.remove("bi-eye-slash");
+            toggleIcon.classList.add("bi-eye");
+          } else {
+            toggleIcon.classList.remove("bi-eye");
+            toggleIcon.classList.add("bi-eye-slash");
+          }});
 
         if (loginButton && loginForm) {
           loginButton.addEventListener("click", function (event) {

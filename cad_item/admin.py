@@ -12,7 +12,7 @@ class Childinline(admin.TabularInline):
 
 class FamilyResource(resources.ModelResource):
     class Meta:
-        model = models.Family
+        model = models.FamilyProd
 
 
 @admin.register(models.FamilyProd)

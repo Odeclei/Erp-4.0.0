@@ -1,5 +1,6 @@
 # flake8: noqa
 from django.contrib import admin
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from clientes import models
 from clientes.views import PER_PAGE
@@ -7,7 +8,7 @@ from clientes.views import PER_PAGE
 # Register your models here.
 
 
-class ClientesResource(models.ClientesResource):
+class ClientesResource(resources.ModelResource):
     class Meta:
         model = models.Clientes
 

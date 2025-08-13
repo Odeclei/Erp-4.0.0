@@ -10,8 +10,14 @@ class Childinline(admin.TabularInline):
     extra = 1
 
 
+class FamilyResource(resources.ModelResource):
+    class Meta:
+        model = models.Family
+
+
 @admin.register(models.FamilyProd)
-class FamilyProdAdmin(admin.ModelAdmin):
+class FamilyProdAdmin(ImportExportModelAdmin):
+    resources_classes = [FamilyResource]
     list_display = ("description",)
     ordering = ("description",)
 

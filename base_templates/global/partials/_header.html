@@ -117,6 +117,11 @@
           <li>
             <a class="dropdown-item h4" href="{% url 'pedidos:create' %}">Novo Pedidos</a>
           </li>
+          {% if user.is_staff or user.is_superuser %}
+          <li>
+            <a href="{% url 'pedidos:importar_pedido' %}" class="dropdown-item h4">Importar Pedido</a>
+          </li>
+          {% endif %}
           <li>
             <hr class="dropdown-divider" />
           </li>

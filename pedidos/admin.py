@@ -32,6 +32,7 @@ class PedidosAdmin(ImportExportModelAdmin):
     ordering = ("-pedido_number",)
     list_editable = (
         "status",
+        "pedido_number",
         "pedido_editable",
     )
     search_fields = (

@@ -1,21 +1,27 @@
+import code
+from dis import code_info
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-import pedidos
 from pedidos.models import Pedidos, ItemPedido
 from pedidos.forms import PedidoForm, ItemPedidoForm
 from clientes.models import Clientes
 from cad_item.models import Item, Finish
 from utility.views import gerar_zpl_etiqueta
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.db import transaction
+
 import requests
+import pandas as pd
 
 from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
     ListView,
+    View,
     UpdateView,
 )
 
@@ -252,6 +258,252 @@ class ItemPedidoDeleteView(DeleteView):
     def get_success_url(self):
         messages.success(self.request, "Item Removido com Sucesso.")
         return reverse_lazy("pedidos:detail", kwargs={"pk": self.object.proforma.pk})
+
+
+class ImportarPedidoView(UserPassesTestMixin, View):
+    template_name = "pedidos/importar_pedido.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Processa o arquivo Excel e cria/atualiza os pedidos.
+        """
+        print("Iniciando processamento do arquivo Excel.")
+
+        if "arquivo_excel" not in request.FILES:
+            print("Nenhum arquivo foi enviado.")
+            return render(
+                request,
+                self.template_name,
+                {
+                    "erro": "Nenhum arquivo foi enviado. Por favor, selecione um arquivo Excel."
+                },
+            )
+
+        arquivo_excel = request.FILES["arquivo_excel"]
+        print(f"Arquivo recebido: {arquivo_excel.name}")
+
+        if not arquivo_excel.name.endswith((".xls", ".xlsx")):
+            print("Formato de arquivo inválido.")
+            return render(
+                request,
+                self.template_name,
+                {
+                    "erro": "Formato de arquivo inválido. Por favor, envie um arquivo .xls ou .xlsx."
+                },
+            )
+
+        try:
+            print("Lendo arquivo Excel.")
+            df = pd.read_excel(arquivo_excel)
+            df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+            print("Arquivo Excel lido com sucesso.")
+
+            print()
+            print(df)
+            print()
+
+            with transaction.atomic():
+                pedidos_criados = 0
+                itens_criados = 0
+                print("Iniciando transação de banco de dados.")
+
+                for index, row in df.iterrows():
+                    import pdb
+
+                    print(f"Processando linha {index + 2} do Excel.")
+                    # programa = row["PROGRAMAÇÃO"]
+                    cod_cliente = row["CÓDIGO"]
+                    # nome_cliente = row["NOME"]
+                    nr_pedido = str(row["PEDIDO"])
+                    cod_item = row["ITEM"]
+                    # desc_item = row["DESCRIÇÃO"]
+                    acabamento = row["NARRATIVA"]
+                    observacao = str(row["OBS_PEDIDO"])
+                    # O SALDO.FATURAR não está sendo usado, mas a variável pode ser criada
+                    qtde_item = row["SALDO.FATURAR"]
+
+                    print("cod_cliente", cod_cliente, type(cod_cliente))
+                    print("nr_pedido", nr_pedido, type(nr_pedido))
+                    print("cod_item", cod_item, type(cod_item))
+                    print("acabamento", acabamento, type(acabamento))
+                    print("observacao", observacao, type(observacao))
+                    print("qtde_item", qtde_item, type(qtde_item))
+
+                    try:
+                        cliente = Clientes.objects.get(pk=cod_cliente)
+                        print(f"Cliente {cod_cliente} encontrado.")
+                    except Clientes.DoesNotExist:
+                        print(
+                            f"Cliente {cod_cliente} não encontrado. Linha {index + 2} ignorada."
+                        )
+                        continue
+
+                    pedido_numero = f"CADASTRAR PEDIDO {index + 2}"
+                    pedido, created = Pedidos.objects.get_or_create(
+                        pedido_cliente=nr_pedido,
+                        defaults={
+                            "cliente": cliente,
+                            "pedido_cliente": nr_pedido,
+                            "pedido_number": pedido_numero,
+                        },
+                    )
+                    if created:
+                        pedidos_criados += 1
+                        print(f"Pedido {nr_pedido} criado.")
+
+                    try:
+                        item = Item.objects.get(item_cod=cod_item)
+                        print(f"Item {cod_item} encontrado.")
+                    except Item.DoesNotExist:
+                        print(
+                            f"Item com código {cod_item} não encontrado. Linha {index + 2} ignorada."
+                        )
+                        continue
+
+                    try:
+                        finish_code = f"{nr_pedido}{index + 2}"
+                        finish, _ = Finish.objects.get_or_create(
+                            code_finish=finish_code, name_finish=acabamento
+                        )
+                        print(f"Finish {acabamento} processado.")
+                    except Exception:
+                        finish = "-"
+                        print("Erro ao processar acabamento.")
+
+                    ItemPedido.objects.create(
+                        proforma=pedido,
+                        item=item,
+                        finish=finish,
+                        quantity=qtde_item,
+                        observation=observacao,
+                    )
+                    itens_criados += 1
+                    print(f"ItemPedido criado para pedido {nr_pedido}.")
+                    # pdb.set_trace()
+
+            print("Transação de banco de dados finalizada com sucesso.")
+            return render(
+                request,
+                self.template_name,
+                {
+                    "sucesso": f"Importação concluída com sucesso! {pedidos_criados} pedido(s) e {itens_criados} item(s) de pedido foram criados ou atualizados."
+                },
+            )
+
+        except Exception as e:
+            print(f"Erro durante a importação: {str(e)}")
+            return render(
+                request,
+                self.template_name,
+                {"erro": f"Ocorreu um erro durante a importação: {str(e)}"},
+            )
+
+    # def post(self, request, *args, **kwargs):
+    #     if "arquivo_excel" not in request.FILES:
+    #         return render(
+    #             request, self.template_name, {"error": "Nenhum arquivo foi carregado."}
+    #         )
+    #     arquivo_excel = request.FILES["arquivo_excel"]
+
+    #     if not arquivo_excel.name.endswith((".xlsx", ".xls")):
+    #         return render(
+    #             request,
+    #             self.template_name,
+    #             {"error": "Formato de arquivo inválido. Deve ser .xlsx ou .xls."},
+    #         )
+    #     try:
+    #         df = pd.read_excel(arquivo_excel)
+    #         df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    #         print()
+    #         print("df", df)
+    #         print()
+    #         with transaction.atomic():
+    #             pedidos_criados = 0
+    #             itens_criados = 0
+
+    #             for index, row in df.iterrows():
+    #                 print(f"linha {index+2}")
+
+    #                 cod_cliente = row["CÓDIGO"]
+    #                 nome_cliente = row["NOME"]
+    #                 nr_pedido = row["NR.PEDIDO"]
+    #                 cod_item = row["ITEM"]
+    #                 desc_item = row["DESCRIÇÃO"]
+    #                 qtde_item = row["SALDO.FATURAR"]
+    #                 acabamento = row["NARRATIVA"]
+    #                 observacao = row["OBS.PEDIDO"]
+
+    #                 print(f"cliente {cod_cliente} - {nome_cliente}")
+    #                 print(f"nr_pedido {nr_pedido}")
+    #                 print(f"cod_item {cod_item} - {desc_item}")
+    #                 print(f"qtde_item {qtde_item}")
+    #                 print(f"acabamento {acabamento}")
+    #                 print(f"observacao {observacao}")
+
+    #                 try:
+    #                     cliente = Clientes.objects.get(pk=cod_cliente)
+    #                 except Clientes.DoesNotExist:
+    #                     print(
+    #                         f"Cliente {cod_cliente} não encontrado. Linha {index+2} ignorada."
+    #                     )
+    #                     continue
+
+    #                 print(f"cliente {cod_cliente} encontrado")
+
+    #                 pedido, created = Pedidos.objects.get_or_create(
+    #                     pedido_cliente=nr_pedido,
+    #                     defaults={
+    #                         "cliente": cliente,
+    #                         "pedido_number": nr_pedido,
+    #                     },
+    #                 )
+    #                 if created:
+    #                     pedidos_criados += 1
+    #                 print(f"pedido {nr_pedido} criado")
+
+    #                 try:
+    #                     item = Item.objects.get(item_cod=cod_item)
+    #                 except Item.DoesNotExist:
+    #                     print(
+    #                         f"Item com código {cod_item} não encontrado. Linha {index+2} ignorada."
+    #                     )
+    #                     continue
+
+    #                 print(f"item {cod_item} encontrado")
+
+    #                 try:
+    #                     finish, _ = Finish.objects.get_or_create(
+    #                         name_finish=acabamento,
+    #                         code_finish=f"{nr_pedido}{index+2}",
+    #                     )
+    #                 except Exception:
+    #                     finish = "-"
+    #                 print(f"finish {acabamento} criado")
+
+    #                 item_pedido = ItemPedido.objects.create(
+    #                     proforma=pedido,
+    #                     item=item,
+    #                     finish=finish,
+    #                     quantity=qtde_item,
+    #                 )
+    #                 itens_criados += 1
+
+    #                 print(f"item_pedido {cod_item} criado")
+
+    #         msg = f"Pedidos e itens criados com sucesso. {pedidos_criados} pedidos criados e {itens_criados} itens criados."
+    #         return render(request, self.template_name, {"success": msg})
+    #     except Exception as e:
+    #         return render(
+    #             request,
+    #             self.template_name,
+    #             {"error": f"Ocorreu um erro durante a importação:{str(e)}"},
+    #         )
 
 
 def EndPedidoView(request, pk):

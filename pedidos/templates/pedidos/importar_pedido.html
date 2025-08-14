@@ -1,0 +1,31 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="container">
+
+  <div class="title">
+    <h2>Importar pedido via Excel</h2>
+    <p>Utilize esta página para enviar um arquivo Excel com a lista de pedidos para importação.</p>  </div>
+
+    {% if erro %}
+    <div class="alert alert-danger">{{ erro }}</div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success">{{ success }}</div>
+    {% endif %}
+    <form action="{% url 'pedidos:importar_pedido' %}" 
+          enctype="multipart/form-data" method="post" class="mt-4">
+      {% csrf_token %}
+      <div class="form-group position-relative">
+        <label for="id_arquivo_excel" class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">
+          <strong>Selecione arquivo Excel:</strong>
+        </label>
+        <input type="file" name="arquivo_excel" id="id_arquivo_excel" class="form-control form-control-file form-control-lg border border-success pt-3" accept=".xls,.xlsx" required>
+      </div>
+      <div class="row justify-content-center my-5">
+        <button type="submit" class="btn btn-lg btn-primary p-3 fs-3">Importar arquivo</button>
+      </div>
+    </form>
+</section>
+{% endblock content %}

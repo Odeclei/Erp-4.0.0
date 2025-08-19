@@ -1,17 +1,17 @@
-import code
-from dis import code_info
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+from clientes.views import PER_PAGE
 from pedidos.models import Pedidos, ItemPedido
 from pedidos.forms import PedidoForm, ItemPedidoForm
 from clientes.models import Clientes
 from cad_item.models import Item, Finish
 from utility.views import gerar_zpl_etiqueta
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import transaction
+from django.db.models import Q
+
 
 import requests
 import pandas as pd
@@ -26,6 +26,8 @@ from django.views.generic import (
 )
 
 from pedidos.models import Pedidos
+
+PER_PAGE = 20
 
 
 class PedidoCreateView(CreateView):
@@ -64,7 +66,7 @@ class PedidoListView(ListView):
     template_name = "pedidos/index.html"
     context_object_name = "pedidos"
     ordering = "-id"
-    paginate_by = 20
+    paginate_by = PER_PAGE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -136,7 +138,54 @@ class PedidoDetailView(DetailView):
         return context
 
 
-class PedidoSearchView(ListView): ...
+class PedidoSearchView(ListView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._search_value = ""
+
+    def setup(self, request, *args, **kwargs):
+        self._search_value = request.GET.get("search", "").strip()
+        return super().setup(request, *args, **kwargs)
+
+    def get_queryset(self):
+        """
+        Filtra a lista de pedidos com base no valor da pesquisa.
+
+        Filtra a lista de pedidos com base no valor da pesquisa, que pode ser
+        o n mero do pedido, o nome do cliente ou o nome da empresa.
+
+        :return: Uma lista de objetos Pedidos que s o resultado da pesquisa.
+        :rtype: QuerySet
+        """
+        search_value = self._search_value
+        queryset = super().get_queryset()
+
+        if search_value:
+            print("valor", search_value)
+            queryset = queryset.filter(
+                Q(pedido_number__icontains=search_value)
+                | Q(pedido_cliente__icontains=search_value)
+                | Q(cliente__nome_fantasia__icontains=search_value)
+            )
+
+        return queryset
+
+    model = Pedidos
+    template_name = "pedidos/index.html"
+    context_object_name = "pedidos"
+    ordering = "-id"
+    paginate_by = PER_PAGE
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self._search_value:
+            search_value = self._search_value
+            context.update(
+                {
+                    "search_value": search_value,
+                }
+            )
+        return context
 
 
 class ItemPedidoCreateView(CreateView):

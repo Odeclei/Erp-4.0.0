@@ -3,6 +3,7 @@
 {% block content %}
   <section>
     <form action="{% url 'pedidos:search' %}" method="get">
+      {% csrf_token %}
       <div class="container-fluid">
         <div class="row justify-content-end">
           <div class="col-md-5">
@@ -26,6 +27,27 @@
                        value="{{ search_value }}" />
               </div>
             </div>
+            <div class="row p-2">
+              <div class="col d-flex justify-content-between">
+                <div class="form-check form-switch mx-2 filter-checkbox">
+                  <input class="form-check-input fs-5" type="checkbox" role="switch" name="statusOpen" value="Aberto" checked id="switchStatusOpen">
+                  <label class="form-check-label fs-5" for="switchStatusOpen">Aberto</label>
+                </div>
+                <div class="form-check form-switch mx-2 filter-checkbox">
+                  <input class="form-check-input fs-5" type="checkbox" role="switch" name="statusLoad" value="Carregando" checked id="switchStatusLoad">
+                  <label class="form-check-label fs-5" for="switchStatusLoad">Carregando</label>
+                </div>
+                <div class="form-check form-switch mx-2 filter-checkbox">
+                  <input class="form-check-input fs-5" type="checkbox" role="switch" name="statusCancel" value="Cancelado" checked id="switchStatusCancel">
+                  <label class="form-check-label fs-5" for="switchStatusCancel">Cancelado</label>
+                </div>
+                <div class="form-check form-switch mx-2 filter-checkbox">
+                  <input class="form-check-input fs-5" type="checkbox" role="switch" name="statusFinsh" value="Concluído" checked id="switchStatusFinish">
+                  <label class="form-check-label fs-5" for="switchStatusFinish">Concluído</label>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -48,7 +70,7 @@
         </thead>
         <tbody class="table-group-divider">
           {% for pedido in pedidos %}
-            <tr class="table-row">
+            <tr class="table-row" data-status="{{ pedido.get_status_display }}">
               <td class="table-cel text-center">
                 <a class="col col-md-2 link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-3"
                    href="{% url 'pedidos:detail' pedido.pk %}">{{ pedido.pedido_number }}</a>
@@ -87,3 +109,35 @@
     {% endif %}
   </section>
 {% endblock content %}
+
+{% block scripts %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+        const tableRows = document.querySelectorAll('.table-row');
+
+        function filterTable() {
+            const checkedStatuses = Array.from(checkboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value.trim()); // Remove espaços em branco
+            
+            tableRows.forEach(row => {
+                const rowStatus = row.dataset.status.trim(); // Remove espaços em branco
+                
+                if (checkedStatuses.includes(rowStatus)) {
+                    row.style.display = ''; // Mostra a linha
+                } else {
+                    row.style.display = 'none'; // Esconde a linha
+                }
+            });
+        }
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filterTable);
+        });
+        
+        // Chamada inicial para garantir o estado correto ao carregar a página
+        filterTable();
+    });
+</script>
+{% endblock scripts %}

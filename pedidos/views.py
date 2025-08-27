@@ -586,6 +586,9 @@ def ImprimeEtiquetas(request, pk):
             )
 
             if not itens_pedido.exists():
+                print(
+                    f"ImprimeEtiquetas: Nenhum item encontrado para este pedido {pk}."
+                )
                 return JsonResponse(
                     {
                         "success": False,
@@ -601,11 +604,13 @@ def ImprimeEtiquetas(request, pk):
                 pedido_number = item.proforma.pedido_number
                 observation = item.observation
 
-                volume_por_unidade = float(item.item.qtde_volume)
+                volume_por_unidade = item.item.qtde_volume
                 quantidade_item = int(item.quantity)
 
                 if volume_por_unidade == 0.5:
-                    volume_por_unidade = 1
+                    volume_por_unidade = int(1)
+                else:
+                    volume_por_unidade = int(volume_por_unidade)
 
                 qtde_item_ped = item.quantity
                 volume_total = int(volume_por_unidade)
@@ -626,25 +631,6 @@ def ImprimeEtiquetas(request, pk):
                             observation,
                         )
 
-                        # volume_total = item.item.qtde_volume
-                        # volume_total = int(volume_total)
-
-                        # for i in range(1, item.quantity + 1):
-                        #     for j in range(1, volume_total + 1):
-                        #         index = f"{item.pk}-{i}-{j}"
-                        #         volume_at = j
-
-                        #         zpl_code = gerar_zpl_etiqueta(
-                        #             item_name,
-                        #             acabamento,
-                        #             index,
-                        #             pedido_number,
-                        #             item_cod,
-                        #             volume_at,
-                        #             volume_total,
-                        #             observation,
-                        #         )
-
                         try:
                             response = requests.post(
                                 PRINT_SERVER_URL, json={"zpl": zpl_code}, timeout=20
@@ -652,6 +638,9 @@ def ImprimeEtiquetas(request, pk):
                             response.raise_for_status()  # Lan a um erro para respostas 4xx/5xx
                         except requests.exceptions.RequestException as e:
                             # Se n o conseguir conectar ao servi o de impress o, retorna um erro claro.
+                            print(
+                                f"ImprimeEtiquetas: Erro ao conectar com o servi o de impress o: {e}"
+                            )
                             return JsonResponse(
                                 {
                                     "success": False,

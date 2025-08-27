@@ -597,16 +597,21 @@ def ImprimeEtiquetas(request, pk):
             for item in itens_pedido:
                 item_name = item.item.name_prod
                 item_cod = item.item.item_cod
-                acabamento = item.finish.name_finish
-                if acabamento is None:
-                    acabamento = ""
+                acabamento = item.finish.name_finish if item.finish else ""
                 pedido_number = item.proforma.pedido_number
-                volume_total = item.item.qtde_volume
-                volume_total = int(volume_total)
                 observation = item.observation
 
-                for i in range(1, item.quantity + 1):
-                    for j in range(1, volume_total + 1):
+                volume_por_unidade = float(item.item.qtde_volume)
+                quantidade_item = int(item.quantity)
+
+                if volume_por_unidade == 0.5:
+                    volume_por_unidade = 1
+
+                qtde_item_ped = item.quantity
+                volume_total = int(volume_por_unidade)
+
+                for i in range(1, qtde_item_ped + 1):
+                    for j in range(1, volume_por_unidade + 1):
                         index = f"{item.pk}-{i}-{j}"
                         volume_at = j
 
@@ -620,6 +625,25 @@ def ImprimeEtiquetas(request, pk):
                             volume_total,
                             observation,
                         )
+
+                        # volume_total = item.item.qtde_volume
+                        # volume_total = int(volume_total)
+
+                        # for i in range(1, item.quantity + 1):
+                        #     for j in range(1, volume_total + 1):
+                        #         index = f"{item.pk}-{i}-{j}"
+                        #         volume_at = j
+
+                        #         zpl_code = gerar_zpl_etiqueta(
+                        #             item_name,
+                        #             acabamento,
+                        #             index,
+                        #             pedido_number,
+                        #             item_cod,
+                        #             volume_at,
+                        #             volume_total,
+                        #             observation,
+                        #         )
 
                         try:
                             response = requests.post(

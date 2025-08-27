@@ -66,6 +66,12 @@ class Item(models.Model):
     qtde_volume = models.FloatField(
         blank=True,
         null=True,
+        help_text="""
+            Quantidade de volumes por item:
+            - 1 item = 1 volume: digite 1
+            - 1 item = 2 volumes: digite 2
+            - 2 itens = 1 volume: digite 0,5
+        """,
     )
     subitens = models.ManyToManyField(
         "SubItem", through="Estrutura", related_name="subprodutos"

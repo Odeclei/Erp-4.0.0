@@ -1,0 +1,26 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+<section class="container">
+  <div class="my-5">
+    <a href="{% url 'rule:grupos_create' %}" class="btn btn-primary btn-lg p-3 fs-4"> Adicionar Grupo</a>
+  </div>
+  <div class="divider">
+    <hr class="my-3" />
+  </div>
+  <div class="title my-4">
+    <h2><strong>Grupos</strong></h2>
+  </div>
+  <ul>
+    {% for grupo in grupos %}
+    <li>
+      <h3>{{ grupo.name }}    
+        <a href="{% url 'rule:grupos_update' grupo.pk %}">
+          <i class="bi bi-pencil"></i>
+        </a>
+      </h3>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock content %}

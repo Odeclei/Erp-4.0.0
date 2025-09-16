@@ -1,0 +1,67 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+<section class="container">
+  <div class="title my-4">
+    <h2>Cadastros Base</h2>
+  </div>
+
+  <button id="btn-abrir-modal" class="btn btn-primary btn-lg p-3 fs-4">Cadastrar Novo Posto</button>
+
+  <div class="modal" id="modal-cadastro">
+
+    <div class="modal-dialog" role="document">
+      <div class="modal-content p-4">
+        <button type="button" class="btn-close fechar position-relative top-0 start-100 translate-middle-x p-3" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"></span>
+        </button>
+
+        <div class="modal-header mx-4">
+          <h2 class="modal-title">Cadastro de Posto de Trabalho</h2>
+        </div>
+        <div class="modal-body">
+
+          <div id="passo-1" class="passo">
+            <div class="row align-items-center my-4">
+              <label for="select-grupo" class="form-label fs-5">Selecione o Grupo:</label>
+              <select id="select-grupo" class="form-control form-control-lg border border-success pt-3">
+              </select>
+            </div>
+            <div class="row justify-content-evenly">
+              <button id="btn-passo-1" class="btn btn-outline-primary col-6 fs-4 p-3">Próximo</button>
+            </div>
+          </div>
+          
+          <div id="passo-2" class="passo" style="display:none;">
+            <div class="row align-items-center my-4">
+              <label for="select-setor" class="form-label fs-5">Selecione o Setor:</label>
+              <select id="select-setor" class="form-control form-control-lg border border-success pt-3"></select>
+            </div>
+            <div class="row justify-content-evenly">
+              <button id="btn-passo-2" class="btn col-5 btn-outline-primary fs-4 p-3">Próximo</button>
+              <button id="btn-voltar-1" class="btn col-5 btn-outline-warning fs-4 p-3">Voltar</button>
+            </div>
+          </div>
+
+          <div id="passo-3" class="passo" style="display:none;">
+            <div class="row align-items-center my-4">
+              <label for="input-nome" class="form-label fs-5">Nome do Posto de Trabalho:</label>
+              <input type="text" id="input-nome" class="form-control form-control-lg border border-success pt-3">
+            </div>
+            <div class="row justify-content-evenly">
+              <button id="btn-finalizar" class="btn col-5 btn-outline-primary fs-4 p-3">Cadastrar</button>
+              <button id="btn-voltar-2" class="btn col-5 btn-outline-warning fs-4 p-3">Voltar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+</section>
+{% endblock content %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'global/js/rule.js' %}"></script>
+{% endblock scripts %}

@@ -59,14 +59,36 @@
              class="nav-link rounded-pill fw-semibold sidebar-link d-block text-decoration-none dropdown-toggle fs-4"
              data-bs-toggle="dropdown"
              aria-expanded="false">
-            <i class="bi bi-gear-wide-connected me-2"></i>Máquinas
+            <i class="bi bi-gear-wide-connected me-2"></i>Cadastros
           </a>
           <ul class="dropdown-menu text-small">
             <li>
-              <a class="dropdown-item nav-link fs-3" href="#">Lista Máquinas</a>
+              <a class="dropdown-item nav-link fs-3" href="{% url 'rule:index' %}">Cadastros Base</a>
             </li>
             <li>
-              <a class="dropdown-item nav-link fs-3" href="#">Nova Máquina</a>
+              <a class="dropdown-item nav-link fs-3" href="{% url 'rule:grupos_list' %}">Grupos</a>
+            </li>
+            <li>
+              <a class="dropdown-item nav-link fs-3" href="{% url 'rule:setores_list' %}">Setores</a>
+            </li>
+            <li>
+              <a class="dropdown-item nav-link fs-3" href="{% url 'rule:postos_list' %}">Postos de Trabalho</a>
+            </li>
+          </ul>
+
+
+
+
+
+
+
+          <ul class="dropdown-menu text-small">
+            
+            <li>
+              <a class="dropdown-item nav-link fs-3" href="#">Lista Postos</a>
+            </li>
+            <li>
+              <a class="dropdown-item nav-link fs-3" href="#">Novo Posto</a>
             </li>
           </ul>
         </li>

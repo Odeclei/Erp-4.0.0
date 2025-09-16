@@ -4,7 +4,7 @@
 <html lang="pt-BR" data-bs-theme="auto">
 <head>
   {% include "global/partials/_head.html" %}
-  <title>{{ site_setup }}</title>
+  <title>{{ site_setup }}{% if subtitle %} - {{ subtitle }}{% endif %}</title>
 </head>
 <body class="bg-body-tertiary my-auto container-lg">
   <div class="container justify-content-center my-5">

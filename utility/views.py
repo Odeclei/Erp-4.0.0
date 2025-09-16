@@ -75,36 +75,3 @@ def gerar_zpl_etiqueta(
     ^XZ
         """
     return texto
-
-    #     texto = f"""
-    # ^XA
-    # ^FT46,50^A0N,50,50^FH^FD123456789 123456789 123456789 123456789 123456789^FS
-    # ^FT46,100^AAN,50,50^FH^FDzebra aa^FS
-    # ^FT46,150^ABN,50,50^FH^FDzebra ab^FS
-    # ^FT46,200^ACN,50,50^FH^FDzebra ac^FS
-    # ^FT46,250^ADN,50,50^FH^FDzebra ad^FS
-    # ^FT46,300^AEN,50,50^FH^FDzebra ae^FS
-    # ^FT46,350^AFN,50,50^FH^FDzebra af^FS
-    # ^FT46,400^AGN,50,50^FH^FDzebra ag^FS
-    # ^FT46,450^AHN,50,50^FH^FDzebra ah^FS
-    # ^FT46,500^APN,50,50^FH^FDzebra ap^FS
-    # ^FT46,550^AQN,50,50^FH^FDzebra aq^FS
-    # ^FT46,600^ARN,50,50^FH^FDzebra ar^FS
-    # ^XZ
-    # """
-    return texto
-
-
-# def imprimir_zpl(zpl):
-#     with open(r"\\vendas01\ZDesigner TLP 2844", "w") as printer:
-#         printer.write(zpl)
-
-
-# def imprimir_zpl(zpl, printer_name="ZDesigner TLP 2844"):
-#     hPrinter = win32print.OpenPrinter(printer_name)
-#     hJob = win32print.StartDocPrinter(hPrinter, 1, ("Etiqueta Pedido", None, "RAW"))
-#     win32print.StartPagePrinter(hPrinter)
-#     win32print.WritePrinter(hPrinter, zpl.encode())
-#     win32print.EndPagePrinter(hPrinter)
-#     win32print.EndDocPrinter(hPrinter)
-#     win32print.ClosePrinter(hPrinter)

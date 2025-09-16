@@ -322,10 +322,8 @@ class ImportarPedidoView(UserPassesTestMixin, View):
         """
         Processa o arquivo Excel e cria/atualiza os pedidos.
         """
-        print("Iniciando processamento do arquivo Excel.")
 
         if "arquivo_excel" not in request.FILES:
-            print("Nenhum arquivo foi enviado.")
             return render(
                 request,
                 self.template_name,
@@ -335,10 +333,8 @@ class ImportarPedidoView(UserPassesTestMixin, View):
             )
 
         arquivo_excel = request.FILES["arquivo_excel"]
-        print(f"Arquivo recebido: {arquivo_excel.name}")
 
         if not arquivo_excel.name.endswith((".xls", ".xlsx")):
-            print("Formato de arquivo inválido.")
             return render(
                 request,
                 self.template_name,
@@ -348,24 +344,16 @@ class ImportarPedidoView(UserPassesTestMixin, View):
             )
 
         try:
-            print("Lendo arquivo Excel.")
             df = pd.read_excel(arquivo_excel)
             df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-            print("Arquivo Excel lido com sucesso.")
-
-            print()
-            print(df)
-            print()
 
             with transaction.atomic():
                 pedidos_criados = 0
                 itens_criados = 0
-                print("Iniciando transação de banco de dados.")
 
                 for index, row in df.iterrows():
                     import pdb
 
-                    print(f"Processando linha {index + 2} do Excel.")
                     # programa = row["PROGRAMAÇÃO"]
                     cod_cliente = row["CÓDIGO"]
                     # nome_cliente = row["NOME"]
@@ -377,20 +365,9 @@ class ImportarPedidoView(UserPassesTestMixin, View):
                     # O SALDO.FATURAR não está sendo usado, mas a variável pode ser criada
                     qtde_item = row["SALDO.FATURAR"]
 
-                    print("cod_cliente", cod_cliente, type(cod_cliente))
-                    print("nr_pedido", nr_pedido, type(nr_pedido))
-                    print("cod_item", cod_item, type(cod_item))
-                    print("acabamento", acabamento, type(acabamento))
-                    print("observacao", observacao, type(observacao))
-                    print("qtde_item", qtde_item, type(qtde_item))
-
                     try:
                         cliente = Clientes.objects.get(pk=cod_cliente)
-                        print(f"Cliente {cod_cliente} encontrado.")
                     except Clientes.DoesNotExist:
-                        print(
-                            f"Cliente {cod_cliente} não encontrado. Linha {index + 2} ignorada."
-                        )
                         continue
 
                     pedido_numero = f"CADASTRAR PEDIDO {index + 2}"
@@ -404,15 +381,10 @@ class ImportarPedidoView(UserPassesTestMixin, View):
                     )
                     if created:
                         pedidos_criados += 1
-                        print(f"Pedido {nr_pedido} criado.")
 
                     try:
                         item = Item.objects.get(item_cod=cod_item)
-                        print(f"Item {cod_item} encontrado.")
                     except Item.DoesNotExist:
-                        print(
-                            f"Item com código {cod_item} não encontrado. Linha {index + 2} ignorada."
-                        )
                         continue
 
                     try:
@@ -420,10 +392,8 @@ class ImportarPedidoView(UserPassesTestMixin, View):
                         finish, _ = Finish.objects.get_or_create(
                             code_finish=finish_code, name_finish=acabamento
                         )
-                        print(f"Finish {acabamento} processado.")
                     except Exception:
                         finish = "-"
-                        print("Erro ao processar acabamento.")
 
                     ItemPedido.objects.create(
                         proforma=pedido,
@@ -433,10 +403,7 @@ class ImportarPedidoView(UserPassesTestMixin, View):
                         observation=observacao,
                     )
                     itens_criados += 1
-                    print(f"ItemPedido criado para pedido {nr_pedido}.")
-                    # pdb.set_trace()
 
-            print("Transação de banco de dados finalizada com sucesso.")
             return render(
                 request,
                 self.template_name,
@@ -446,113 +413,11 @@ class ImportarPedidoView(UserPassesTestMixin, View):
             )
 
         except Exception as e:
-            print(f"Erro durante a importação: {str(e)}")
             return render(
                 request,
                 self.template_name,
                 {"erro": f"Ocorreu um erro durante a importação: {str(e)}"},
             )
-
-    # def post(self, request, *args, **kwargs):
-    #     if "arquivo_excel" not in request.FILES:
-    #         return render(
-    #             request, self.template_name, {"error": "Nenhum arquivo foi carregado."}
-    #         )
-    #     arquivo_excel = request.FILES["arquivo_excel"]
-
-    #     if not arquivo_excel.name.endswith((".xlsx", ".xls")):
-    #         return render(
-    #             request,
-    #             self.template_name,
-    #             {"error": "Formato de arquivo inválido. Deve ser .xlsx ou .xls."},
-    #         )
-    #     try:
-    #         df = pd.read_excel(arquivo_excel)
-    #         df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    #         print()
-    #         print("df", df)
-    #         print()
-    #         with transaction.atomic():
-    #             pedidos_criados = 0
-    #             itens_criados = 0
-
-    #             for index, row in df.iterrows():
-    #                 print(f"linha {index+2}")
-
-    #                 cod_cliente = row["CÓDIGO"]
-    #                 nome_cliente = row["NOME"]
-    #                 nr_pedido = row["NR.PEDIDO"]
-    #                 cod_item = row["ITEM"]
-    #                 desc_item = row["DESCRIÇÃO"]
-    #                 qtde_item = row["SALDO.FATURAR"]
-    #                 acabamento = row["NARRATIVA"]
-    #                 observacao = row["OBS.PEDIDO"]
-
-    #                 print(f"cliente {cod_cliente} - {nome_cliente}")
-    #                 print(f"nr_pedido {nr_pedido}")
-    #                 print(f"cod_item {cod_item} - {desc_item}")
-    #                 print(f"qtde_item {qtde_item}")
-    #                 print(f"acabamento {acabamento}")
-    #                 print(f"observacao {observacao}")
-
-    #                 try:
-    #                     cliente = Clientes.objects.get(pk=cod_cliente)
-    #                 except Clientes.DoesNotExist:
-    #                     print(
-    #                         f"Cliente {cod_cliente} não encontrado. Linha {index+2} ignorada."
-    #                     )
-    #                     continue
-
-    #                 print(f"cliente {cod_cliente} encontrado")
-
-    #                 pedido, created = Pedidos.objects.get_or_create(
-    #                     pedido_cliente=nr_pedido,
-    #                     defaults={
-    #                         "cliente": cliente,
-    #                         "pedido_number": nr_pedido,
-    #                     },
-    #                 )
-    #                 if created:
-    #                     pedidos_criados += 1
-    #                 print(f"pedido {nr_pedido} criado")
-
-    #                 try:
-    #                     item = Item.objects.get(item_cod=cod_item)
-    #                 except Item.DoesNotExist:
-    #                     print(
-    #                         f"Item com código {cod_item} não encontrado. Linha {index+2} ignorada."
-    #                     )
-    #                     continue
-
-    #                 print(f"item {cod_item} encontrado")
-
-    #                 try:
-    #                     finish, _ = Finish.objects.get_or_create(
-    #                         name_finish=acabamento,
-    #                         code_finish=f"{nr_pedido}{index+2}",
-    #                     )
-    #                 except Exception:
-    #                     finish = "-"
-    #                 print(f"finish {acabamento} criado")
-
-    #                 item_pedido = ItemPedido.objects.create(
-    #                     proforma=pedido,
-    #                     item=item,
-    #                     finish=finish,
-    #                     quantity=qtde_item,
-    #                 )
-    #                 itens_criados += 1
-
-    #                 print(f"item_pedido {cod_item} criado")
-
-    #         msg = f"Pedidos e itens criados com sucesso. {pedidos_criados} pedidos criados e {itens_criados} itens criados."
-    #         return render(request, self.template_name, {"success": msg})
-    #     except Exception as e:
-    #         return render(
-    #             request,
-    #             self.template_name,
-    #             {"error": f"Ocorreu um erro durante a importação:{str(e)}"},
-    #         )
 
 
 def EndPedidoView(request, pk):
@@ -586,9 +451,6 @@ def ImprimeEtiquetas(request, pk):
             )
 
             if not itens_pedido.exists():
-                print(
-                    f"ImprimeEtiquetas: Nenhum item encontrado para este pedido {pk}."
-                )
                 return JsonResponse(
                     {
                         "success": False,
@@ -638,9 +500,6 @@ def ImprimeEtiquetas(request, pk):
                             response.raise_for_status()  # Lan a um erro para respostas 4xx/5xx
                         except requests.exceptions.RequestException as e:
                             # Se n o conseguir conectar ao servi o de impress o, retorna um erro claro.
-                            print(
-                                f"ImprimeEtiquetas: Erro ao conectar com o servi o de impress o: {e}"
-                            )
                             return JsonResponse(
                                 {
                                     "success": False,

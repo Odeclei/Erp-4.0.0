@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.conf import settings
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -41,11 +42,13 @@ def login_view(request):
     # Define a ação do formulário usando reverse()
     # Certifique-se de que 'site_setup:login' está configurado no seu urls.py
     form_action = reverse("site_setup:login")
+    subtitle = "Login"
 
     context = {
         "form": form,
         "next": next_param,  # Passa 'next' para o template
         "form_action": form_action,
+        "subtitle": subtitle,
     }
 
     return render(request, "site_setup/Login.html", context)
@@ -53,5 +56,9 @@ def login_view(request):
 
 @login_required
 def home_view(request):
+    sibtitle = "Home"
+    context = {
+        "subtitle": sibtitle,
+    }
     # Aqui você pode definir a lógica para a página inicial após o login
-    return render(request, "site_setup/home.html")
+    return render(request, "site_setup/home.html", context)

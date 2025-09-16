@@ -1,0 +1,32 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+<section class="container">
+  <div class="my-5">
+    <a href="{% url 'rule:setores_create' %}" class="btn btn-primary btn-lg p-3 fs-4"> Adicionar Setor</a>
+  </div>
+
+  <div class="title my-4">
+    <h2><strong>Setores</strong></h2>
+  </div>
+  {% for grupo in grupos_com_setores %}
+  <div class="divider">
+    <hr class="my-3"/>
+    <h2 class="mt-4"><strong>{{ grupo.name }}</strong></h2><br>
+  </div>
+  <ul>
+    {% for setor in grupo.sectors_set.all %}
+    <li>
+      <h3>
+        {{ setor.name }}    
+          <a href="{% url 'rule:setores_update' setor.pk %}">
+            <i class="bi bi-pencil"></i>
+          </a>
+      </h3>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+
+</section>
+{% endblock content %}

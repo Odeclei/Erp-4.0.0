@@ -1,0 +1,32 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+<section class="container">
+  {% comment %} <button id="btn-abrir-modal" class="btn btn-primary btn-lg p-3 fs-4">Cadastrar Novo Posto</button> {% endcomment %}
+
+  {% include "rule/workstation/partials/_addnew.html" %}
+
+  <div class="title my-4">
+    <h2>Postos de Trabalhos</h2>
+  </div>
+  <div class="divider">
+    <hr class="my-3" />
+  </div>
+  <ul>
+    {% for posto in postos %}
+    <li>
+      <h3>{{ posto.description }}    
+        <a href="{% url 'rule:postos_update' posto.pk %}">
+          <i class="bi bi-pencil"></i>
+        </a>
+      </h3>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock content %}
+
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'global/js/rule.js' %}"></script>
+{% endblock scripts %}

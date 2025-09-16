@@ -39,3 +39,36 @@
   /* 250px é a largura padrão do offcanvas do Bootstrap */
   transition: transform 0.3s ease-in-out;
 }
+
+/* Estilo para o modal. Ele será o fundo semitransparente que cobre a tela inteira. */
+#modal-cadastro {
+  /* Fica na frente de tudo */
+  position: fixed;
+  z-index: 1050;
+  /* Garante que fique acima de outros elementos */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  /* Cor e opacidade do fundo */
+  background-color: rgb(0, 0, 0);
+  /* Preto */
+  background-color: rgba(0, 0, 0, 0.6);
+  /* Preto com 60% de opacidade */
+
+  /* Para centralizar o modal-dialog (opcional, mas recomendado) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Inicialmente, o modal deve ficar escondido */
+  display: none;
+}
+
+/* Opcional: Adiciona um efeito de transição para suavizar a abertura */
+.modal-open {
+  overflow: hidden;
+  /* Evita que o scroll da página apareça ao abrir o modal */
+}

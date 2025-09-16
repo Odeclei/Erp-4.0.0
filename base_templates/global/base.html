@@ -4,9 +4,10 @@
 <html lang="pt-BR" data-bs-theme="light">
 <head>
   {% include "global/partials/_head.html" %}
-  <title>{{site_setup}}</title>
+  <title>{{ site_setup }}{% if subtitle %} - {{ subtitle }}{% endif %}</title>
 </head>
 <body class="bg-body-tertiary my-auto container-lg">
+  <input type="hidden" name="mac_id" value="{{ mac_id }}">
   <header class="p-3 mb-3 border-bottom">
     {% include "global/partials/_header.html" %}
   </header>

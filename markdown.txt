@@ -1,0 +1,78 @@
+As regras de Markdown mais utilizadas são aquelas que permitem formatar textos de forma simples e rápida, criando a estrutura básica que vemos em READMEs, documentações e mensagens.
+
+Títulos
+Os títulos são essenciais para organizar o conteúdo em seções e subseções.
+
+Use de 1 a 6 # para criar diferentes níveis de título.
+
+Exemplo:
+
+Markdown
+
+# Título Principal
+## Subtítulo
+### Subseção
+Estilos de Texto
+Você pode alterar o estilo do texto para dar ênfase a palavras ou frases.
+
+Para negrito, use dois asteriscos (**texto**) ou dois underscores (__texto__).
+
+Para itálico, use um asterisco (*texto*) ou um underscore (_texto_).
+
+Para ~~tachado~~, use dois til (~~texto~~).
+
+Listas
+As listas ajudam a organizar informações de forma clara.
+
+Listas não ordenadas: use *, - ou +.
+
+Markdown
+
+- Item 1
+- Item 2
+    - Subitem
+Listas ordenadas: use números seguidos de um ponto.
+
+Markdown
+
+1. Primeiro item
+2. Segundo item
+3. Terceiro item
+Links e Imagens
+Links: crie um link para direcionar o usuário para outra página. A sintaxe é [texto do link](URL).
+
+Exemplo: [Acesse o Google](https://www.google.com)
+
+Imagens: adicione uma imagem ao documento. A sintaxe é a mesma dos links, mas com um ! no início: ![texto alternativo](URL da imagem).
+
+Exemplo: ![Logo do GitHub](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)
+
+Blocos de Código
+Perfeitos para destacar comandos de terminal, trechos de código ou qualquer texto técnico.
+
+Código em linha: use uma crase (código).
+
+Exemplo: Instale a dependência com o comando npm install.
+
+Bloco de código: use três crases (`) no início e no fim do bloco. Para ter destaque de sintaxe, adicione o nome da linguagem após as crases iniciais.
+
+Exemplo:
+
+Markdown
+
+```javascript
+function helloWorld() {
+  console.log("Olá, mundo!");
+}
+```
+Tabelas
+As tabelas são ótimas para organizar dados em linhas e colunas. Use | para separar as colunas e - para o cabeçalho.
+
+Exemplo:
+
+Markdown
+
+| Coluna 1 | Coluna 2 | Coluna 3 |
+|----------|:--------:|---------:|
+| Texto    | Central  | à direita|
+| Linha 2  | Dados    | mais dados|

@@ -4,8 +4,6 @@ import json
 import os
 
 from django.contrib.messages import constants as messages
-from getmac import get_mac_address as gma
-from import_export.formats.base_formats import XLSX
 
 # from unittest import expectedFailure
 
@@ -17,21 +15,6 @@ MESSAGE_TAGS = {
     messages.DEBUG: "secondary",
     messages.SUCCESS: "success",
 }
-
-
-def add_mac(mac):
-    try:
-        with open("macs.json", "r") as f:
-            dados = json.load(f)
-    except FileNotFoundError:
-        dados = []
-    if mac not in dados:
-        dados.append(mac)
-    with open("macs.json", "w") as f:
-        json.dump(dados, f, indent=4)
-
-
-add_mac(gma())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +48,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # my apps
+    "_itens",
+    "_operadores",
+    "_resources",
+    "_transactions",
     "rule",
     "cad_item",
     "apont",
@@ -276,7 +263,7 @@ SESSION_COOKIE_AGE = 1200
 # Atualiza o tempo da sessão a cada requisição
 SESSION_SAVE_EVERY_REQUEST = True
 
-# IMPORT_EXPORT_FORMATS = [XLSX]
+AUTH_USER_MODEL = "_operadores.Operator"
 
 try:
     from project.local_settings import *

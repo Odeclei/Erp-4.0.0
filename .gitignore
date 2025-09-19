@@ -16,6 +16,9 @@ gunicorn-error-log
 vscode/
 vscode
 /vscode/
+/fabrica/
+/ignore/
+
 
 /data/
 /output/

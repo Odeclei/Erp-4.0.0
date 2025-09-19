@@ -1,9 +1,10 @@
-# flake8: noqa
-from django import forms
-from django.conf import settings
 from django.db import models
+from django.conf import settings
+from django import forms
+from _resources.models import Unidade_Medida
 
 
+# Create your models here.
 class FamilyProd(models.Model):
     class Meta:
         verbose_name = "Família Produto"
@@ -12,17 +13,17 @@ class FamilyProd(models.Model):
     refer = models.CharField(
         max_length=20, unique=True, verbose_name="Código Família Comercial"
     )
-    description = models.CharField(max_length=100, verbose_name="Nome Família")
+    name = models.CharField(max_length=100, verbose_name="Nome Família")
 
     def save(self, *args, **kwargs):
-        self.description = self.description.upper()
+        self.name = self.name.upper()
         super(FamilyProd, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.description
+        return self.name
 
 
-class Item(models.Model):
+class ItemAcabado(models.Model):
     class Meta:
         verbose_name = "Item"
         verbose_name_plural = "Itens"
@@ -31,13 +32,9 @@ class Item(models.Model):
         max_length=20,
         unique=True,
     )
-    name_prod = models.CharField(max_length=100, verbose_name="Nome Produto")
-    name_abrev = models.CharField(max_length=50, verbose_name="Nome Resumido")
-    semi_code = models.CharField(
-        max_length=50,
-        verbose_name="Referência Semiacabado",
-        help_text='Digitar código sem ponto "."',
-    )
+    item_desc = models.CharField(max_length=100, verbose_name="Nome Produto")
+    item_name = models.CharField(max_length=50, verbose_name="Nome Resumido")
+
     qtd_per_day = models.IntegerField(verbose_name="Peças ao dia")
     is_active = models.BooleanField(default=True, verbose_name="Ativo")
     family = models.ForeignKey(
@@ -53,7 +50,7 @@ class Item(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name="item_created_by",
+        related_name="itemacab_created_by",
     )
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
@@ -61,7 +58,7 @@ class Item(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name="item_updated_by",
+        related_name="itemacab_updated_by",
     )
     qtde_volume = models.FloatField(
         blank=True,
@@ -74,14 +71,14 @@ class Item(models.Model):
         """,
     )
     subitens = models.ManyToManyField(
-        "SubItem", through="Estrutura", related_name="subprodutos"
+        "ItemBase", through="Estrutura", related_name="subprodutos"
     )
 
     def save(self, *args, **kwargs):
         self.name_prod = self.name_prod.upper()
         self.name_prod = self.name_prod.upper()
         self.name_abrev = self.name_abrev.upper()
-        super(Item, self).save(*args, **kwargs)
+        super(ItemAcabado, self).save(*args, **kwargs)
 
     def clean(self):
         # Validation logic from clean_item_cod
@@ -101,81 +98,65 @@ class Item(models.Model):
         return subprodutos_quantidade
 
     def __str__(self) -> str:
-        item = f"{self.item_cod} - {self.name_prod}"
+        item = f"{self.item_cod} - {self.item_desc}"
         return item
 
 
-class Material(models.Model):
-    MATERIAL_CHOICES = [("Madeiras", ("Madeira")), ("Chapas", ("Chapas"))]
-    material_code = models.CharField(max_length=15, unique=True)
-    material_description = models.CharField(max_length=100)
-    material_group = models.CharField(
-        max_length=50, choices=MATERIAL_CHOICES, default="Madeiras"
+class Componentes(models.Model):
+    COMPONENTES_CHOICES = [("Madeiras", ("Madeira")), ("Chapas", ("Chapas"))]
+    codigo = models.CharField(max_length=15, unique=True)
+    nome = models.CharField(max_length=100)
+    grupo = models.CharField(
+        max_length=50, choices=COMPONENTES_CHOICES, default="Madeiras"
     )
-    unidade_medida = models.CharField(
-        max_length=50,
-        default="cm",
-        choices=[
-            ("m³", "Metros Cúbicos"),
-            ("m²", "Metros Quadrados"),
-            ("ml", "Metro Linear"),
-        ],
+    unidade_medida = models.ForeignKey(
+        Unidade_Medida, on_delete=models.CASCADE, null=True, blank=True
     )
 
     def __str__(self):
-        return f"{self.material_code} - {self.material_description}"
+        return f"{self.codigo} - {self.nome}"
 
 
-class SubItem(models.Model):
+class ItemBase(models.Model):
     class Meta:
         verbose_name = "Sub-Item"
         verbose_name_plural = "Sub-Itens"
 
-    subitem_cod = models.CharField(max_length=20, unique=True, verbose_name="Código")
-    name_subitem = models.CharField(max_length=100, verbose_name="Nome Sub-Item")
-    observation = models.TextField(verbose_name="Observações   ", null=True, blank=True)
-    # code_father = models.ManyToManyField(
-    #     Item, through='FichaTecnica', related_name='code_semi_item')
+    itembase_cod = models.CharField(max_length=20, unique=True, verbose_name="Código")
+    itembase_name = models.CharField(max_length=100, verbose_name="Nome Sub-Item")
     ficha_tecnica = models.ImageField(
         upload_to="assets/ficha_tecnica/%Y%m/", default="", blank=True
     )
     variation = models.CharField(
         max_length=50, null=True, blank=True, verbose_name="Variação"
     )
-    material = models.ForeignKey(
-        Material,
-        verbose_name=("Material"),
+    componente = models.ForeignKey(
+        Componentes,
+        verbose_name=("Componente"),
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
-    comprimento = models.DecimalField(
-        max_digits=10,
-        decimal_places=0,
-        null=True,
-        blank=True,
-        verbose_name="Comprimento (mm)",
+    comprimento = models.FloatField(
+        verbose_name="Comprimento (mm)", null=True, blank=True
     )
-    largura = models.DecimalField(
-        max_digits=10,
-        decimal_places=0,
+    largura = models.FloatField(
         null=True,
         blank=True,
         verbose_name="Largura (mm)",
     )
-    espessura = models.DecimalField(
-        max_digits=10,
-        decimal_places=0,
+    espessura = models.FloatField(
         null=True,
         blank=True,
         verbose_name="Espessura (mm)",
     )
+    observation = models.TextField(verbose_name="Observações   ", null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         self.name_subitem = self.name_subitem.upper()
-        super(SubItem, self).save(*args, **kwargs)
+        super(ItemBase, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         item = f"{self.subitem_cod} - {self.name_subitem}"
@@ -183,16 +164,18 @@ class SubItem(models.Model):
 
 
 class Estrutura(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.SET_NULL, null=True, blank=True)
-    subitem = models.ForeignKey(
-        SubItem, on_delete=models.SET_NULL, null=True, blank=True
+    item_acab = models.ForeignKey(
+        ItemAcabado, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    item_base = models.ForeignKey(
+        ItemBase, on_delete=models.SET_NULL, null=True, blank=True
     )
     qntde_pre = models.PositiveIntegerField(null=True)
     qntde_usi = models.PositiveIntegerField(null=True)
     qntde_lix = models.PositiveIntegerField(null=True)
 
     class Meta:
-        unique_together = ("item", "subitem")
+        unique_together = ("item_acab", "item_base")
 
     def __str__(self) -> str:
         return super().__str__()

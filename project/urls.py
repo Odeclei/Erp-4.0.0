@@ -10,6 +10,7 @@ urlpatterns = [
     path("carregamento/", include("carregamento.urls")),
     path("clientes/", include("clientes.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("item2/", include("_itens.urls")),
     path("item/", include("cad_item.urls")),
     path("order/", include("ppcp.urls")),
     path("pedidos/", include("pedidos.urls")),

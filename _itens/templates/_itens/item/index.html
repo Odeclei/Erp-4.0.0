@@ -1,0 +1,54 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <section class="container">
+    <div class="row justify-content-between pb-4">
+      <div class="col-md-2 align-content-center">
+        <a href="#" class="btn btn-lg btn-success py-2">Cadastrar Novo Produto</a>
+      </div>
+      <div class="col-md-5 ms-auto" id="search-container">
+        <form action="{% url '_itens:item_search' %}" class="d-flex col-md-8">
+          <input class="form-control form-control-lg col-10 search-input me-sm-2"
+                 type="search"
+                 placeholder="Buscar Produtos"
+                 id="search"
+                 name="search"
+                 value="{{ search_value }}">
+          <button class="btn btn-lg btn-primary my-1 my-sm-0" type="submit">
+            <i class="bi bi-search fs-2"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% if itens %}
+      <table class="table table-hover caption-top my-5">
+        <caption class="table-caption text-center">
+          <h2>Produtos Cadastrados</h2>
+        </caption>
+        <thead>
+          <tr class="table-row-header">
+            <th scope="col" class="table-header fs-2">Código</th>
+            <th scope="col" class="table-header fs-2">Descrição Produto</th>
+            <th scope="col" class="table-header fs-2">Família</th>
+            <th scope="col" class="table-header fs-2">Qtde dia</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for item in itens %}
+            <tr class="table-row">
+              <td class="table-cel table-text-center">
+                <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-3"
+                   href="{% url '_itens:item_detail' item.id %}">{{ item.item_cod }}</a>
+              </td>
+              <td class="table-cel table-text-left fs-3">{{ item.item_desc }}</td>
+              <td class="table-cel table-text-left fs-3">{{ item.family }}</td>
+              <td class="table-cel text-center fs-3">{{ item.qtd_per_day }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <h1>Nenhum item encontrado</h1>
+    {% endif %}
+  </section>
+{% endblock content %}

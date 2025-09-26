@@ -4,7 +4,6 @@ from django import forms
 from _resources.models import Unidade_Medida
 
 
-# Create your models here.
 class FamilyProd(models.Model):
     class Meta:
         verbose_name = "Família Produto"
@@ -75,9 +74,8 @@ class ItemAcabado(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.name_prod = self.name_prod.upper()
-        self.name_prod = self.name_prod.upper()
-        self.name_abrev = self.name_abrev.upper()
+        self.item_desc = self.item_desc.upper()
+        self.item_name = self.item_name.upper()
         super(ItemAcabado, self).save(*args, **kwargs)
 
     def clean(self):
@@ -87,14 +85,16 @@ class ItemAcabado(models.Model):
         return super().clean()
 
     def obter_subprodutos_e_quantidades(self):
-        subprodutos = Estrutura.objects.filter(produto=self)
-        subprodutos_quantidade = [
-            {
-                "subproduto": estrutura.subprodutos,  # type: ignore
-                "quantidade": estrutura.qntde_pre,
-            }
-            for estrutura in subprodutos
-        ]
+        subprodutos = Estrutura.objects.filter(produto=self).select_related("item_base")
+        subprodutos_quantidade = []
+        if subprodutos:
+            for estrutura in subprodutos:
+                subprodutos_quantidade.append(
+                    {
+                        "subproduto": estrutura.item_base,
+                        "quantiade": estrutura.qntde_pre,
+                    }
+                )
         return subprodutos_quantidade
 
     def __str__(self) -> str:
@@ -102,25 +102,38 @@ class ItemAcabado(models.Model):
         return item
 
 
+class ComponentesGroup(models.Model):
+    class Meta:
+        verbose_name = "Grupo Componentes"
+        verbose_name_plural = "Grupos Componentes"
+
+    group = models.CharField(max_length=15, unique=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Componentes(models.Model):
-    COMPONENTES_CHOICES = [("Madeiras", ("Madeira")), ("Chapas", ("Chapas"))]
+    class Meta:
+        verbose_name = "Componente"
+        verbose_name_plural = "Componentes"
+
     codigo = models.CharField(max_length=15, unique=True)
-    nome = models.CharField(max_length=100)
-    grupo = models.CharField(
-        max_length=50, choices=COMPONENTES_CHOICES, default="Madeiras"
-    )
+    name = models.CharField(max_length=100)
+    grupo = models.ForeignKey(ComponentesGroup, on_delete=models.CASCADE)
     unidade_medida = models.ForeignKey(
         Unidade_Medida, on_delete=models.CASCADE, null=True, blank=True
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.nome}"
+        return f"{self.codigo} - {self.name}"
 
 
 class ItemBase(models.Model):
     class Meta:
-        verbose_name = "Sub-Item"
-        verbose_name_plural = "Sub-Itens"
+        verbose_name = "Item Base"
+        verbose_name_plural = "Itens Base"
 
     itembase_cod = models.CharField(max_length=20, unique=True, verbose_name="Código")
     itembase_name = models.CharField(max_length=100, verbose_name="Nome Sub-Item")
@@ -155,11 +168,11 @@ class ItemBase(models.Model):
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        self.name_subitem = self.name_subitem.upper()
+        self.itembase_name = self.itembase_name.upper()
         super(ItemBase, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
-        item = f"{self.subitem_cod} - {self.name_subitem}"
+        item = f"{self.itembase_cod} - {self.itembase_name}"
         return item
 
 
@@ -178,7 +191,10 @@ class Estrutura(models.Model):
         unique_together = ("item_acab", "item_base")
 
     def __str__(self) -> str:
-        return super().__str__()
+        item_acab_cod = self.item_acab.item_cod if self.item_acab else "N/A"
+        item_base_cod = self.item_base.itembase_cod if self.item_base else "N/A"
+        string = f"{item_acab_cod} - {item_base_cod}"
+        return string
 
 
 class Finish(models.Model):

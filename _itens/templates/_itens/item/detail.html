@@ -1,0 +1,99 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <section>
+    <div class="container">
+      <h2 class="mb-5">Detalhes do item:</h2>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-label fs-4 " for="readOnlyCod">
+          <strong>Código:</strong>
+        </label>
+        <input class="form-control form-control-lg  border border-success fs-4"
+               id="readOnlyCod"
+               type="text"
+               value="{{ item.item_cod }}"
+               readonly>
+      </div>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-label fs-4 " for="readOnlyDesc">
+          <strong>Descrição:</strong>
+        </label>
+        <input class="form-control form-control-lg  border border-success fs-4"
+               id="readOnlyDesc"
+               type="text"
+               value="{{ item.item_desc }}"
+               readonly>
+      </div>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-label fs-4 " for="readOnlyFamily">
+          <strong>Familia:</strong>
+        </label>
+        <input class="form-control form-control-lg  border border-success fs-4"
+               id="readOnlyFamily"
+               type="text"
+               value="{{ item.family.name }}"
+               readonly>
+      </div>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-label fs-4 " for="readOnlyPcDia">
+          <strong>Peças ao dia:</strong>
+        </label>
+        <input class="form-control form-control-lg  border border-success fs-4"
+               id="readOnlyPcDia"
+               type="text"
+               value="{{ item.qtd_per_day }}"
+               readonly>
+      </div>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-label fs-4 " for="readOnlyCreatedBy">
+          <strong>Cadastrado por:</strong>
+        </label>
+        <input class="form-control form-control-lg  border border-success fs-4"
+               id="readOnlyCreatedBy"
+               type="text"
+               value="{{ item.created_by }}"
+               readonly>
+      </div>
+      <div class="d-flex flex-nowrap align-content-center mb-4">
+        <label class="col-md-2 form-check-label fs-4  " for="readOnlyActive">
+          <strong>Ativo:</strong>
+        </label>
+        <input class="form-check-input form-control-lg border border-success"
+               disabled
+               id="readOnlyActive"
+               type="checkbox"
+               {% if item.is_active %}checked="checked"{% endif %}
+               style="height: 2rem;
+                      width: 3rem">
+      </div>
+      {% if item.updated_by %}
+        <div class="d-flex flex-nowrap align-content-center mb-4">
+          <label class="col-md-2 form-label fs-4 " for="readOnlyUpdatedBy">
+            <strong>Editado por:</strong>
+          </label>
+          <input class="form-control form-control-lg  border border-success fs-4"
+                 id="readOnlyUpdatedBy"
+                 type="text"
+                 value="{{ item.updated_by }}"
+                 readonly>
+        </div>
+        <div class="d-flex flex-nowrap align-content-center mb-4">
+          <label class="col-md-2 form-label fs-4 " for="readOnlyUpdatedAt">
+            <strong>Editado em:</strong>
+          </label>
+          <input class="form-control form-control-lg  border border-success fs-4"
+                 id="readOnlyUpdatedAt"
+                 type="text"
+                 value="{{ item.updated_at }}"
+                 readonly>
+        </div>
+      {% endif %}
+    </div>
+    <div class="d-flex justify-content-evenly my-5">
+      <a href="#" class="btn btn-lg btn-success col-3 py-3 mx-2 fs-3">Editar</a>
+      <a href="#" class="btn btn-lg btn-danger col-3 py-3 mx-2 fs-3">Excluir</a>
+      <a href="{% url '_itens:item_list' %}"
+         class="btn btn-lg btn-info col-3 py-3 mx-2 fs-3">Voltar</a>
+    </div>
+  </section>
+{% endblock content %}

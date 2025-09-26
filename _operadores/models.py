@@ -17,4 +17,7 @@ class Operator(AbstractUser):
     is_superviser = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.get_full_name or self.username
+        full_name = str(self.get_full_name())
+        if full_name:
+            return full_name
+        return self.username

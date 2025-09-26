@@ -1,0 +1,71 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block content %}
+  <section class="container mt-5">
+    <div class="row">
+      {# Define o título com base se é criação ou edição (embora esta view seja apenas Create) #}
+      {% if form_item.instance.pk %}
+        <h2>Edição do Item (ID: {{ form_item.instance.pk }})</h2>
+      {% else %}
+        <h2>Criar Novo Item</h2>
+      {% endif %}
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-md-10">
+        <form action="{{ form_action }}" method="post" class="card p-4 shadow-sm">
+          {% csrf_token %}
+          {# Erros não específicos de campo (e.g., validação de unique_together) #}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+          {% endif %}
+          {% for field in form %}
+            <div class="position-relative mb-4">
+              <label for="{{ field.id_for_label }}" class="position-absolute top-0 start-0 translate-middle-y bg-body-tertiary fs-4">{{ field.label }}</label>
+              {% if field.name == 'family' %}
+                <input 
+                  class="form-control form-control-lg border border-success pt-3"
+                  list ="family-options"
+                  id="family_search"
+                  placeholder = "Selecione ou digite a Família..."
+
+                  value="{{ field.value|default_if_none:'' }}"
+                >
+                <datalist id="family-options">
+                  {% for familia in all_families %}
+                  <option value="{{ familia.refer }} - {{ familia.name }}" data-pk="{{ familia.pk }}"></option>
+                  {% endfor %}
+                </datalist>
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback d-block">
+                      {% for error in field.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+              {% else %}
+                {# 2. CORREÇÃO: Renderizar o campo de input real #}
+                {{ field }}
+                {# 3. Melhoria: Exibir Help Text e Erros #}
+                {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="mt-4 d-flex justify-content-end">
+            <a href="{% url '_itens:item_list' %}" class="btn btn-secondary me-2">
+              <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i> Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

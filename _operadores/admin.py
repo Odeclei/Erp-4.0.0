@@ -20,6 +20,6 @@ class OperatorAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         (
             "Informações Adicionais",
-            {"fields": ("matricula", "setor", "workstation", "is_superviser")},
+            {"fields": ("matricula", "workstation", "turno", "is_superviser")},
         ),
     )

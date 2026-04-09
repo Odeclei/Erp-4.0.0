@@ -5,165 +5,430 @@
 
 {% block extra_css %}
 <style>
-    .kpi-card {
-        background: white;
-        border-left: 4px solid #007bff;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    :root {
+        --color-primary: #0055ff;
+        --color-success: #00cc66;
+        --color-warning: #ffab00;
+        --color-danger: #ff3b30;
+        --color-light: #f5f7fa;
+        --color-dark: #1a202c;
     }
 
-    .kpi-value {
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #0033cc 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0, 85, 255, 0.2);
+    }
+
+    .dashboard-header h1 {
         font-size: 2.5em;
-        font-weight: bold;
-        color: #333;
-        margin: 10px 0;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .dashboard-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1em;
+    }
+
+    /* KPI Cards Modernos */
+    .kpi-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease, transform 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--color-primary), #00d4ff);
+        transition: height 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .kpi-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .kpi-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        background: var(--color-light);
+    }
+
+    .kpi-card.excellente .kpi-icon {
+        background: rgba(0, 204, 102, 0.1);
+        color: var(--color-success);
+    }
+
+    .kpi-card.bom .kpi-icon {
+        background: rgba(255, 171, 0, 0.1);
+        color: var(--color-warning);
+    }
+
+    .kpi-card.ruim .kpi-icon {
+        background: rgba(255, 59, 48, 0.1);
+        color: var(--color-danger);
     }
 
     .kpi-label {
-        font-size: 0.9em;
-        color: #666;
+        font-size: 0.85em;
+        color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
 
-    .status-excellente { border-left-color: #28a745; }
-    .status-bom { border-left-color: #ffc107; }
-    .status-ruim { border-left-color: #dc3545; }
+    .kpi-value {
+        font-size: 2.8em;
+        font-weight: 700;
+        color: var(--color-dark);
+        line-height: 1;
+        margin: 10px 0;
+    }
+
+    .kpi-subtext {
+        font-size: 0.85em;
+        color: #6c757d;
+        margin-top: 8px;
+    }
+
+    /* Chart Container */
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-card h3 {
+        color: var(--color-dark);
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
     .chart-container {
         position: relative;
-        height: 300px;
-        margin-bottom: 30px;
+        height: 350px;
+    }
+
+    /* Tabelas Modernas */
+    .table-container {
         background: white;
-        padding: 20px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .table-container h3 {
+        padding: 20px 25px;
+        margin: 0;
+        background: linear-gradient(135deg, var(--color-light), white);
+        color: var(--color-dark);
+        font-weight: 700;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .table-maquinas {
         border-collapse: collapse;
         width: 100%;
-        background: white;
-        border-radius: 4px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .table-maquinas th {
-        background: #f8f9fa;
-        padding: 15px;
+        background: var(--color-light);
+        padding: 15px 20px;
         text-align: left;
-        border-bottom: 2px solid #dee2e6;
-        font-weight: 600;
-        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 700;
+        color: var(--color-dark);
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .table-maquinas td {
-        padding: 15px;
-        border-bottom: 1px solid #dee2e6;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f1f3f5;
+        color: #495057;
     }
 
+    .table-maquinas tr:hover {
+        background: #f9fafb;
+    }
+
+    .table-maquinas tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .machine-name {
+        font-weight: 700;
+        color: var(--color-dark);
+        font-size: 1em;
+    }
+
+    .machine-desc {
+        font-size: 0.85em;
+        color: #6c757d;
+    }
+
+    .oee-value {
+        font-weight: 700;
+        font-size: 1.1em;
+        color: var(--color-dark);
+    }
+
+    /* Status Badges */
     .badge-status {
         display: inline-block;
-        padding: 5px 10px;
-        border-radius: 20px;
+        padding: 6px 12px;
+        border-radius: 6px;
         font-size: 0.85em;
-        font-weight: 500;
+        font-weight: 600;
+        white-space: nowrap;
     }
 
     .badge-excellente {
-        background: #d4edda;
-        color: #155724;
+        background: rgba(0, 204, 102, 0.15);
+        color: #009933;
     }
 
     .badge-bom {
-        background: #fff3cd;
-        color: #856404;
+        background: rgba(255, 171, 0, 0.15);
+        color: #cc8800;
     }
 
     .badge-ruim {
-        background: #f8d7da;
-        color: #721c24;
+        background: rgba(255, 59, 48, 0.15);
+        color: #cc0000;
     }
 
-    .info-grid {
+    /* Grid Layout */
+    .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
+    }
+
+    .table-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .table-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .kpi-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .kpi-value {
+            font-size: 2em;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8em;
+        }
+    }
+
+    /* Animações */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .kpi-card {
+        animation: slideIn 0.5s ease forwards;
+    }
+
+    .kpi-card:nth-child(n) {
+        animation-delay: calc(0.1s * var(--index, 0));
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <h1 class="mb-4">
-        <i class="fas fa-chart-line"></i> Dashboard OEE
-    </h1>
 
-    <!-- KPIs Principais -->
-    <div class="info-grid">
-        <div class="kpi-card {% if oee_media >= 85 %}status-excellente{% elif oee_media >= 70 %}status-bom{% else %}status-ruim{% endif %}">
-            <div class="kpi-label">OEE Geral</div>
-            <div class="kpi-value">{{ oee_media|floatformat:1 }}%</div>
-            <small class="text-muted">Overall Equipment Effectiveness</small>
-        </div>
-
-        <div class="kpi-card {% if disponibilidade_media >= 85 %}status-excellente{% elif disponibilidade_media >= 70 %}status-bom{% else %}status-ruim{% endif %}">
-            <div class="kpi-label">Disponibilidade</div>
-            <div class="kpi-value">{{ disponibilidade_media|floatformat:1 }}%</div>
-            <small class="text-muted">Tempo Produtivo / Total</small>
-        </div>
-
-        <div class="kpi-card {% if performance_media >= 85 %}status-excellente{% elif performance_media >= 70 %}status-bom{% else %}status-ruim{% endif %}">
-            <div class="kpi-label">Performance</div>
-            <div class="kpi-value">{{ performance_media|floatformat:1 }}%</div>
-            <small class="text-muted">Produção Teórica</small>
-        </div>
-
-        <div class="kpi-card {% if qualidade_media >= 95 %}status-excellente{% elif qualidade_media >= 85 %}status-bom{% else %}status-ruim{% endif %}">
-            <div class="kpi-label">Qualidade</div>
-            <div class="kpi-value">{{ qualidade_media|floatformat:1 }}%</div>
-            <small class="text-muted">Peças Boas / Total</small>
-        </div>
+<!-- Header -->
+<div class="dashboard-header">
+    <div class="container-fluid">
+        <h1>
+            <i class="fas fa-tachometer-alt"></i>
+            Dashboard OEE
+        </h1>
+        <p>Acompanhamento em tempo real do desempenho operacional</p>
     </div>
+</div>
 
-    <!-- Dados de Produção -->
-    <div class="info-grid">
-        <div class="kpi-card">
-            <div class="kpi-label">Máquinas Ativas</div>
-            <div class="kpi-value">{{ qtde_maquinas }}</div>
+<div class="container-fluid">
+    <!-- KPIs Principais (OEE, Disponibilidade, Performance, Qualidade) -->
+    <div class="kpi-grid">
+        <div class="kpi-card {% if oee_media >= 85 %}excellente{% elif oee_media >= 70 %}bom{% else %}ruim{% endif %}">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">OEE Geral</div>
+                    <div class="kpi-value">{{ oee_media|floatformat:1 }}%</div>
+                    <div class="kpi-subtext">Overall Equipment Effectiveness</div>
+                </div>
+                <div class="kpi-icon">
+                    <i class="fas fa-gauge-high"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="kpi-card">
-            <div class="kpi-label">Quantidade Produzida</div>
-            <div class="kpi-value">{{ qtde_produzida }}</div>
-            <small class="text-muted">peças</small>
+        <div class="kpi-card {% if disponibilidade_media >= 85 %}excellente{% elif disponibilidade_media >= 70 %}bom{% else %}ruim{% endif %}">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Disponibilidade</div>
+                    <div class="kpi-value">{{ disponibilidade_media|floatformat:1 }}%</div>
+                    <div class="kpi-subtext">Tempo Produtivo</div>
+                </div>
+                <div class="kpi-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="kpi-card">
-            <div class="kpi-label">Quantidade Refugo</div>
-            <div class="kpi-value">{{ qtde_refugo }}</div>
-            <small class="text-muted">peças perdidas</small>
+        <div class="kpi-card {% if performance_media >= 85 %}excellente{% elif performance_media >= 70 %}bom{% else %}ruim{% endif %}">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Performance</div>
+                    <div class="kpi-value">{{ performance_media|floatformat:1 }}%</div>
+                    <div class="kpi-subtext">Velocidade Produção</div>
+                </div>
+                <div class="kpi-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- Gráfico de Tendência -->
-    <div class="row">
-        <div class="col-lg-12">
-            <h3 class="mt-4 mb-3">Tendência OEE - Últimos 7 dias</h3>
-            <div class="chart-container">
-                <canvas id="tendenciaChart"></canvas>
+        <div class="kpi-card {% if qualidade_media >= 95 %}excellente{% elif qualidade_media >= 85 %}bom{% else %}ruim{% endif %}">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Qualidade</div>
+                    <div class="kpi-value">{{ qualidade_media|floatformat:1 }}%</div>
+                    <div class="kpi-subtext">Peças Boas</div>
+                </div>
+                <div class="kpi-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Máquinas com Melhor OEE -->
-    <div class="row mt-4">
-        <div class="col-lg-6">
-            <h3 class="mb-3">🏆 Top 5 Melhor OEE</h3>
+    <!-- Dados de Produção -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Máquinas Ativas</div>
+                    <div class="kpi-value">{{ qtde_maquinas }}</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(0, 85, 255, 0.1); color: var(--color-primary);">
+                    <i class="fas fa-industry"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Qtde Produzida</div>
+                    <div class="kpi-value">{{ qtde_produzida }}</div>
+                    <div class="kpi-subtext">peças</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(0, 204, 102, 0.1); color: var(--color-success);">
+                    <i class="fas fa-boxes"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div>
+                    <div class="kpi-label">Qtde Refugo</div>
+                    <div class="kpi-value">{{ qtde_refugo }}</div>
+                    <div class="kpi-subtext">peças perdidas</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(255, 59, 48, 0.1); color: var(--color-danger);">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Tendência -->
+    <div class="chart-card">
+        <h3>
+            <i class="fas fa-chart-line"></i>
+            Tendência OEE - Últimos 7 dias
+        </h3>
+        <div class="chart-container">
+            <canvas id="tendenciaChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabelas: Melhor e Pior OEE -->
+    <div class="table-grid">
+        <!-- Top 5 Melhor OEE -->
+        <div class="table-container">
+            <h3>
+                <i class="fas fa-trophy"></i>
+                Top 5 Melhor OEE
+            </h3>
             <table class="table-maquinas">
                 <thead>
                     <tr>
@@ -176,17 +441,23 @@
                     {% for ind in melhor_oee %}
                     <tr>
                         <td>
-                            <strong>{{ ind.machine.code }}</strong><br>
-                            <small class="text-muted">{{ ind.machine.name }}</small>
+                            <span class="machine-name">{{ ind.machine.code }}</span>
+                            {% if ind.machine.name %}<br><span class="machine-desc">{{ ind.machine.name }}</span>{% endif %}
                         </td>
-                        <td><strong>{{ ind.oee|floatformat:1 }}%</strong></td>
+                        <td class="oee-value">{{ ind.oee|floatformat:1 }}%</td>
                         <td>
                             {% if ind.oee >= 85 %}
-                            <span class="badge-status badge-excellente">✓ Excelente</span>
+                            <span class="badge-status badge-excellente">
+                                <i class="fas fa-check-circle"></i> Excelente
+                            </span>
                             {% elif ind.oee >= 70 %}
-                            <span class="badge-status badge-bom">⚠ Bom</span>
+                            <span class="badge-status badge-bom">
+                                <i class="fas fa-exclamation-triangle"></i> Bom
+                            </span>
                             {% else %}
-                            <span class="badge-status badge-ruim">✗ Ruim</span>
+                            <span class="badge-status badge-ruim">
+                                <i class="fas fa-times-circle"></i> Ruim
+                            </span>
                             {% endif %}
                         </td>
                     </tr>
@@ -195,9 +466,12 @@
             </table>
         </div>
 
-        <!-- Máquinas com Pior OEE -->
-        <div class="col-lg-6">
-            <h3 class="mb-3">⚠️ Top 5 Pior OEE</h3>
+        <!-- Top 5 Pior OEE -->
+        <div class="table-container">
+            <h3>
+                <i class="fas fa-triangle-exclamation"></i>
+                Top 5 Pior OEE
+            </h3>
             <table class="table-maquinas">
                 <thead>
                     <tr>
@@ -210,17 +484,23 @@
                     {% for ind in pior_oee %}
                     <tr>
                         <td>
-                            <strong>{{ ind.machine.code }}</strong><br>
-                            <small class="text-muted">{{ ind.machine.name }}</small>
+                            <span class="machine-name">{{ ind.machine.code }}</span>
+                            {% if ind.machine.name %}<br><span class="machine-desc">{{ ind.machine.name }}</span>{% endif %}
                         </td>
-                        <td><strong>{{ ind.oee|floatformat:1 }}%</strong></td>
+                        <td class="oee-value">{{ ind.oee|floatformat:1 }}%</td>
                         <td>
                             {% if ind.oee >= 85 %}
-                            <span class="badge-status badge-excellente">✓ Excelente</span>
+                            <span class="badge-status badge-excellente">
+                                <i class="fas fa-check-circle"></i> Excelente
+                            </span>
                             {% elif ind.oee >= 70 %}
-                            <span class="badge-status badge-bom">⚠ Bom</span>
+                            <span class="badge-status badge-bom">
+                                <i class="fas fa-exclamation-triangle"></i> Bom
+                            </span>
                             {% else %}
-                            <span class="badge-status badge-ruim">✗ Ruim</span>
+                            <span class="badge-status badge-ruim">
+                                <i class="fas fa-times-circle"></i> Ruim
+                            </span>
                             {% endif %}
                         </td>
                     </tr>
@@ -237,6 +517,10 @@
     const ctx = document.getElementById('tendenciaChart').getContext('2d');
     const tendenciaData = {{ tendencia_oee|safe }};
 
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(0, 85, 255, 0.2)');
+    gradient.addColorStop(1, 'rgba(0, 85, 255, 0.01)');
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -244,16 +528,16 @@
             datasets: [{
                 label: 'OEE (%)',
                 data: tendenciaData.map(d => d.oee),
-                borderColor: '#007bff',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                borderWidth: 2,
+                borderColor: '#0055ff',
+                backgroundColor: gradient,
+                borderWidth: 3,
                 fill: true,
                 tension: 0.4,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointBackgroundColor: '#007bff',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#0055ff',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 2,
+                pointBorderWidth: 3,
             }]
         },
         options: {
@@ -263,6 +547,14 @@
                 legend: {
                     display: true,
                     position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: 600
+                        }
+                    }
                 }
             },
             scales: {
@@ -272,7 +564,20 @@
                     ticks: {
                         callback: function(value) {
                             return value + '%';
+                        },
+                        font: {
+                            size: 11
                         }
+                    },
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: false
                     }
                 }
             }

@@ -1,6 +1,5 @@
 {% extends "global/base.html" %}
 {% load static %}
-{% load math_filters %}
 
 {% block title %}Dashboard OEE{% endblock %}
 
@@ -323,25 +322,10 @@
 
                 <div class="border-top pt-4">
                     <div class="progress" style="height: 10px;">
-                        {% with total_peças=qtde_produzida|add:qtde_refugo %}
-                        {% if total_peças > 0 %}
-                            {% with eficiencia=qtde_produzida|mul:100|div:total_peças %}
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ eficiencia|floatformat:0 }}%" aria-valuenow="{{ eficiencia|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: {% widthratio qtde_refugo total_peças 100 %}%" aria-valuenow="{% widthratio qtde_refugo total_peças 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
-                            {% endwith %}
-                        {% endif %}
-                        {% endwith %}
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ eficiencia_peças|floatformat:0 }}%" aria-valuenow="{{ eficiencia_peças|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ percentual_refugo|floatformat:0 }}%" aria-valuenow="{{ percentual_refugo|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    <p class="small text-muted mt-2">
-                        Eficiência de Peças: 
-                        {% with total_peças=qtde_produzida|add:qtde_refugo %}
-                        {% if total_peças > 0 %}
-                            {% widthratio qtde_produzida total_peças 100 %}%
-                        {% else %}
-                            0%
-                        {% endif %}
-                        {% endwith %}
-                    </p>
+                    <p class="small text-muted mt-2">Eficiência de Peças: {{ eficiencia_peças|floatformat:1 }}%</p>
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ from calendar import c
 import code
 from django import forms
 from pedidos.models import Pedidos, ItemPedido, Finish
-from cad_item.models import Finish as CadItemFinish
+from _itens.models import Finish as CadItemFinish
 
 
 class PedidoForm(forms.ModelForm):

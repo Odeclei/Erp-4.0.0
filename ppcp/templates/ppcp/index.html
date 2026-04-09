@@ -1,10 +1,15 @@
+
+
 {% extends "global/base.html" %}
+{% load static %}
+
+{% comment %} {% extends "global/base.html" %}
 {% load static %}
 
 {% block content %}
 
 <form action="{% url "order:search" %}" method="get">
-  {% comment %} {% csrf_token %} {% endcomment %}
+  
   <div class="container">
     <div class="row justify-content-end">
       <div class="col-md-5">
@@ -58,4 +63,92 @@
   {% endif %}
 </section>
 
+{% endblock content %} {% endcomment %}
+
+
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row align-items-center mb-4">
+    <div class="col-md-6">
+      <h2 class="text-primary fw-bold mb-0">Ordens de Produção</h2>
+      <p class="text-muted small">Gerencie as programações e status de fabricação</p>
+    </div>
+    
+    <div class="col-md-6">
+      <form action="{% url 'order:search' %}" method="get">
+        <div class="input-group shadow-sm">
+          <span class="input-group-text bg-white border-end-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search text-muted" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+            </svg>
+          </span>
+          <input 
+            id="query" 
+            name="search" 
+            type="search" 
+            class="form-control border-start-0 ps-0" 
+            placeholder="Procurar ordens..."
+            value="{{ search_value|default:'' }}"
+          >
+          <button type="submit" class="btn btn-primary px-4">Buscar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'order:create' %}" class="btn btn-success d-flex align-items-center shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+      </svg>
+      Nova Ordem
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      {% if ordens %}
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4 py-3" style="width: 20%;">Cód. Ordem</th>
+            <th class="py-3">Descrição</th>
+            <th class="text-center py-3" style="width: 20%;">Status</th>
+            <th class="text-end pe-4 py-3">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ordem in ordens %}
+          <tr>
+            <td class="ps-4 fw-bold text-dark">
+              {{ ordem.order_number }}
+            </td>
+            <td class="text-secondary">
+              {{ ordem.description|truncatechars:80 }}
+            </td>
+            <td class="text-center">
+              <span class="badge {% if ordem.status.name == 'Concluído' %}bg-success{% elif ordem.status.name == 'Pendente' %}bg-warning text-dark{% else %}bg-info{% endif %} rounded-pill px-3">
+                {{ ordem.status }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <a href="{% url 'order:detail' ordem.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                Detalhes
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center py-5">
+        <img src="{% static 'global/img/empty-box.svg' %}" alt="Vazio" style="width: 80px; opacity: 0.5;">
+        <h5 class="mt-3 text-muted">Nenhuma programação encontrada.</h5>
+        <a class="btn btn-outline-primary mt-2" href='{% url "order:create" %}'>Criar Primeira Ordem</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock content %}

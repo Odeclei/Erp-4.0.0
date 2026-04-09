@@ -1,56 +1,100 @@
-{% extends "global/base.html" %} {% load static %} {% block content %}
-<section class="container">
-  <p class="fs-1">
-    {% if form.order_number.value %} Alteração de Programação {% else %}
-    Cadastro Nova Programação {% endif %}
-  </p>
-</section>
+{% extends "global/base.html" %} {% load static %}
 
-<section class="form-group">
-  <form action="{{form_action}}" method="post">
-    {% csrf_token %} {% for field in form %}
-    <div class="row g-2 align-items-center">
-      <div class="col-2">
-        <label for="{{field.id_for_label}}" class="col-form-label fs-4"
-          >{{field.label}}:</label
-        >
-      </div>
-      <div class="col-6">{{field}}</div>
-    </div>
-    {% endfor %}
-    <div class="btn-field center my-3">
-      {% if form.order_number.value %}
-      <button class="btn btn-lg btn-primary mx-3" type="submit">
-        Atualizar Programação
-      </button>
-      {% else %}
-      <button class="btn btn-lg btn-primary mx-3" type="submit">
-        Cadastrar Programação
-      </button>
-      {% endif %}
-      <button class="btn btn-lg btn-secondary mx-3" type="reset">
-        Limpar Campos
-      </button>
-    </div>
-  </form>
-</section>
-{% endblock content %} {% block scripts %}
 
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow border-0 rounded-3">
+    <div class="card-header bg-primary text-white py-3">
+      <h3 class="mb-0 fw-bold">
+        <i class="bi bi-calendar-check me-2"></i>
+        {% if form.instance.pk %} Alterar Programação {% else %} Cadastrar Nova Programação {% endif %}
+      </h3>
+    </div>
+    
+    <div class="card-body p-4 p-md-5">
+      <form action="{{form_action}}" method="post" class="needs-validation">
+        {% csrf_token %} 
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="form-floating">
+              {{ form.order_number }}
+              <label for="{{ form.order_number.id_for_label }}">{{ form.order_number.label }}</label>
+            </div>
+            {% if form.order_number.errors %}<div class="text-danger small">{{ form.order_number.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              {{ form.prog_year }}
+              <label for="{{ form.prog_year.id_for_label }}">{{ form.prog_year.label }}</label>
+            </div>
+            <div class="form-text small">{{ form.prog_year.help_text }}</div>
+          </div>
+
+          <div class="col-12">
+            <div class="form-floating">
+              {{ form.description }}
+              <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              {{ form.status }}
+              <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-5 border-top pt-4">
+          <a href="{% url 'order:list' %}" class="btn btn-outline-secondary px-4 py-2">
+            Cancelar
+          </a>
+          <button type="reset" class="btn btn-light px-4 py-2 text-danger">
+            Limpar
+          </button>
+          <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm fw-bold">
+            {% if form.instance.pk %} Atualizar {% else %} Cadastrar {% endif %} Programação
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %} 
+
+{% block scripts %}
 <script>
   $(document).ready(function () {
+    // Inicialização do Select2 com a URL corrigida e estilo Bootstrap 5
     $("#id_family").select2({
+      theme: "bootstrap-5", // Se você tiver o tema bootstrap-5 para select2
       ajax: {
-        url: "http://127.0.0.1:8000/item/creat/",
+        url: "{% url '_itens:item_search' %}",
         dataType: "json",
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term 
+          };
+        },
         processResults: function (data) {
           return {
-            results: $.map(data, function (item) {
-              return { id: item.id, text: item.description };
+            results: $.map(data.results, function (item) {
+              return { 
+                id: item.id, 
+                text: item.text || item.description 
+              };
             }),
           };
         },
+        cache: true
       },
       minimumInputLength: 1,
+      placeholder: "Selecione a família do item...",
+      allowClear: true
     });
   });
 </script>

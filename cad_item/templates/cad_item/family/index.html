@@ -2,56 +2,77 @@
 {% load static %}
 
 {% block content %}
-<section class="search-container">
-  <form action="{% url "cad_item:family_search" %}" method="get">
-    <div class="group">
-      <svg viewBox="0 0 24 24" aria-hidden="true" class="search-icon">
-        <g>
-          <path
-            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
-          ></path>
-        </g>
-      </svg>
-
-      <input
-        id="query"
-        class="search-input"
-        type="search"
-        placeholder="Buscar ..."
-        name="search"
-        value="{{ search_value }}"  
-      />
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h3 class="mb-0 text-primary">Famílias de Produtos</h3>
+        
+        <form action="{% url 'cad_item:family_search' %}" method="get" class="d-flex w-100" style="max-width: 400px;">
+            <div class="input-group">
+                <input 
+                    class="form-control" 
+                    type="search" 
+                    placeholder="Ref. ou Descrição..." 
+                    name="search" 
+                    value="{{ search_value|default:'' }}"
+                >
+                <button class="btn btn-primary" type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+                </button>
+            </div>
+        </form>
     </div>
-  </form>
-</section>
 
-<section class="family-content">
-  <table class="table-itens">
-    <caption class="table-caption">
-      <h3>Famílias de Produtos Cadastradas</h3>
-    </caption>
-    <thead>
-      <tr class="table-row-header">
-        <th class="table-header">Código</th>
-        <th class="table-header">Família</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in form_family %}
-        <tr class="table-row">
-          <td class="table-cel table-text-center">{{item.refer}}</td>
-          <td class="table-cel table-text-left">
-            <a 
-              href="{% url "cad_item:family_update" item.pk %}"
-            >
-            {{item.description}}
-            </a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Código (Refer)</th>
+                        <th>Descrição da Família</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in form_family %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">{{ item.refer }}</td>
+                        <td>{{ item.description }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'cad_item:family_update' item.pk %}" class="btn btn-sm btn-outline-warning">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-5 text-muted">
+                            Nenhum resultado encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
+    {% if is_paginated %}
+    <nav aria-label="Navegação de páginas" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1{% if search_value %}&search={{ search_value }}{% endif %}">&laquo; Primeira</a></li>
+            {% endif %}
 
+            {% for n in page_range %}
+                <li class="page-item {% if page_obj.number == n %}active{% endif %}">
+                    <a class="page-link" href="?page={{ n }}{% if search_value %}&search={{ search_value }}{% endif %}">{{ n }}</a>
+                </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_value %}&search={{ search_value }}{% endif %}">Última &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
 {% endblock content %}

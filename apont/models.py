@@ -2,7 +2,6 @@
 from django.conf import settings
 from django.db import models
 
-from cad_item.models import Item
 from ppcp.models import ItemProgramacao, SubItemProgramacao
 from rule.models import Machines
 

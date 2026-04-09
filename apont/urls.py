@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apont.views import (
-    get_template_url,
+    # get_template_url,
     ApontStop,
     FimProducaoView,
     IniciarSetupView,
@@ -14,7 +14,7 @@ app_name = "apont"
 
 urlpatterns = [
     # path('', ReadBarcodeView, name='read_barcode'),
-    path("", get_template_url, name="read_barcode"),
+    path("", ReadBarcodeView, name="read_barcode"),
     path("start-setup/", IniciarSetupView, name="start_setup"),
     path("fim_producao/", FimProducaoView, name="fim_producao"),
     path("parada/", StopsMotiveView, name="stop_group"),

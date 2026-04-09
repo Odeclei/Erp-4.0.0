@@ -1,7 +1,12 @@
 # flake8: noqa
 from django import forms
 
-from cad_item.models import Estrutura, FamilyProd, Item, SubItem
+from _itens.models import (
+    Estrutura,
+    FamilyProd,
+    ItemAcabado as Item,
+    ItemBase as SubItem,
+)
 
 
 class ItemForm(forms.ModelForm):
@@ -11,8 +16,8 @@ class ItemForm(forms.ModelForm):
         model = Item
         fields = (
             "item_cod",
-            "name_prod",
-            "name_abrev",
+            "item_desc",
+            "item_name",
             "semi_code",
             "qtd_per_day",
             "is_active",
@@ -82,13 +87,13 @@ class SubItemForm(forms.ModelForm):
     class Meta:
         model = SubItem
         fields = (
-            "subitem_cod",
-            "name_subitem",
+            "itembase_cod",
+            "itembase_name",
             "observation",
             "ficha_tecnica",
             "variation",
             "is_active",
-            "material",
+            "componente",
             "comprimento",
             "largura",
             "espessura",
@@ -98,13 +103,13 @@ class SubItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Opcional: Adicionar classes CSS para estilização
-        self.fields["material"].widget.attrs.update(
+        self.fields["componente"].widget.attrs.update(
             {"class": "col-18 col-md-18 grid-item"}
         )
         self.fields["ficha_tecnica"].widget.attrs.update(
             {"class": "col-18 col-md-18 grid-item"}
         )
-        self.fields["name_subitem"].widget.attrs.update({"class": "form-control"})
+        self.fields["itembase_name"].widget.attrs.update({"class": "form-control"})
         self.fields["largura"].widget.attrs.update({"class": "form-control"})
         self.fields["comprimento"].widget.attrs.update({"class": "form-control"})
         self.fields["espessura"].widget.attrs.update({"class": "form-control"})

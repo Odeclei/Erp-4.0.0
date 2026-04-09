@@ -46,7 +46,7 @@ class FamilyForm(forms.ModelForm):
         model = FamilyProd
         fields = (
             "refer",
-            "name",
+            "description",
         )
 
 

@@ -14,33 +14,43 @@ class FamilyProdView(ListView):
     model = FamilyProd
     template_name = "cad_item/family/index.html"
     context_object_name = "form_family"
-    ordering = ("-Nome Família",)
     paginate_by = PER_PAGE
+
+    def get_queryset(self):
+        # Otimização: ordenação feita diretamente na query principal
+        return FamilyProd.objects.all().order_by("description")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = context["paginator"]
-        page = context["page_obj"]
-        num_pages = paginator.num_pages
-
-        current_page = page.number
-
-        start_index = max(1, current_page - 2)
-        if start_index == 1:
-            end_index = min(
-                num_pages, 5
-            )  # show up to 5 pages if we're near the beginning
-        else:
-            end_index = min(num_pages, current_page + 2)
-
-        page_range = range(start_index, end_index + 1)
-
-        context["page_range"] = page_range
+        # Lógica de range de páginas para o template
+        if context.get('is_paginated'):
+            page_obj = context['page_obj']
+            num_pages = context['paginator'].num_pages
+            current_page = page_obj.number
+            
+            start_index = max(1, current_page - 2)
+            end_index = min(num_pages, start_index + 4) # Garante 5 páginas se possível
+            if end_index == num_pages:
+                start_index = max(1, num_pages - 4)
+                
+            context["page_range"] = range(start_index, end_index + 1)
         return context
 
+class FamilySearchView(FamilyProdView): # Herda de FamilyProdView para manter paginação e contexto
     def get_queryset(self):
-        query_set = FamilyProd.objects.all().order_by("description")
-        return query_set
+        search_value = self.request.GET.get("search", "").strip()
+        if not search_value:
+            return super().get_queryset()
+            
+        return super().get_queryset().filter(
+            Q(refer__icontains=search_value) | 
+            Q(description__icontains=search_value)
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["search_value"] = self.request.GET.get("search", "").strip()
+        return ctx
 
 
 class FamilyCreateView(CreateView):
@@ -79,36 +89,36 @@ class FamilyUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class FamilySearchView(ListView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._search_value = ""
+# class FamilySearchView(ListView):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self._search_value = ""
 
-    def setup(self, request, *args, **kwargs):
-        self._search_value = request.GET.get("search", "").strip()
-        return super().setup(request, *args, **kwargs)
+#     def setup(self, request, *args, **kwargs):
+#         self._search_value = request.GET.get("search", "").strip()
+#         return super().setup(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        search_value = self._search_value
-        ctx.update(
-            {
-                "search_value": search_value,
-            }
-        )
-        return ctx
+#     def get_context_data(self, **kwargs):
+#         ctx = super().get_context_data(**kwargs)
+#         search_value = self._search_value
+#         ctx.update(
+#             {
+#                 "search_value": search_value,
+#             }
+#         )
+#         return ctx
 
-    def get_queryset(self):
-        search_value = self._search_value
-        return (
-            super()
-            .get_queryset()
-            .filter(
-                Q(refer__icontains=search_value)
-                | Q(description__icontains=search_value)
-            )
-        )
+#     def get_queryset(self):
+#         search_value = self._search_value
+#         return (
+#             super()
+#             .get_queryset()
+#             .filter(
+#                 Q(refer__icontains=search_value)
+#                 | Q(description__icontains=search_value)
+#             )
+#         )
 
-    model = FamilyProd
-    template_name = "cad_item/family/index.html"
-    context_object_name = "form_family"
+#     model = FamilyProd
+#     template_name = "cad_item/family/index.html"
+#     context_object_name = "form_family"

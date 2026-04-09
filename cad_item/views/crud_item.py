@@ -14,7 +14,7 @@ from django.views.generic import (
 )
 
 from cad_item.forms import EstruturaForm, ItemForm
-from cad_item.models import Estrutura, FamilyProd, Item, SubItem
+from _itens.models import Estrutura, FamilyProd, ItemAcabado as Item, ItemBase as SubItem
 
 PER_PAGE = 20
 

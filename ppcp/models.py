@@ -2,8 +2,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
-from cad_item.models import Item, SubItem
+from _itens.models import ItemAcabado
+from _itens.models import ItemBase
 
 # Create your models here.
 
@@ -19,9 +21,13 @@ class StatusOrder(models.Model):
         return self.name
 
 
+def get_current_year():
+    return now().strftime("%y")
+
+
 class ManufacturingOrder(models.Model):
     order_date = datetime.now()
-    order_year = order_date.strftime("%y")
+    # order_year = order_date.strftime("%y")
 
     order_number = models.CharField(
         max_length=4, null=True, blank=True, verbose_name="Ordem Produção", unique=True
@@ -32,7 +38,7 @@ class ManufacturingOrder(models.Model):
         help_text="Digitar somente 2 dígitos do ano.",
         null=True,
         blank=True,
-        default=order_year,
+        default=get_current_year,
     )
     description = models.TextField(verbose_name="Descrição", null=True, blank=True)
     status = models.ForeignKey(
@@ -61,7 +67,9 @@ class ManufacturingOrder(models.Model):
 
 
 class ItemProgramacao(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True, blank=True)
+    item = models.ForeignKey(
+        ItemAcabado, on_delete=models.CASCADE, null=True, blank=True
+    )
     programacao = models.ForeignKey(
         ManufacturingOrder, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -89,7 +97,7 @@ class SubItemProgramacao(models.Model):
         ItemProgramacao, on_delete=models.CASCADE, null=True, blank=True
     )
     subproduto = models.ForeignKey(
-        SubItem, on_delete=models.CASCADE, null=True, blank=True
+        ItemBase, on_delete=models.CASCADE, null=True, blank=True
     )
     programacao = models.ForeignKey(
         ManufacturingOrder, on_delete=models.CASCADE, null=True, blank=True
@@ -105,6 +113,8 @@ class SubItemProgramacao(models.Model):
 
 
 class Estoque(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True, blank=True)
+    item = models.ForeignKey(
+        ItemAcabado, on_delete=models.CASCADE, null=True, blank=True
+    )
     qtde = models.IntegerField()
     local = models.CharField(max_length=50)

@@ -1,10 +1,12 @@
+import logging
+
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, View
 
-from cad_item.models import Item
+from _itens.models import ItemAcabado
 from ppcp.forms import ItemProgramacaoForm, ManufacturingOrderForm
 from ppcp.models import ItemProgramacao, ManufacturingOrder
 
@@ -17,6 +19,7 @@ class OrderListView(ListView):
     context_object_name = "ordens"
     ordering = "-order_number"
     paginate_by = PER_PAGE
+    queryset = ManufacturingOrder.objects.select_related("status").all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,24 +53,25 @@ class OrderDetailView(DetailView):
     context_object_name = "item"
     form_class = ItemProgramacaoForm
     sucess_url = reverse_lazy("order:list")
+    queryset = ManufacturingOrder.objects.select_related(
+        "created_by", "changed_by", "status"
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         form = ItemProgramacaoForm()
 
         ajax_url = reverse_lazy("order:add_item", kwargs={"pk": self.kwargs["pk"]})
-        pk_order = self.kwargs["pk"]
+        # pk_order = self.kwargs["pk"]
 
-        itens_list = (
-            ItemProgramacao.objects.all()
-            .filter(programacao__pk=pk_order)
-            .order_by("-item__item_cod")
-        )
+        context["itens_list"] = ItemProgramacao.objects.filter(
+            programacao_id=self.object.pk
+        ).select_related("item")
 
         context.update(
             {
                 "item_form": form,
-                "itens_list": itens_list,
                 "ajax_url": ajax_url,
             }
         )
@@ -108,9 +112,7 @@ class OrderUpdateView(UpdateView):
     context_object_name = "form"
 
     def get_success_url(self):
-        return reverse_lazy(
-            "order:detail", kwargs={"pk": self.object.pk}
-        )  # type: ignore
+        return reverse_lazy("order:detail", kwargs={"pk": self.object.pk})  # type: ignore
 
     def form_valid(self, form):
         form.instance.changed_by = self.request.user
@@ -151,18 +153,82 @@ class OrderSearchView(ListView):
 
 class BuscaItemView(View):
     def get(self, request, *args, **kwargs):
-        termo_busca = request.GET.get("q", "").strip()
+        term = request.GET.get("q")
 
-        itens_list = []
+        results = []
 
-        if termo_busca:
-            itens_query = Item.objects.filter(
-                Q(item_cod__icontains=termo_busca) | Q(name_prod__icontains=termo_busca)
-            ).order_by("item_cod")[:10]
+        # DEBUG: Total de itens no banco
+        total_items = ItemAcabado.objects.count()
 
-            for item in itens_query:
-                itens_list.append(
-                    {"id": item.pk, "text": f"{item.item_cod} - {item.name_prod}"}
+        if total_items == 0:
+            logging.warning("Nenhum item encontrado no banco de dados.", exc_info=True)
+
+        if term:
+            # Ajuste 'item_cod' e 'item_desc' para os nomes reais no seu model
+            itens = ItemAcabado.objects.filter(
+                Q(item_cod__icontains=term) | Q(item_desc__icontains=term)
+            )[:20]
+
+            for idx, item in enumerate(itens, 1):
+                results.append(
+                    {"id": item.pk, "text": f"{item.item_cod} - {item.item_desc}"}
                 )
 
-        return JsonResponse({"results": itens_list})
+        return JsonResponse({"results": results}, safe=False)
+
+
+class GetBomView(View):
+    """Retorna a Bill of Materials (BOM) de um produto em JSON"""
+
+    def get(self, request, *args, **kwargs):
+        from _itens.models import ComponenteProgramacao, Estrutura
+
+        item_id = request.GET.get("item_id")
+        bom_producao = []
+        bom_compra = []
+
+        if item_id:
+            try:
+                item = ItemAcabado.objects.get(pk=item_id)
+
+                # ===== ITENS PRODUZIDOS (Estrutura) =====
+                estruturas = Estrutura.objects.filter(item=item).select_related(
+                    "subitem"
+                )
+                for est in estruturas:
+                    bom_producao.append(
+                        {
+                            "id": est.subitem.pk,
+                            "codigo": est.subitem.itembase_cod,
+                            "nome": est.subitem.itembase_name,
+                            "qtde_pre": est.qntde_pre or 0,
+                            "qtde_usi": est.qntde_usi or 0,
+                            "qtde_lix": est.qntde_lix or 0,
+                        }
+                    )
+
+                # ===== ITENS COMPRADOS (ComponenteProgramacao) =====
+                componentes = ComponenteProgramacao.objects.filter(
+                    item_acabado=item
+                ).select_related("componente")
+
+                for comp_prog in componentes:
+                    comp = comp_prog.componente
+                    bom_compra.append(
+                        {
+                            "id": comp.pk,
+                            "codigo": comp.codigo,
+                            "nome": comp.name,
+                            "quantidade": comp_prog.quantidade,
+                            "grupo": comp.grupo.name,
+                            "tipo_compra": comp.get_tipo_compra_display(),
+                            "qtde_minima": comp.qtde_minima,
+                            "prazo_dias": comp.prazo_entrega_dias or 0,
+                        }
+                    )
+            except ItemAcabado.DoesNotExist:
+                pass
+
+        return JsonResponse(
+            {"bom_producao": bom_producao, "bom_compra": bom_compra}, safe=False
+        )

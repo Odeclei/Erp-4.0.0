@@ -1,6 +1,7 @@
-from django.db import models
-from django.conf import settings
 from django import forms
+from django.conf import settings
+from django.db import models
+
 from _resources.models import Unidade_Medida
 
 
@@ -12,14 +13,14 @@ class FamilyProd(models.Model):
     refer = models.CharField(
         max_length=20, unique=True, verbose_name="Código Família Comercial"
     )
-    name = models.CharField(max_length=100, verbose_name="Nome Família")
+    description = models.CharField(max_length=100, verbose_name="Nome Família")
 
     def save(self, *args, **kwargs):
-        self.name = self.name.upper()
+        self.description = self.description.upper()
         super(FamilyProd, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.name
+        return self.description
 
 
 class ItemAcabado(models.Model):
@@ -33,6 +34,13 @@ class ItemAcabado(models.Model):
     )
     item_desc = models.CharField(max_length=100, verbose_name="Nome Produto")
     item_name = models.CharField(max_length=50, verbose_name="Nome Resumido")
+    semi_code = models.CharField(
+        max_length=50,
+        verbose_name="Referência Semiacabado",
+        help_text='Digitar código sem ponto "."',
+        blank=True,
+        null=True,
+    )
 
     qtd_per_day = models.IntegerField(verbose_name="Peças ao dia")
     is_active = models.BooleanField(default=True, verbose_name="Ativo")
@@ -85,14 +93,14 @@ class ItemAcabado(models.Model):
         return super().clean()
 
     def obter_subprodutos_e_quantidades(self):
-        subprodutos = Estrutura.objects.filter(produto=self).select_related("item_base")
+        subprodutos = Estrutura.objects.filter(item=self).select_related("subitem")
         subprodutos_quantidade = []
         if subprodutos:
             for estrutura in subprodutos:
                 subprodutos_quantidade.append(
                     {
-                        "subproduto": estrutura.item_base,
-                        "quantiade": estrutura.qntde_pre,
+                        "subproduto": estrutura.subitem,
+                        "quantidade": estrutura.qntde_pre,
                     }
                 )
         return subprodutos_quantidade
@@ -100,6 +108,85 @@ class ItemAcabado(models.Model):
     def __str__(self) -> str:
         item = f"{self.item_cod} - {self.item_desc}"
         return item
+
+
+class InsumoGroup(models.Model):
+    """Categorias de insumos: Madeiras, Tecidos, Espumas, Hardware, etc"""
+
+    class Meta:
+        verbose_name = "Grupo Insumo"
+        verbose_name_plural = "Grupos Insumos"
+
+    codigo = models.CharField(max_length=20, unique=True)
+    nome = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
+
+class Insumo(models.Model):
+    """
+    Matérias-primas e insumos básicos usados para fabricar ItemBase:
+    - Madeiras: pinus, tauari, mdf 15mm
+    - Tecidos brutos
+    - Espumas
+    - Hardware padrão
+    """
+
+    class Meta:
+        verbose_name = "Insumo - MP"
+        verbose_name_plural = "Insumos - MP"
+
+    TIPO_CHOICES = [
+        ("madeira", "Madeira"),
+        ("tecido", "Tecido"),
+        ("espuma", "Espuma"),
+        ("hardware", "Hardware"),
+        ("pintura", "Pintura/Acabamento"),
+        ("outro", "Outro"),
+    ]
+
+    codigo = models.CharField(max_length=30, unique=True, verbose_name="Código Insumo")
+    nome = models.CharField(max_length=150, verbose_name="Nome/Descrição")
+    tipo = models.CharField(
+        max_length=20, choices=TIPO_CHOICES, verbose_name="Tipo de Insumo"
+    )
+    grupo = models.ForeignKey(
+        InsumoGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Grupo",
+    )
+    unidade_medida = models.ForeignKey(
+        Unidade_Medida,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Unidade de Medida",
+    )
+    especificacao = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Especificação (ex: 15mm, 1,5m, etc)",
+    )
+    estoque_minimo = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="Estoque Mínimo",
+        help_text="Quantidade mínima para disparar reposição",
+    )
+    observacoes = models.TextField(null=True, blank=True, verbose_name="Observações")
+    is_active = models.BooleanField(default=True, verbose_name="Ativo")
+
+    def save(self, *args, **kwargs):
+        self.nome = self.nome.upper()
+        super(Insumo, self).save(*args, **kwargs)
+
+    def __str__(self):
+        especif = f" ({self.especificacao})" if self.especificacao else ""
+        return f"{self.codigo} - {self.nome}{especif}"
 
 
 class ComponentesGroup(models.Model):
@@ -119,11 +206,36 @@ class Componentes(models.Model):
         verbose_name = "Componente"
         verbose_name_plural = "Componentes"
 
+    TIPO_COMPRA_CHOICES = [
+        ("estoque", "Mantém em Estoque"),
+        ("demanda", "Compra sob Demanda"),
+    ]
+
     codigo = models.CharField(max_length=15, unique=True)
     name = models.CharField(max_length=100)
     grupo = models.ForeignKey(ComponentesGroup, on_delete=models.CASCADE)
     unidade_medida = models.ForeignKey(
         Unidade_Medida, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    # Controle de estoque
+    tipo_compra = models.CharField(
+        max_length=10,
+        choices=TIPO_COMPRA_CHOICES,
+        default="demanda",
+        verbose_name="Tipo de Compra",
+    )
+    qtde_minima = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Quantidade Mínima em Estoque",
+        help_text="Deixar em branco para compra sob demanda",
+    )
+    prazo_entrega_dias = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Prazo de Entrega (dias)",
+        help_text="Dias necessários para recebimento do fornecedor",
     )
 
     def __str__(self):
@@ -132,8 +244,8 @@ class Componentes(models.Model):
 
 class ItemBase(models.Model):
     class Meta:
-        verbose_name = "Item Base"
-        verbose_name_plural = "Itens Base"
+        verbose_name = "Item Base - KIT"
+        verbose_name_plural = "Itens Base - KIT"
 
     itembase_cod = models.CharField(max_length=20, unique=True, verbose_name="Código")
     itembase_name = models.CharField(max_length=100, verbose_name="Nome Sub-Item")
@@ -171,16 +283,48 @@ class ItemBase(models.Model):
         self.itembase_name = self.itembase_name.upper()
         super(ItemBase, self).save(*args, **kwargs)
 
+    insumos = models.ManyToManyField(
+        Insumo, through="ComposicaoInsumo", related_name="itemsbases"
+    )
+
     def __str__(self) -> str:
         item = f"{self.itembase_cod} - {self.itembase_name}"
         return item
 
 
+class ComposicaoInsumo(models.Model):
+    """
+    Define quais insumos são necessários para fabricar um ItemBase
+    e em que quantidade
+    """
+
+    class Meta:
+        verbose_name = "Composição de Insumo"
+        verbose_name_plural = "Composições de Insumo"
+        unique_together = ("itembase", "insumo")
+
+    itembase = models.ForeignKey(
+        ItemBase, on_delete=models.CASCADE, related_name="composicao_insumos"
+    )
+    insumo = models.ForeignKey(
+        Insumo, on_delete=models.CASCADE, related_name="composicoes"
+    )
+    quantidade = models.FloatField(verbose_name="Quantidade Necessária")
+    observacoes = models.CharField(
+        max_length=100, null=True, blank=True, verbose_name="Observações"
+    )
+
+    def __str__(self):
+        return (
+            f"{self.itembase.itembase_cod} → {self.insumo.codigo} ({self.quantidade})"
+        )
+
+
 class Estrutura(models.Model):
-    item_acab = models.ForeignKey(
+    item = models.ForeignKey(
         ItemAcabado, on_delete=models.SET_NULL, null=True, blank=True
     )
-    item_base = models.ForeignKey(
+    subitem = models.ForeignKey(
         ItemBase, on_delete=models.SET_NULL, null=True, blank=True
     )
     qntde_pre = models.PositiveIntegerField(null=True)
@@ -188,13 +332,36 @@ class Estrutura(models.Model):
     qntde_lix = models.PositiveIntegerField(null=True)
 
     class Meta:
-        unique_together = ("item_acab", "item_base")
+        unique_together = ("item", "subitem")
 
     def __str__(self) -> str:
-        item_acab_cod = self.item_acab.item_cod if self.item_acab else "N/A"
-        item_base_cod = self.item_base.itembase_cod if self.item_base else "N/A"
-        string = f"{item_acab_cod} - {item_base_cod}"
+        item_cod = self.item.item_cod if self.item else "N/A"
+        subitem_cod = self.subitem.itembase_cod if self.subitem else "N/A"
+        string = f"{item_cod} - {subitem_cod}"
         return string
+
+
+class ComponenteProgramacao(models.Model):
+    """
+    Links entre ItemAcabado e Componentes Comprados
+    Similar a Estrutura, mas para items comprados (tecido, espuma, ferragem, etc)
+    """
+
+    class Meta:
+        verbose_name = "Componente Programado"
+        verbose_name_plural = "Componentes Programados"
+        unique_together = ("item_acabado", "componente")
+
+    item_acabado = models.ForeignKey(
+        ItemAcabado, on_delete=models.CASCADE, related_name="componentes_comprados"
+    )
+    componente = models.ForeignKey(
+        Componentes, on_delete=models.CASCADE, related_name="programacoes"
+    )
+    quantidade = models.PositiveIntegerField(verbose_name="Quantidade por Unidade")
+
+    def __str__(self) -> str:
+        return f"{self.item_acabado.item_cod} → {self.componente.codigo}"
 
 
 class Finish(models.Model):

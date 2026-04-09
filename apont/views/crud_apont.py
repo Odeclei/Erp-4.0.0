@@ -9,20 +9,19 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
 from apont.models import Apont_Type, Motive
-from cad_item.models import Estrutura
+from _itens.models import Estrutura
 from ppcp.models import ItemProgramacao, SubItemProgramacao
 from rule.models import Machines, MacId
 
 
-def get_template_url(request): ...
+# def get_template_url(request): ...
 
 
 def select_model_by_machine_id(machine_id):
     machine = get_object_or_404(Machines, pk=machine_id)
 
     machine_code = machine.code
-    machine_formatado = f"{machine_code[0].upper()}{
-        machine_code[1:].lower()}"
+    machine_formatado = f"{machine_code[0].upper()}{machine_code[1:].lower()}"
     model_nm = machine_formatado.replace("-", "_")
 
     model = apps.get_model("apont", model_nm)
@@ -94,7 +93,6 @@ def remover_apontamento(maquina_id, apontamento_id):
 
 def ReadBarcodeView(request):
     if request.method == "GET":
-
         form_action = reverse_lazy("apont:read_barcode")
 
         context = {
@@ -237,7 +235,6 @@ def IniciarSetupView(request):
 
 def FimProducaoView(request):
     if request.method == "POST":
-
         dados_form = request.POST
 
         qtde_boa = dados_form["qtde_boa"]

@@ -3,15 +3,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-
 urlpatterns = [
     path("", include("site_setup.urls")),
     path("apont/", include("apont.urls")),
     path("carregamento/", include("carregamento.urls")),
     path("clientes/", include("clientes.urls")),
     path("dashboard/", include("dashboard.urls")),
-    path("item2/", include("_itens.urls")),
-    path("item/", include("cad_item.urls")),
+    path("item/", include("_itens.urls")),
     path("order/", include("ppcp.urls")),
     path("pedidos/", include("pedidos.urls")),
     path("regras/", include("rule.urls")),

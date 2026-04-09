@@ -95,38 +95,110 @@
       <form action="{% url "order:add_item" item.pk %}" method="post">
         {% csrf_token %}
 
-        <div class="row">
-          <select name="programacao" id="id_programacao" hidden="hidden" >
-            <option value="{{item.pk}}">{{item.order_number}}</option>
-          </select>
+        <div class="form-group mb-3">
+          <label for="item_search" class="form-label">Produto</label>
+          <!-- Campo hidden para armazenar o ID do item -->
+          {{ item_form.item }}
+          <div style="position: relative;">
+            <input 
+              type="text" 
+              id="item_search" 
+              class="form-control form-control-lg" 
+              placeholder="Digite código ou descrição do produto..."
+              autocomplete="off">
+            <ul id="item_suggestions" class="list-group" style="position: absolute; top: 100%; left: 0; right: 0; display: none; max-height: 300px; overflow-y: auto; z-index: 1000; border: 1px solid #ddd; border-top: none; margin-top: -1px;"></ul>
+          </div>
+          {% if item_form.item.errors %}
+            <div class="alert alert-danger mt-2">{{ item_form.item.errors }}</div>
+          {% endif %}
         </div>
 
+        <!-- SEÇÃO: EXIBIÇÃO DA BOM -->
+        <div id="bom_section" style="display: none; margin-top: 20px;">
+          <div class="alert alert-info mb-3">
+            <h5 class="mb-3">📋 Estrutura do Produto (BOM)</h5>
+            
+            <!-- ABAS -->
+            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px;">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-producao" data-bs-toggle="tab" data-bs-target="#bom-producao" 
+                        type="button" role="tab" aria-controls="bom-producao" aria-selected="true">
+                  🏭 Itens Produzidos
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-compra" data-bs-toggle="tab" data-bs-target="#bom-compra" 
+                        type="button" role="tab" aria-controls="bom-compra" aria-selected="false">
+                  🛒 Itens Comprados
+                </button>
+              </li>
+            </ul>
 
-        <div class="form-float">
-          <label for="id_item" class="form-label">Item</label>
-          <select name="item" id="id_item" class="form-control form-control-lg select2-ajax"></select>
+            <!-- CONTEÚDO DAS ABAS -->
+            <div class="tab-content">
+              
+              <!-- ABA 1: ITENS PRODUZIDOS -->
+              <div class="tab-pane fade show active" id="bom-producao" role="tabpanel" aria-labelledby="tab-producao">
+                <table class="table table-sm table-striped mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 20%;">Código</th>
+                      <th style="width: 35%;">Descrição</th>
+                      <th class="text-center" style="width: 15%;">Pré</th>
+                      <th class="text-center" style="width: 15%;">Usinagem</th>
+                      <th class="text-center" style="width: 15%;">Lixamento</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bom_list_producao"></tbody>
+                </table>
+                <div id="bom_vazio_producao" class="alert alert-warning mt-3 mb-0">
+                  Nenhum item produzido neste produto
+                </div>
+              </div>
+              
+              <!-- ABA 2: ITENS COMPRADOS -->
+              <div class="tab-pane fade" id="bom-compra" role="tabpanel" aria-labelledby="tab-compra">
+                <table class="table table-sm table-striped mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 15%;">Código</th>
+                      <th style="width: 25%;">Descrição</th>
+                      <th style="width: 15%;">Grupo</th>
+                      <th class="text-center" style="width: 10%;">Qtde</th>
+                      <th style="width: 15%;">Tipo Compra</th>
+                      <th class="text-center" style="width: 10%;">Prazo (dias)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bom_list_compra"></tbody>
+                </table>
+                <div id="bom_vazio_compra" class="alert alert-warning mt-3 mb-0">
+                  Nenhum item comprado neste produto
+                </div>
+              </div>
+              
+            </div>
+          </div>
         </div>
 
-        <p class="form-label mt-3">Quantidade</p>
-        <div class="form-floating mb-3">
-          <input 
-            type="number" 
-            name="quantidade" 
-            class="form-control form-control-lg" 
-            onchange="altera_quantidade()" 
-            min="0" required id="id_quantidade">
+        <div class="form-group mb-3">
+          <label for="id_quantidade" class="form-label">{{ item_form.quantidade.label }}</label>
+          {{ item_form.quantidade }}
+          {% if item_form.quantidade.errors %}
+            <div class="alert alert-danger mt-2">{{ item_form.quantidade.errors }}</div>
+          {% endif %}
         </div>
+
         <div class="row g-2 mb-3">
           <div class="col-md">
             <div class="form-group">
               <label for="id_start_at" class="form-label">Data Prevista Início</label>
-              <input type="date" name="id_start_at" class="form-control form-control-lg" id="id_start_at">
+              <input type="date" name="start_at" class="form-control form-control-lg" id="id_start_at">
             </div>
           </div>
           <div class="col-md">
             <div class="form-group">
               <label for="id_ends_at" class="form-label">Data Prevista Término</label>
-              <input type="date" name="id_ends_at" class="form-control form-control-lg" id="id_ends_at">
+              <input type="date" name="ends_at" class="form-control form-control-lg" id="id_ends_at">
             </div>
           </div>
         </div>
@@ -164,10 +236,10 @@
                 <a 
                   class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
                   target="_blank" rel="noopener noreferrer"
-                  href="{% url "cad_item:detail" produto.item.pk %}">
+                  href="{% url "_itens:item_detail" produto.item.pk %}">
                   {{produto.item.item_cod}}</a>
               </td>
-              <td class="table-cel table-text-left">{{produto.item.name_prod}}</td>
+              <td class="table-cel table-text-left">{{produto.item.item_desc}}</td>
               <td class="table-cel table-text-center">{{produto.quantidade}}</td>
               <td 
                 class="table-cel table-text-center"
@@ -203,28 +275,217 @@
     <script src="{% static "global/js/order_add_item.js" %}"></script>
     <script>
       $(document).ready(function() {
-        $('#id_item').select2({
-          width: '100%',
-          placeholder: "Digite o código do produto...",
-          minimumInputLength: 2, // Quantidade mínima de caracteres para começar a buscar
-          allowClear: true,
-          ajax: {
-            url: "{% url 'order:busca_item' %}", // URL da sua view Django para busca
-            dataType: 'json',
-            delay: 250, // Atraso em milissegundos para a busca (evita muitas requisições rápidas)
-            data: function (params) {
-              return {
-                q: params.term // Parâmetro de busca que será enviado para a view (q é o padrão do Select2)
-              };
+        const searchInput = $('#item_search');
+        const itemField = $('#id_item');
+        const suggestionsList = $('#item_suggestions');
+        const bomSection = $('#bom_section');
+        let debounceTimer;
+
+        // Função para carregar e exibir a BOM do produto
+        function loadBOM(itemId) {
+          console.log('=== CARREGANDO BOM ===');
+          console.log('Item ID:', itemId);
+          
+          $.ajax({
+            url: "{% url 'order:get_bom' %}",
+            data: { item_id: itemId },
+            type: 'GET',
+            success: function(data) {
+              console.log('✓ BOM RECEBIDA:', data);
+              
+              const bomProducao = data.bom_producao || [];
+              const bomCompra = data.bom_compra || [];
+              
+              console.log('Total de itens produzidos:', bomProducao.length);
+              console.log('Total de itens comprados:', bomCompra.length);
+              
+              // ===== PREENCHER ABA 1: ITENS PRODUZIDOS =====
+              const bomListProducao = $('#bom_list_producao');
+              const bomVazioProducao = $('#bom_vazio_producao');
+              
+              bomListProducao.empty();
+              
+              if (bomProducao.length === 0) {
+                bomVazioProducao.show();
+              } else {
+                bomVazioProducao.hide();
+                bomProducao.forEach(function(componente, idx) {
+                  const row = `
+                    <tr>
+                      <td><strong>${componente.codigo}</strong></td>
+                      <td>${componente.nome}</td>
+                      <td class="text-center"><span class="badge bg-primary">${componente.qtde_pre}</span></td>
+                      <td class="text-center"><span class="badge bg-success">${componente.qtde_usi}</span></td>
+                      <td class="text-center"><span class="badge bg-warning">${componente.qtde_lix}</span></td>
+                    </tr>
+                  `;
+                  bomListProducao.append(row);
+                });
+              }
+              
+              // ===== PREENCHER ABA 2: ITENS COMPRADOS =====
+              const bomListCompra = $('#bom_list_compra');
+              const bomVazioCompra = $('#bom_vazio_compra');
+              
+              bomListCompra.empty();
+              
+              if (bomCompra.length === 0) {
+                bomVazioCompra.show();
+              } else {
+                bomVazioCompra.hide();
+                bomCompra.forEach(function(componente, idx) {
+                  const badgeCompra = componente.tipo_compra === 'Mantém em Estoque' 
+                    ? '<span class="badge bg-info">Estoque</span>'
+                    : '<span class="badge bg-warning">Sob Demanda</span>';
+                  
+                  const row = `
+                    <tr>
+                      <td><strong>${componente.codigo}</strong></td>
+                      <td>${componente.nome}</td>
+                      <td><small class="badge bg-secondary">${componente.grupo}</small></td>
+                      <td class="text-center"><span class="badge bg-primary">${componente.quantidade}</span></td>
+                      <td>${badgeCompra}</td>
+                      <td class="text-center">
+                        ${componente.prazo_dias > 0 
+                          ? `<small class="text-muted">${componente.prazo_dias}d</small>` 
+                          : '<small class="text-muted">-</small>'}
+                      </td>
+                    </tr>
+                  `;
+                  bomListCompra.append(row);
+                });
+              }
+              
+              bomSection.show();
             },
-            processResults: function (data) {
-              console.log("Dados recebidos:", data);
-              return {
-                results: data.results // A view já está retornando no formato correto
-              };
-            },
-            cache: true
+            error: function(xhr, status, error) {
+              console.log('✗ ERRO AO CARREGAR BOM');
+              console.log('Erro:', error);
+              bomSection.hide();
+            }
+          });
+        }
+
+        console.log('=== AUTOCOMPLETE INICIADO ===');
+        console.log('Campo hidden item:', itemField);
+        console.log('ID do campo hidden:', itemField.attr('id'));
+
+        // Busca itens via AJAX
+        function searchItems(term) {
+          console.log('--- Buscando itens com termo:', term);
+          
+          if (term.length < 1) {
+            console.log('Term vazio, escondendo sugestões');
+            suggestionsList.hide().empty();
+            return;
           }
+
+          $.ajax({
+            url: "{% url 'order:busca_item' %}",
+            data: { q: term },
+            type: 'GET',
+            success: function(data) {
+              console.log('✓ RESPOSTA AJAX RECEBIDA:', data);
+              console.log('Total de resultados:', data.results.length);
+              
+              suggestionsList.empty();
+              const results = data.results || [];
+
+              if (results.length === 0) {
+                console.log('Nenhum produto encontrado');
+                suggestionsList.html('<li class="list-group-item text-muted">Nenhum produto encontrado</li>');
+              } else {
+                results.forEach(function(item, index) {
+                  console.log(`Resultado ${index + 1}:`, {id: item.id, text: item.text});
+                  
+                  const li = document.createElement('li');
+                  li.className = 'list-group-item';
+                  li.style.cursor = 'pointer';
+                  li.style.padding = '10px 15px';
+                  li.innerHTML = item.text;
+                  li.dataset.id = item.id;
+                  
+                  li.addEventListener('click', function() {
+                    console.log('>>> CLICOU EM SUGESTÃO <<<');
+                    console.log('ID a ser setado:', item.id);
+                    console.log('Texto a ser setado:', item.text);
+                    
+                    itemField.val(item.id);
+                    searchInput.val(item.text);
+                    
+                    console.log('Campo hidden agora contém:', itemField.val());
+                    console.log('Input visível agora contém:', searchInput.val());
+                    
+                    suggestionsList.hide();
+
+                    // 🎯 CARREGAR BOM DO PRODUTO
+                    loadBOM(item.id);
+                  });
+                  
+                  li.addEventListener('mouseenter', function() {
+                    li.style.backgroundColor = '#e9ecef';
+                  });
+                  
+                  li.addEventListener('mouseleave', function() {
+                    li.style.backgroundColor = 'transparent';
+                  });
+                  
+                  suggestionsList.append(li);
+                });
+              }
+              
+              suggestionsList.show();
+            },
+            error: function(xhr, status, error) {
+              console.log('✗ ERRO NA REQUISIÇÃO AJAX');
+              console.log('Status:', status);
+              console.log('Erro:', error);
+              console.log('Resposta do servidor:', xhr.responseText);
+              
+              suggestionsList.html('<li class="list-group-item text-danger">Erro ao buscar produtos</li>');
+              suggestionsList.show();
+            }
+          });
+        }
+
+        // Escuta digitação no input
+        searchInput.on('input', function() {
+          clearTimeout(debounceTimer);
+          const term = $(this).val();
+          
+          console.log('Input digitado:', term);
+          
+          // Aguarda 300ms para não fazer requisição a cada letra
+          debounceTimer = setTimeout(function() {
+            searchItems(term);
+          }, 300);
+        });
+
+        // Esconde sugestões ao clicar fora
+        $(document).on('click', function(e) {
+          if (!$(e.target).closest('#item_search, #item_suggestions').length) {
+            suggestionsList.hide();
+          }
+        });
+
+        // Validação antes de submeter
+        $('form').on('submit', function(e) {
+          const itemValue = itemField.val();
+          const quantidade = $('#id_quantidade').val();
+          
+          console.log('=== TENTANDO SUBMETER FORMULÁRIO ===');
+
+            console.log('✗ ERRO: Quantidade inválida!');
+            e.preventDefault();
+            alert('Por favor, informe uma quantidade válida (maior que 0)');
+            return false;
+          }
+          
+          console.log('✓ Formulário validado com sucesso');
+          console.log('Dados que serão enviados:');
+          console.log('  - item:', itemValue);
+          console.log('  - quantidade:', quantidade);
+          // Formulário será enviado normalmente via POST
         });
       });
     </script>

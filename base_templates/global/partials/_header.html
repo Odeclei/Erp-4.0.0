@@ -57,32 +57,26 @@
            aria-expanded="false">Produtos</a>
         <ul class="dropdown-menu text-small">
           <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:read' %}">Produtos Cadastrados</a>
+            <a class="dropdown-item h4" href="{% url '_itens:item_list' %}">Produtos Cadastrados</a>
           </li>
           <li>
-            <a class="dropdown-item h4" href="{% url '_itens:item_list' %}">NOvo Produtos Cadastrados</a>
-          </li>
-          <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:creat' %}">Novo Produto</a>
-          </li>
-          <li>
-            <a class="dropdown-item h4" href="{% url '_itens:item_create' %}">Novo Novo Produto</a>
+            <a class="dropdown-item h4" href="{% url '_itens:item_create' %}">Novo Produto</a>
           </li>
           <li>
             <hr class="dropdown-divider"/>
           </li>
           {% comment %} separador horizontal{% endcomment %}
           <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:subitem_list' %}">Subprodutos Cadastrados</a>
+            <a class="dropdown-item h4" href="#">Subprodutos Cadastrados</a>
           </li>
           <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:subitem_create' %}">Novo Subproduto</a>
+            <a class="dropdown-item h4" href="#">Novo Subproduto</a>
           </li>
           <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:family_list' %}">Famílias Cadastradas</a>
+            <a class="dropdown-item h4" href="#">Famílias Cadastradas</a>
           </li>
           <li>
-            <a class="dropdown-item h4" href="{% url 'cad_item:family_create' %}">Nova Família</a>
+            <a class="dropdown-item h4" href="#">Nova Família</a>
           </li>
           <li>
             <hr class="dropdown-divider" />

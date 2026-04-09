@@ -10,7 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, DeleteView, UpdateView
 
-from cad_item.models import Estrutura, Item
+from _itens.models import Estrutura, ItemAcabado as Item
 from ppcp.forms import ItemProgramacaoForm, SubItemProgramacaoForm
 from ppcp.models import ItemProgramacao, ManufacturingOrder, SubItemProgramacao
 
@@ -23,23 +23,108 @@ class ItemOrderCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy("order:detail", kwargs={"pk": self.kwargs["pk"]})
 
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
-        start_at = self.request.POST.get("id_start_at")
-        ends_at = self.request.POST.get("id_ends_at")
+        print("\n" + "=" * 60)
+        print(">>> ITEMORDERCREATVIEW - FORM_VALID <<<")
+        print("=" * 60)
+
+        # DEBUG: Mostra todos os dados POST
+        print("\n[POST DATA]")
+        for key, value in self.request.POST.items():
+            print(f"  {key}: {value} (type: {type(value).__name__})")
+
+        # DEBUG: Dados do form
+        print("\n[FORM DATA]")
+        print(f"  form.cleaned_data: {form.cleaned_data}")
+        print(f"  form.errors: {form.errors}")
+
+        # DEBUG: Campo item especificamente
+        print("\n[CAMPO ITEM]")
+        item_value = form.cleaned_data.get("item")
+        print(f"  item_value: {item_value}")
+        print(f"  item_value type: {type(item_value).__name__}")
+        print(f"  item_value is None: {item_value is None}")
+
+        start_at = self.request.POST.get("start_at")
+        ends_at = self.request.POST.get("ends_at")
+
+        print(f"\n[DATAS]")
+        print(f"  start_at: {start_at}")
+        print(f"  ends_at: {ends_at}")
 
         item_programado = form.save(commit=False)
+
+        print(f"\n[ITEM_PROGRAMADO ANTES DE SALVAR]")
+        print(f"  item_programado.item: {item_programado.item}")
+        print(f"  item_programado.quantidade: {item_programado.quantidade}")
+
+        # DEBUG: Verifica se a programação existe
+        pk_programacao = self.kwargs["pk"]
+        print(f"\n[VERIFICANDO PROGRAMAÇÃO]")
+        print(f"  PK procurado: {pk_programacao}")
+        try:
+            programacao = ManufacturingOrder.objects.get(pk=pk_programacao)
+            print(f"  ✓ Programação encontrada: {programacao}")
+            print(f"    - order_number: {programacao.order_number}")
+            print(f"    - status: {programacao.status}")
+        except ManufacturingOrder.DoesNotExist:
+            print(f"  ✗ ERRO: Programação NÃO existe no banco!")
+            messages.error(
+                self.request, f"Erro: Programação {pk_programacao} não encontrada!"
+            )
+            return self.form_invalid(form)
+
+        item_programado.programacao = programacao
+
         if start_at:
             item_programado.start_at = start_at
         if ends_at:
             item_programado.ends_at = ends_at
-        item_programado.save()
+
+        print(f"\n[TENTANDO SALVAR ITEM_PROGRAMADO]")
+        print(f"  item: {item_programado.item}")
+        if item_programado.item:
+            print(f"  item.pk: {item_programado.item.pk}")
+        print(f"  programacao: {item_programado.programacao}")
+        print(f"  programacao.pk: {item_programado.programacao.pk}")
+        print(f"  quantidade: {item_programado.quantidade}")
+
+        # DEBUG: Verifica se o item existe no banco
+        if item_programado.item:
+            print(f"\n[VERIFICANDO ITEM]")
+            try:
+                item_db = Item.objects.get(pk=item_programado.item.pk)
+                print(f"  ✓ Item existe no banco: {item_db}")
+            except Item.DoesNotExist:
+                print(
+                    f"  ✗ ERRO: Item {item_programado.item.pk} não existe em ItemAcabado!"
+                )
+
+        try:
+            item_programado.save()
+            print("✓ Item salvo com sucesso!")
+        except Exception as e:
+            print(f"✗ ERRO ao salvar: {str(e)}")
+            print(f"  Tipo do erro: {type(e).__name__}")
+            import traceback
+
+            print(f"  Traceback: {traceback.format_exc()}")
+            messages.error(self.request, f"Erro ao salvar o item: {str(e)}")
+            return self.form_invalid(form)
 
         messages.success(self.request, "Item Programado com Sucesso.")
 
-        # item_programado = form.save(commit=False)  # commit=False)
-
         item = item_programado.item.pk
-        subprodutos = Estrutura.objects.all().filter(item__pk=item)
+
+        print(f"\n[PROCURANDO ESTRUTURA]")
+        print(f"  item.pk: {item}")
+
+        subprodutos = Estrutura.objects.filter(item__pk=item).select_related("subitem")
+
+        print(f"  Estruturas encontradas: {subprodutos.count()}")
 
         list_subprodutos = []
 
@@ -63,9 +148,33 @@ class ItemOrderCreateView(CreateView):
                 )
             )
 
+        print(f"\n[CRIANDO SUBITENS]")
+        print(f"  Total de subitens a criar: {len(list_subprodutos)}")
+
         if len(list_subprodutos) > 0:
-            SubItemProgramacao.objects.bulk_create(list_subprodutos)
+            try:
+                SubItemProgramacao.objects.bulk_create(list_subprodutos)
+                print("✓ Subitens criados com sucesso!")
+            except Exception as e:
+                print(f"✗ ERRO ao criar subitens: {str(e)}")
+                messages.warning(
+                    self.request, f"Item salvo, mas sem subitens: {str(e)}"
+                )
+
+        print("=" * 60 + "\n")
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print("\n" + "=" * 60)
+        print(">>> ITEMORDERCREATVIEW - FORM_INVALID <<<")
+        print("=" * 60)
+        print("\n[ERROS DO FORMULÁRIO]")
+        for field, errors in form.errors.items():
+            print(f"  {field}: {errors}")
+            for error in errors:
+                messages.error(self.request, f"{field}: {error}")
+        print("=" * 60 + "\n")
+        return super().form_invalid(form)
 
     def get_initial(self):
         initial = super().get_initial()
@@ -99,9 +208,10 @@ class ItemOrderCreateView(CreateView):
 
         if term:
             itens = Item.objects.filter(
-                Q(item_cod__icontains=term) | Q(name__icontains=term)
+                Q(item_cod__icontains=term) | Q(item_desc__icontains=term)
             )
-            return JsonResponse(list(itens.values()), safe=False)
+            data = [{"id": item.pk, "text": item.item_desc} for item in itens]
+            return JsonResponse(data, safe=False)
         return super().get(request, *args, **kwargs)
 
 

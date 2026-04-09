@@ -1,99 +1,641 @@
-{% extends "global/base.html" %}
-{% load static %}
-{% block content %}
-  <section>
-    <div class="container">
-      <h2 class="mb-5">Detalhes do item:</h2>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-label fs-4 " for="readOnlyCod">
-          <strong>Código:</strong>
-        </label>
-        <input class="form-control form-control-lg  border border-success fs-4"
-               id="readOnlyCod"
-               type="text"
-               value="{{ item.item_cod }}"
-               readonly>
-      </div>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-label fs-4 " for="readOnlyDesc">
-          <strong>Descrição:</strong>
-        </label>
-        <input class="form-control form-control-lg  border border-success fs-4"
-               id="readOnlyDesc"
-               type="text"
-               value="{{ item.item_desc }}"
-               readonly>
-      </div>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-label fs-4 " for="readOnlyFamily">
-          <strong>Familia:</strong>
-        </label>
-        <input class="form-control form-control-lg  border border-success fs-4"
-               id="readOnlyFamily"
-               type="text"
-               value="{{ item.family.name }}"
-               readonly>
-      </div>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-label fs-4 " for="readOnlyPcDia">
-          <strong>Peças ao dia:</strong>
-        </label>
-        <input class="form-control form-control-lg  border border-success fs-4"
-               id="readOnlyPcDia"
-               type="text"
-               value="{{ item.qtd_per_day }}"
-               readonly>
-      </div>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-label fs-4 " for="readOnlyCreatedBy">
-          <strong>Cadastrado por:</strong>
-        </label>
-        <input class="form-control form-control-lg  border border-success fs-4"
-               id="readOnlyCreatedBy"
-               type="text"
-               value="{{ item.created_by }}"
-               readonly>
-      </div>
-      <div class="d-flex flex-nowrap align-content-center mb-4">
-        <label class="col-md-2 form-check-label fs-4  " for="readOnlyActive">
-          <strong>Ativo:</strong>
-        </label>
-        <input class="form-check-input form-control-lg border border-success"
-               disabled
-               id="readOnlyActive"
-               type="checkbox"
-               {% if item.is_active %}checked="checked"{% endif %}
-               style="height: 2rem;
-                      width: 3rem">
-      </div>
-      {% if item.updated_by %}
-        <div class="d-flex flex-nowrap align-content-center mb-4">
-          <label class="col-md-2 form-label fs-4 " for="readOnlyUpdatedBy">
-            <strong>Editado por:</strong>
-          </label>
-          <input class="form-control form-control-lg  border border-success fs-4"
-                 id="readOnlyUpdatedBy"
-                 type="text"
-                 value="{{ item.updated_by }}"
-                 readonly>
-        </div>
-        <div class="d-flex flex-nowrap align-content-center mb-4">
-          <label class="col-md-2 form-label fs-4 " for="readOnlyUpdatedAt">
-            <strong>Editado em:</strong>
-          </label>
-          <input class="form-control form-control-lg  border border-success fs-4"
-                 id="readOnlyUpdatedAt"
-                 type="text"
-                 value="{{ item.updated_at }}"
-                 readonly>
-        </div>
-      {% endif %}
+{% extends "global/base.html" %} {% load static %} {% block content %}
+<section>
+  <div class="container">
+    <h2 class="mb-5">Detalhes do item:</h2>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyCod">
+        <strong>Código:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyCod"
+        type="text"
+        value="{{ item.item_cod }}"
+        readonly
+      />
     </div>
-    <div class="d-flex justify-content-evenly my-5">
-      <a href="#" class="btn btn-lg btn-success col-3 py-3 mx-2 fs-3">Editar</a>
-      <a href="#" class="btn btn-lg btn-danger col-3 py-3 mx-2 fs-3">Excluir</a>
-      <a href="{% url '_itens:item_list' %}"
-         class="btn btn-lg btn-info col-3 py-3 mx-2 fs-3">Voltar</a>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyDesc">
+        <strong>Descrição:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyDesc"
+        type="text"
+        value="{{ item.item_desc }}"
+        readonly
+      />
     </div>
-  </section>
-{% endblock content %}
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyFamily">
+        <strong>Familia:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyFamily"
+        type="text"
+        value="{{ item.family.name }}"
+        readonly
+      />
+    </div>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyPcDia">
+        <strong>Peças ao dia:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyPcDia"
+        type="text"
+        value="{{ item.qtd_per_day }}"
+        readonly
+      />
+    </div>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyCreatedBy">
+        <strong>Cadastrado por:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyCreatedBy"
+        type="text"
+        value="{{ item.created_by }}"
+        readonly
+      />
+    </div>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-check-label fs-4" for="readOnlyActive">
+        <strong>Ativo:</strong>
+      </label>
+      <input
+        class="form-check-input form-control-lg border border-success"
+        disabled
+        id="readOnlyActive"
+        type="checkbox"
+        {%
+        if
+        item.is_active
+        %}checked="checked"
+        {%
+        endif
+        %}
+        style="height: 2rem; width: 3rem"
+      />
+    </div>
+    {% if item.updated_by %}
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyUpdatedBy">
+        <strong>Editado por:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyUpdatedBy"
+        type="text"
+        value="{{ item.updated_by }}"
+        readonly
+      />
+    </div>
+    <div class="d-flex flex-nowrap align-content-center mb-4">
+      <label class="col-md-2 form-label fs-4" for="readOnlyUpdatedAt">
+        <strong>Editado em:</strong>
+      </label>
+      <input
+        class="form-control form-control-lg border border-success fs-4"
+        id="readOnlyUpdatedAt"
+        type="text"
+        value="{{ item.updated_at }}"
+        readonly
+      />
+    </div>
+    {% endif %}
+
+    <!-- ===== SEÇÃO: BILL OF MATERIALS ===== -->
+    <hr class="my-5" />
+    <h3 class="mb-4">📋 Bill of Materials (BOM)</h3>
+
+    <!-- ABAS -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="tab-producao"
+          data-bs-toggle="tab"
+          data-bs-target="#bom-producao"
+          type="button"
+          role="tab"
+          aria-controls="bom-producao"
+          aria-selected="true"
+        >
+          🏭 Itens Produzidos (Estrutura)
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="tab-compra"
+          data-bs-toggle="tab"
+          data-bs-target="#bom-compra"
+          type="button"
+          role="tab"
+          aria-controls="bom-compra"
+          aria-selected="false"
+        >
+          🛒 Itens Comprados
+        </button>
+      </li>
+    </ul>
+
+    <!-- CONTEÚDO DAS ABAS -->
+    <div class="tab-content mb-5">
+      <!-- ABA 1: ITENS PRODUZIDOS -->
+      <div
+        class="tab-pane fade show active"
+        id="bom-producao"
+        role="tabpanel"
+        aria-labelledby="tab-producao"
+      >
+        <!-- Formulário para adicionar item produzido -->
+        <div class="card mb-4 border-info">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">➕ Adicionar Item Produzido</h5>
+          </div>
+          <div class="card-body">
+            <form id="form-add-producao" class="row g-3">
+              {% csrf_token %}
+
+              <div class="col-md-4">
+                <label for="input-itembase" class="form-label">Item Base</label>
+                <input
+                  type="text"
+                  id="input-itembase"
+                  class="form-control"
+                  placeholder="Digite código ou nome..."
+                  autocomplete="off"
+                />
+                <div
+                  id="sugestoes-itembase"
+                  class="list-group mt-2"
+                  style="display: none; max-height: 200px; overflow-y: auto"
+                ></div>
+                <input
+                  type="hidden"
+                  id="hidden-itembase-id"
+                  name="itembase_id"
+                />
+              </div>
+
+              <div class="col-md-2">
+                <label for="input-pre" class="form-label">Pré</label>
+                <input
+                  type="number"
+                  id="input-pre"
+                  name="qtde_pre"
+                  class="form-control"
+                  min="0"
+                  placeholder="0"
+                />
+              </div>
+
+              <div class="col-md-2">
+                <label for="input-usinagem" class="form-label">Usinagem</label>
+                <input
+                  type="number"
+                  id="input-usinagem"
+                  name="qtde_usi"
+                  class="form-control"
+                  min="0"
+                  placeholder="0"
+                />
+              </div>
+
+              <div class="col-md-2">
+                <label for="input-lix" class="form-label">Lixamento</label>
+                <input
+                  type="number"
+                  id="input-lix"
+                  name="qtde_lix"
+                  class="form-control"
+                  min="0"
+                  placeholder="0"
+                />
+              </div>
+
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-info w-100">
+                  <i class="bi bi-plus"></i> Adicionar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabela de itens produzidos -->
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Itens da Estrutura</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 20%">Código</th>
+                  <th style="width: 35%">Descrição</th>
+                  <th class="text-center" style="width: 10%">Pré</th>
+                  <th class="text-center" style="width: 10%">Usinagem</th>
+                  <th class="text-center" style="width: 10%">Lix</th>
+                  <th class="text-center" style="width: 15%">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="table-producao">
+                <!-- Preenchido via JavaScript -->
+              </tbody>
+            </table>
+            <div id="vazio-producao" class="alert alert-info m-3 mb-0">
+              Nenhum item produzido cadastrado ainda.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 2: ITENS COMPRADOS -->
+      <div
+        class="tab-pane fade"
+        id="bom-compra"
+        role="tabpanel"
+        aria-labelledby="tab-compra"
+      >
+        <!-- Formulário para adicionar item comprado -->
+        <div class="card mb-4 border-success">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">➕ Adicionar Item Comprado</h5>
+          </div>
+          <div class="card-body">
+            <form id="form-add-compra" class="row g-3">
+              {% csrf_token %}
+
+              <div class="col-md-5">
+                <label for="input-componente" class="form-label"
+                  >Componente</label
+                >
+                <input
+                  type="text"
+                  id="input-componente"
+                  class="form-control"
+                  placeholder="Digite código ou nome..."
+                  autocomplete="off"
+                />
+                <div
+                  id="sugestoes-componente"
+                  class="list-group mt-2"
+                  style="display: none; max-height: 200px; overflow-y: auto"
+                ></div>
+                <input
+                  type="hidden"
+                  id="hidden-componente-id"
+                  name="componente_id"
+                />
+              </div>
+
+              <div class="col-md-3">
+                <label for="input-qtde-compra" class="form-label"
+                  >Quantidade</label
+                >
+                <input
+                  type="number"
+                  id="input-qtde-compra"
+                  name="quantidade"
+                  class="form-control"
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                />
+              </div>
+
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">
+                  <i class="bi bi-plus"></i> Adicionar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabela de itens comprados -->
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Itens de Compra</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 15%">Código</th>
+                  <th style="width: 25%">Descrição</th>
+                  <th style="width: 15%">Grupo</th>
+                  <th class="text-center" style="width: 10%">Qtde</th>
+                  <th style="width: 15%">Tipo Compra</th>
+                  <th class="text-center" style="width: 10%">Prazo</th>
+                  <th class="text-center" style="width: 10%">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="table-compra">
+                <!-- Preenchido via JavaScript -->
+              </tbody>
+            </table>
+            <div id="vazio-compra" class="alert alert-info m-3 mb-0">
+              Nenhum item de compra cadastrado ainda.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-evenly my-5">
+    <a href="#" class="btn btn-lg btn-success col-3 py-3 mx-2 fs-3">Editar</a>
+    <a href="#" class="btn btn-lg btn-danger col-3 py-3 mx-2 fs-3">Excluir</a>
+    <a
+      href="{% url '_itens:item_list' %}"
+      class="btn btn-lg btn-info col-3 py-3 mx-2 fs-3"
+      >Voltar</a
+    >
+  </div>
+</section>
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    const itemId = {{ item.id }};
+
+    // ===== CARREGAR BOM AO ABRIR A PÁGINA =====
+    function loadBOM() {
+      $.ajax({
+        url: "{% url '_itens:bom_get' item.id %}",
+        type: 'GET',
+        success: function(data) {
+          // Preencher tabela de itens produzidos
+          const tableProducao = $('#table-producao');
+          tableProducao.empty();
+
+          if (data.bom_producao.length === 0) {
+            $('#vazio-producao').show();
+          } else {
+            $('#vazio-producao').hide();
+            data.bom_producao.forEach(function(est) {
+              const row = `
+                <tr>
+                  <td><strong>${est.codigo}</strong></td>
+                  <td>${est.nome}</td>
+                  <td class="text-center"><span class="badge bg-primary">${est.qtde_pre}</span></td>
+                  <td class="text-center"><span class="badge bg-success">${est.qtde_usi}</span></td>
+                  <td class="text-center"><span class="badge bg-warning">${est.qtde_lix}</span></td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-estrutura"
+                            data-estrutura-id="${est.id}">🗑️ Remover</button>
+                  </td>
+                </tr>
+              `;
+              tableProducao.append(row);
+            });
+          }
+
+          // Preencher tabela de itens comprados
+          const tableCompra = $('#table-compra');
+          tableCompra.empty();
+
+          if (data.bom_compra.length === 0) {
+            $('#vazio-compra').show();
+          } else {
+            $('#vazio-compra').hide();
+            data.bom_compra.forEach(function(comp) {
+              const tipoCompra = comp.tipo_compra === 'Mantém em Estoque'
+                ? '<span class="badge bg-info">Estoque</span>'
+                : '<span class="badge bg-warning">Demanda</span>';
+
+              const row = `
+                <tr>
+                  <td><strong>${comp.codigo}</strong></td>
+                  <td>${comp.nome}</td>
+                  <td><small class="badge bg-secondary">${comp.grupo}</small></td>
+                  <td class="text-center"><span class="badge bg-primary">${comp.quantidade}</span></td>
+                  <td>${tipoCompra}</td>
+                  <td class="text-center"><small>${comp.prazo_dias}d</small></td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger btn-remove-componente"
+                            data-componente-id="${comp.id}">🗑️ Remover</button>
+                  </td>
+                </tr>
+              `;
+              tableCompra.append(row);
+            });
+          }
+        }
+      });
+    }
+
+    // Carregar ao inicial
+    loadBOM();
+
+    // ===== ADICIONAR ITEM PRODUZIDO =====
+    $('#form-add-producao').on('submit', function(e) {
+      e.preventDefault();
+      const itembaseId = $('#hidden-itembase-id').val();
+      const qtdePre = $('#input-pre').val();
+      const qtdeUsi = $('#input-usinagem').val();
+      const qtdeLix = $('#input-lix').val();
+
+      if (!itembaseId) {
+        alert('Seleccione um item base');
+        return;
+      }
+
+      $.ajax({
+        url: "{% url '_itens:bom_add_estrutura' item.id %}",
+        type: 'POST',
+        data: {
+          csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+          itembase_id: itembaseId,
+          qtde_pre: qtdePre,
+          qtde_usi: qtdeUsi,
+          qtde_lix: qtdeLix
+        },
+        success: function(data) {
+          if (data.success) {
+            // Limpar formulário
+            $('#form-add-producao')[0].reset();
+            $('#hidden-itembase-id').val('');
+            $('#input-itembase').val('');
+            // Recarregar BOM
+            loadBOM();
+          }
+        },
+        error: function() {
+          alert('Erro ao adicionar item');
+        }
+      });
+    });
+
+    // ===== ADICIONAR ITEM COMPRADO =====
+    $('#form-add-compra').on('submit', function(e) {
+      e.preventDefault();
+      const componenteId = $('#hidden-componente-id').val();
+      const quantidade = $('#input-qtde-compra').val();
+
+      if (!componenteId) {
+        alert('Seleccione um componente');
+        return;
+      }
+
+      $.ajax({
+        url: "{% url '_itens:bom_add_componente' item.id %}",
+        type: 'POST',
+        data: {
+          csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+          componente_id: componenteId,
+          quantidade: quantidade
+        },
+        success: function(data) {
+          if (data.success) {
+            // Limpar formulário
+            $('#form-add-compra')[0].reset();
+            $('#hidden-componente-id').val('');
+            $('#input-componente').val('');
+            // Recarregar BOM
+            loadBOM();
+          }
+        },
+        error: function() {
+          alert('Erro ao adicionar componente');
+        }
+      });
+    });
+
+    // ===== REMOVER ESTRUTURA =====
+    $(document).on('click', '.btn-remove-estrutura', function() {
+      if (!confirm('Deseja remover este item da estrutura?')) return;
+
+      const estruturaId = $(this).data('estrutura-id');
+      $.ajax({
+        url: `/itens/bom/remove-estrutura/${estruturaId}/`,
+        type: 'POST',
+        data: {
+          csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(data) {
+          if (data.success) {
+            loadBOM();
+          }
+        }
+      });
+    });
+
+    // ===== REMOVER COMPONENTE =====
+    $(document).on('click', '.btn-remove-componente', function() {
+      if (!confirm('Deseja remover este componente?')) return;
+
+      const componenteId = $(this).data('componente-id');
+      $.ajax({
+        url: `/itens/bom/remove-componente/${componenteId}/`,
+        type: 'POST',
+        data: {
+          csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(data) {
+          if (data.success) {
+            loadBOM();
+          }
+        }
+      });
+    });
+
+    // ===== AUTOCOMPLETE ITEMBASE =====
+    $('#input-itembase').on('input', function() {
+      const term = $(this).val();
+      if (term.length < 2) {
+        $('#sugestoes-itembase').hide();
+        return;
+      }
+
+      $.ajax({
+        url: "{% url '_itens:busca_itembase' %}",
+        data: { q: term },
+        type: 'GET',
+        success: function(data) {
+          const sugestoes = $('#sugestoes-itembase');
+          sugestoes.empty();
+
+          data.results.forEach(function(item) {
+            const div = $(`
+              <a href="#" class="list-group-item list-group-item-action" data-id="${item.id}">
+                ${item.text}
+              </a>
+            `);
+
+            div.on('click', function(e) {
+              e.preventDefault();
+              $('#input-itembase').val(item.text);
+              $('#hidden-itembase-id').val(item.id);
+              sugestoes.hide();
+            });
+
+            sugestoes.append(div);
+          });
+
+          if (data.results.length > 0) {
+            sugestoes.show();
+          }
+        }
+      });
+    });
+
+    // ===== AUTOCOMPLETE COMPONENTE =====
+    $('#input-componente').on('input', function() {
+      const term = $(this).val();
+      if (term.length < 2) {
+        $('#sugestoes-componente').hide();
+        return;
+      }
+
+      $.ajax({
+        url: "{% url '_itens:busca_componente' %}",
+        data: { q: term },
+        type: 'GET',
+        success: function(data) {
+          const sugestoes = $('#sugestoes-componente');
+          sugestoes.empty();
+
+          data.results.forEach(function(item) {
+            const div = $(`
+              <a href="#" class="list-group-item list-group-item-action" data-id="${item.id}">
+                ${item.text}
+              </a>
+            `);
+
+            div.on('click', function(e) {
+              e.preventDefault();
+              $('#input-componente').val(item.text);
+              $('#hidden-componente-id').val(item.id);
+              sugestoes.hide();
+            });
+
+            sugestoes.append(div);
+          });
+
+          if (data.results.length > 0) {
+            sugestoes.show();
+          }
+        }
+      });
+    });
+
+    // Esconder sugestões ao clicar fora
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#input-itembase, #sugestoes-itembase').length) {
+        $('#sugestoes-itembase').hide();
+      }
+      if (!$(e.target).closest('#input-componente, #sugestoes-componente').length) {
+        $('#sugestoes-componente').hide();
+      }
+    });
+  });
+</script>
+{% endblock scripts %} {% endblock content %}

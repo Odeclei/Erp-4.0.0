@@ -6,7 +6,7 @@ from clientes.views import PER_PAGE
 from pedidos.models import Pedidos, ItemPedido
 from pedidos.forms import PedidoForm, ItemPedidoForm
 from clientes.models import Clientes
-from cad_item.models import Item, Finish
+from _itens.models import ItemAcabado as Item, Finish
 from utility.views import gerar_zpl_etiqueta
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import transaction

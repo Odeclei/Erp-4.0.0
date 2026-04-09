@@ -1,6 +1,5 @@
 # Flake8: noqa
 
-import json
 import os
 
 from django.contrib.messages import constants as messages
@@ -53,7 +52,7 @@ INSTALLED_APPS = [
     "_resources",
     "_transactions",
     "rule",
-    "cad_item",
+    # "cad_item",  # Removido - migrado para _itens
     "apont",
     "desempenho",
     "site_setup",

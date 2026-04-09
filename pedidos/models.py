@@ -2,7 +2,7 @@ from enum import auto
 from django.db import models
 
 # Create your models here.
-from cad_item.models import Finish, Item
+from _itens.models import Finish, ItemAcabado as Item
 from clientes.models import Clientes
 
 

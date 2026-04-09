@@ -17,9 +17,10 @@ from apont.models import RegistroApontamento, Stops
 from desempenho.models import (
     IndicadorDesempenho,
     ResumoDesempenhoSetor,
-    ResumoDesempenhoGrupo
+    ResumoDesempenhoGrupo,
 )
 from rule.models import Machines, Sectors, Group, Turno
+from _itens.models import Estrutura
 
 
 class DesempenhoService:
@@ -27,9 +28,79 @@ class DesempenhoService:
 
     # Padrão: 60 peças/hora (ajustar conforme necessário)
     VELOCIDADE_PRODUCAO_PADRAO = 60.0  # peças/hora
+    HORAS_TURNO_PADRAO = 9.0  # 9 horas padrão
 
     @staticmethod
-    def calcular_indicadores_maquina(machine: Machines, data: date) -> IndicadorDesempenho:
+    def _obter_velocidade_producao(apontamento: RegistroApontamento) -> float:
+        """
+        Calcula a velocidade de produção esperada para um apontamento específico.
+        
+        Se o apontamento é de um subproduto (sub-peça):
+        - Busca o item acabado relacionado
+        - Encontra a quantidade de sub-peças necessárias
+        - Calcula: (qtd_item_dia × qtd_subpeça) / 9 horas
+        
+        Se não tiver subproduto, usa velocidade padrão.
+        
+        Args:
+            apontamento: RegistroApontamento com dados a processar
+            
+        Returns:
+            float: Velocidade em peças/hora
+            
+        Exemplo:
+            Item: Sapato, 100/dia (100/9 = 11.11 pc/hr)
+            SubPeça: Pé Traseiro, 2 por Sapato
+            Velocidade Pé = (100 × 2) / 9 = 22.22 pc/hr
+        """
+        try:
+            # Se não tem subproduto, usa padrão
+            if not apontamento.subproduto:
+                return DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
+            
+            # Obter informações do subproduto
+            sub_item_prog = apontamento.subproduto  # SubItemProgramacao
+            item_prog = sub_item_prog.produto_programado  # ItemProgramacao
+            item_acabado = item_prog.item  # ItemAcabado
+            
+            # Obter a quantidade diária do item acabado
+            qtd_item_dia = item_acabado.qtd_per_day
+            if not qtd_item_dia or qtd_item_dia <= 0:
+                return DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
+            
+            # Procurar a relação de quantidade na tabela Estrutura
+            # (quantas sub-peças são necessárias por item acabado)
+            try:
+                estrutura = Estrutura.objects.get(
+                    item=item_acabado,
+                    subitem=sub_item_prog.subproduto
+                )
+                
+                # Determinar qual fase está sendo executada (pré, usinagem ou lixamento)
+                # Usar a quantidade apropriada da fase
+                qntde_subpeca = estrutura.qntde_usi  # padrão: usinagem
+                
+                if not qntde_subpeca or qntde_subpeca <= 0:
+                    return DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
+                
+                # Calcular: quantidade de subpeças por dia / 9 horas
+                qtd_subpeca_dia = qtd_item_dia * qntde_subpeca
+                velocidade = qtd_subpeca_dia / DesempenhoService.HORAS_TURNO_PADRAO
+                
+                return velocidade
+                
+            except Estrutura.DoesNotExist:
+                # Se não encontrar relação, usa padrão
+                return DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
+                
+        except Exception:
+            # Em caso de erro, retorna padrão
+            return DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
+
+    @staticmethod
+    def calcular_indicadores_maquina(
+        machine: Machines, data: date
+    ) -> IndicadorDesempenho:
         """
         Calcula todos os indicadores (Disponibilidade, Performance, Qualidade, OEE) para uma máquina em um dia
 
@@ -42,16 +113,11 @@ class DesempenhoService:
         """
         # Obter todos os apontamentos do dia
         apontamentos = RegistroApontamento.objects.filter(
-            machine=machine,
-            data=data,
-            status="concluido"
+            machine=machine, data=data, status="concluido"
         )
 
         # Obter todas as paradas do dia
-        paradas = Stops.objects.filter(
-            machine=machine,
-            date__date=data
-        )
+        paradas = Stops.objects.filter(machine=machine, date__date=data)
 
         # Calcular tempo disponível do turno
         tempo_total_minutos = DesempenhoService._calcular_tempo_turno(machine, data)
@@ -60,27 +126,56 @@ class DesempenhoService:
         tempo_parado_segundos = paradas.aggregate(Sum("duration"))["duration__sum"] or 0
         tempo_parado_minutos = tempo_parado_segundos / 60
         tempo_funcional_minutos = tempo_total_minutos - tempo_parado_minutos
-        disponibilidade = (tempo_funcional_minutos / tempo_total_minutos * 100) if tempo_total_minutos > 0 else 0
+        disponibilidade = (
+            (tempo_funcional_minutos / tempo_total_minutos * 100)
+            if tempo_total_minutos > 0
+            else 0
+        )
 
         # 2. PERFORMANCE (Quantidade produzida / Quantidade teórica esperada)
-        tempo_producao_minutos = apontamentos.aggregate(
-            Sum("get_tempo_producao_minutos")
-        )["get_tempo_producao_minutos__sum"] or 0
-
-        qtde_produzida = apontamentos.aggregate(Sum("qtde_produzida_boa"))["qtde_produzida_boa__sum"] or 0
-        qtde_programada = apontamentos.aggregate(Sum("qtde_programada"))["qtde_programada__sum"] or 0
-
-        # Quantidade teórica = tempo de produção real × velocidade padrão
-        horas_producao = tempo_producao_minutos / 60
-        qtde_teorica = horas_producao * DesempenhoService.VELOCIDADE_PRODUCAO_PADRAO
-        performance = (qtde_produzida / qtde_teorica * 100) if qtde_teorica > 0 else 0
+        # Calcular performance de forma precisa iterando por cada apontamento
+        # Para considerar a velocidade específica de cada subproduto
+        qtde_produzida_total = 0
+        qtde_teorica_total = 0
+        qtde_programada_total = 0
+        tempo_producao_minutos_total = 0
+        
+        for apontamento in apontamentos:
+            # Obter quantidade produzida deste apontamento
+            qtde_boa = apontamento.qtde_produzida_boa or 0
+            qtde_produzida_total += qtde_boa
+            
+            # Obter quantidade programada
+            qtde_programada_total += apontamento.qtde_programada or 0
+            
+            # Obter tempo de produção deste apontamento em horas
+            tempo_producao_min = apontamento.get_tempo_producao_minutos()
+            tempo_producao_minutos_total += tempo_producao_min or 0
+            tempo_producao_hrs = tempo_producao_min / 60.0 if tempo_producao_min else 0
+            
+            # Obter velocidade de produção esperada para este apontamento
+            velocidade = DesempenhoService._obter_velocidade_producao(apontamento)
+            
+            # Calcular quantidade teórica para este apontamento
+            qtde_teorica = tempo_producao_hrs * velocidade
+            qtde_teorica_total += qtde_teorica
+        
+        performance = (
+            (qtde_produzida_total / qtde_teorica_total * 100)
+            if qtde_teorica_total > 0
+            else 0
+        )
 
         # 3. QUALIDADE (Peças boas / Total de peças)
-        qtde_refugo = apontamentos.aggregate(Sum("qtde_refugo"))["qtde_refugo__sum"] or 0
-        qtde_retrabalho = apontamentos.aggregate(Sum("qtde_retrabalho"))["qtde_retrabalho__sum"] or 0
-        qtde_total = qtde_produzida + qtde_refugo + qtde_retrabalho
+        qtde_refugo = (
+            apontamentos.aggregate(Sum("qtde_refugo"))["qtde_refugo__sum"] or 0
+        )
+        qtde_retrabalho = (
+            apontamentos.aggregate(Sum("qtde_retrabalho"))["qtde_retrabalho__sum"] or 0
+        )
+        qtde_total = qtde_produzida_total + qtde_refugo + qtde_retrabalho
 
-        qualidade = (qtde_produzida / qtde_total * 100) if qtde_total > 0 else 0
+        qualidade = (qtde_produzida_total / qtde_total * 100) if qtde_total > 0 else 0
 
         # 4. OEE
         oee = (disponibilidade / 100) * (performance / 100) * (qualidade / 100) * 100
@@ -96,13 +191,13 @@ class DesempenhoService:
                 "oee": round(oee, 2),
                 "tempo_total_disponivel_minutos": tempo_total_minutos,
                 "tempo_parado_minutos": tempo_parado_minutos,
-                "tempo_producao_minutos": tempo_producao_minutos,
-                "qtde_programada": qtde_programada,
-                "qtde_produzida": qtde_produzida,
+                "tempo_producao_minutos": tempo_producao_minutos_total,
+                "qtde_programada": qtde_programada_total,
+                "qtde_produzida": qtde_produzida_total,
                 "qtde_refugo": qtde_refugo,
                 "qtde_retrabalho": qtde_retrabalho,
-                "calculado_por": "sistema"
-            }
+                "calculado_por": "sistema",
+            },
         )
 
         return indicador
@@ -140,15 +235,11 @@ class DesempenhoService:
             ResumoDesempenhoSetor com médias agregadas
         """
         # Obter todas as máquinas do setor
-        maquinas = Machines.objects.filter(
-            workStation__sector=setor,
-            active=True
-        )
+        maquinas = Machines.objects.filter(workStation__sector=setor, active=True)
 
         # Obter indicadores de todas as máquinas do setor para a data
         indicadores = IndicadorDesempenho.objects.filter(
-            machine__in=maquinas,
-            data=data
+            machine__in=maquinas, data=data
         )
 
         if not indicadores.exists():
@@ -156,8 +247,7 @@ class DesempenhoService:
             for machine in maquinas:
                 DesempenhoService.calcular_indicadores_maquina(machine, data)
             indicadores = IndicadorDesempenho.objects.filter(
-                machine__in=maquinas,
-                data=data
+                machine__in=maquinas, data=data
             )
 
         # Calcular médias
@@ -168,7 +258,7 @@ class DesempenhoService:
             oee_media=Avg("oee"),
             qtde_total=Count("id"),
             qtde_produzida=Sum("qtde_produzida"),
-            qtde_programada=Sum("qtde_programada")
+            qtde_programada=Sum("qtde_programada"),
         )
 
         resumo, created = ResumoDesempenhoSetor.objects.update_or_create(
@@ -182,7 +272,7 @@ class DesempenhoService:
                 "qtde_maquinas": stats["qtde_total"] or 0,
                 "qtde_programada_total": stats["qtde_programada"] or 0,
                 "qtde_produzida_total": stats["qtde_produzida"] or 0,
-            }
+            },
         )
 
         return resumo
@@ -221,16 +311,20 @@ class DesempenhoService:
                     "qtde_maquinas": 0,
                     "qtde_setores": 0,
                     "qtde_produzida_total": 0,
-                }
+                },
             )
             return resumo
 
         # Calcular médias dos resumos dos setores
         stats = {
-            "disp_media": sum(r.disponibilidade_media for r in resumos_setores) / len(resumos_setores),
-            "perf_media": sum(r.performance_media for r in resumos_setores) / len(resumos_setores),
-            "qual_media": sum(r.qualidade_media for r in resumos_setores) / len(resumos_setores),
-            "oee_media": sum(r.oee_media for r in resumos_setores) / len(resumos_setores),
+            "disp_media": sum(r.disponibilidade_media for r in resumos_setores)
+            / len(resumos_setores),
+            "perf_media": sum(r.performance_media for r in resumos_setores)
+            / len(resumos_setores),
+            "qual_media": sum(r.qualidade_media for r in resumos_setores)
+            / len(resumos_setores),
+            "oee_media": sum(r.oee_media for r in resumos_setores)
+            / len(resumos_setores),
             "qtde_maquinas": sum(r.qtde_maquinas for r in resumos_setores),
             "qtde_setores": len(resumos_setores),
             "qtde_produzida": sum(r.qtde_produzida_total for r in resumos_setores),
@@ -247,7 +341,7 @@ class DesempenhoService:
                 "qtde_maquinas": stats["qtde_maquinas"],
                 "qtde_setores": stats["qtde_setores"],
                 "qtde_produzida_total": stats["qtde_produzida"],
-            }
+            },
         )
 
         return resumo
@@ -286,8 +380,7 @@ class DesempenhoService:
         """
         data_inicio = date.today() - timedelta(days=dias)
         indicadores = IndicadorDesempenho.objects.filter(
-            machine=machine,
-            data__gte=data_inicio
+            machine=machine, data__gte=data_inicio
         ).order_by("data")
 
         return {
@@ -301,7 +394,7 @@ class DesempenhoService:
                     "qualidade": ind.qualidade,
                 }
                 for ind in indicadores
-            ]
+            ],
         }
 
     @staticmethod
@@ -317,8 +410,7 @@ class DesempenhoService:
             List de IndicadorDesempenho ordenado por OEE descendente
         """
         return list(
-            IndicadorDesempenho.objects.filter(data=data)
-            .order_by("-oee")[:limite]
+            IndicadorDesempenho.objects.filter(data=data).order_by("-oee")[:limite]
         )
 
     @staticmethod
@@ -334,8 +426,7 @@ class DesempenhoService:
             List de IndicadorDesempenho ordenado por OEE ascendente
         """
         return list(
-            IndicadorDesempenho.objects.filter(data=data)
-            .order_by("oee")[:limite]
+            IndicadorDesempenho.objects.filter(data=data).order_by("oee")[:limite]
         )
 
     @staticmethod
@@ -360,15 +451,15 @@ class DesempenhoService:
         for turno in turnos:
             if turno.hora_inicio and turno.hora_fim:
                 tempo_turno = (
-                    datetime.combine(date.today(), turno.hora_fim) -
-                    datetime.combine(date.today(), turno.hora_inicio)
+                    datetime.combine(date.today(), turno.hora_fim)
+                    - datetime.combine(date.today(), turno.hora_inicio)
                 ).total_seconds() / 60
 
                 # Subtrair almoço se configurado
                 if turno.hora_inicio_almoco and turno.hora_fim_almoco:
                     tempo_almoco = (
-                        datetime.combine(date.today(), turno.hora_fim_almoco) -
-                        datetime.combine(date.today(), turno.hora_inicio_almoco)
+                        datetime.combine(date.today(), turno.hora_fim_almoco)
+                        - datetime.combine(date.today(), turno.hora_inicio_almoco)
                     ).total_seconds() / 60
                     tempo_turno -= tempo_almoco
 

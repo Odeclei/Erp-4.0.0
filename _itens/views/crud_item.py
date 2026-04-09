@@ -160,7 +160,10 @@ class GetBomAbaView(View):
             item = ItemAcabado.objects.get(pk=item_id)
 
             # Itens produzidos
-            estruturas = Estrutura.objects.filter(item=item).select_related("subitem")
+            estruturas = Estrutura.objects.filter(
+                item=item,
+                subitem__isnull=False  # Filtrar apenas estruturas com subitem válido
+            ).select_related("subitem")
             for est in estruturas:
                 bom_producao.append(
                     {
@@ -176,7 +179,8 @@ class GetBomAbaView(View):
 
             # Itens comprados
             componentes = ComponenteProgramacao.objects.filter(
-                item_acabado=item
+                item_acabado=item,
+                componente__isnull=False  # Filtrar apenas componentes válidos
             ).select_related("componente")
             for comp in componentes:
                 bom_compra.append(

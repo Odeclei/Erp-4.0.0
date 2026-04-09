@@ -1,14 +1,15 @@
-from django.shortcuts import render
-from django.db.models import Prefetch
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET, require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 import json
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView
+from django.db.models import Prefetch
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
+from django.views.generic import CreateView, ListView, UpdateView
+
 from .models import Group, Sectors, WorkStation
 
 
@@ -61,7 +62,7 @@ class SetorCreateView(LoginRequiredMixin, CreateView):
 class SetorUpdateView(LoginRequiredMixin, UpdateView):
     model = Sectors
     template_name = "rule/sector/sector_form.html"
-    fieds = "__all__"
+    fields = "__all__"
     success_url = reverse_lazy("rule:setores_list")
 
 
